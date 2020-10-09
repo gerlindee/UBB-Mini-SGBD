@@ -12,17 +12,17 @@ namespace ClientApp
     {
         public Client()
         {
-            ClientSocket = new TcpClient();
+            tcpClient = new TcpClient();
         }
 
         public void Connect()
         {
-            ClientSocket.Connect(TCPConfigs.IP, TCPConfigs.Port);
+            tcpClient.Connect(TCPConfigs.IP, TCPConfigs.Port);
         }
 
         public bool IsDataAvailable()
         {
-            return ClientSocket.Available > 0;
+            return tcpClient.Available > 0;
         }
     }
 }

@@ -9,14 +9,11 @@ namespace TCPObserver
 {
     public abstract class IObserver
     {
-        protected TcpClient ClientSocket
-        {
-            get; set;
-        }
+        protected TcpClient tcpClient;
 
         public void WriteToConnection(string Message)
         {
-            var Stream = ClientSocket.GetStream();
+            var Stream = tcpClient.GetStream();
             var SentContent = Encoding.ASCII.GetBytes(Message.Trim() + TCPConfigs.Delimiter);
             Stream.Write(SentContent, 0, SentContent.Length);
             Stream.Flush();
@@ -25,7 +22,7 @@ namespace TCPObserver
         public string ReadFromConnection()
         {
             var ReceivedContent = new byte[TCPConfigs.MessageLength];
-            ClientSocket.GetStream().Read(ReceivedContent, 0, ClientSocket.ReceiveBufferSize);
+            tcpClient.GetStream().Read(ReceivedContent, 0, tcpClient.ReceiveBufferSize);
             return Encoding.ASCII.GetString(ReceivedContent).Split(TCPConfigs.Delimiter)[0].Trim();
         }
 
@@ -33,16 +30,16 @@ namespace TCPObserver
 
     public abstract class Observable
     {
-        private List<IObserver> Observers = new List<IObserver>();
+        private List<IObserver> observers = new List<IObserver>();
 
-        public void AddObserver(IObserver observer)
+        public void Subscribe(IObserver observer)
         {
-            Observers.Add(observer);
+            observers.Add(observer);
         }
 
-        public void RemoveObserver(IObserver observer)
+        public void Unsubscribe(IObserver observer)
         {
-            Observers.Remove(observer);
+            observers.Remove(observer);
         }
 
 

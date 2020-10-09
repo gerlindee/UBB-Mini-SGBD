@@ -10,17 +10,27 @@ namespace ServerApp
 {
     class Session : IObserver
     {
-        private int SessionID;
+        private readonly int sessionID;
 
         public int getSessionID()
         {
-            return SessionID;
+            return sessionID;
         }
 
-        public Session(int sessionID, TcpClient clientSocket)
+        public Session(int ID, TcpClient clientSocket)
         {
-            SessionID = sessionID;
-            ClientSocket = clientSocket;
+            sessionID = ID;
+            tcpClient = clientSocket;
+        }
+
+        public void DisplayClientRequest(string query)
+        {
+            Console.WriteLine("Client " + sessionID + ": " + query);
+        }
+
+        public void HandleClientRequest(string command, string attributes)
+        {
+
         }
     }
 }

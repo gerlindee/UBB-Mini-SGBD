@@ -1,4 +1,5 @@
-﻿using System;
+﻿using miniSGBD;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -12,19 +13,19 @@ namespace ClientApp
 {
     public partial class TestForm : Form
     {
-        private Client Client; 
+        private readonly Client tcpClient; 
 
         public TestForm(Client client)
         {
-            Client = client;
-            Client.Connect();
+            tcpClient = client;
+            tcpClient.Connect();
             InitializeComponent();
         }
 
         private void button_db_name_Click(object sender, EventArgs e)
         {
-            string Message = text_db_name.Text;
-            Client.WriteToConnection(Message);
+            string databaseName = text_db_name.Text;
+            tcpClient.WriteToConnection(Commands.CREATE_DATABASE + databaseName);
         }
     }
 }

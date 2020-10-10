@@ -26,6 +26,10 @@ namespace ClientApp
         private void button_db_name_Click(object sender, EventArgs e)
         {
             tcpClient.Write(Commands.CREATE_DATABASE + ";" + text_db_name.Text);
+
+            string message = Commands.MapResponseToMessage(tcpClient.ReadFromServer());
+            string caption = "Query Execution Result";
+            MessageBox.Show(message, caption, MessageBoxButtons.OK);
         }
     }
 }

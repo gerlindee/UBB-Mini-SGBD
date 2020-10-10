@@ -49,7 +49,8 @@ namespace ServerApp
                         {
                             var clientRequest = clientSession.Read();
                             clientSession.DisplayClientRequest(clientRequest);
-                            clientSession.HandleClientRequest(clientRequest);
+                            var response = clientSession.HandleClientRequest(clientRequest);
+                            clientSession.Write(response);
                         }
                         catch (Exception)
                         {

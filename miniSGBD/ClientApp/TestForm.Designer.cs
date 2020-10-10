@@ -34,6 +34,7 @@
             this.button_db_delete = new System.Windows.Forms.Button();
             this.button_db_show_all = new System.Windows.Forms.Button();
             this.button_db_show_all_tables = new System.Windows.Forms.Button();
+            this.button_db_create_table_nav = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label_db_name
@@ -98,12 +99,24 @@
             this.button_db_show_all_tables.UseVisualStyleBackColor = true;
             this.button_db_show_all_tables.Click += new System.EventHandler(this.button_db_show_all_tables_Click);
             // 
+            // button_db_create_table_nav
+            // 
+            this.button_db_create_table_nav.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button_db_create_table_nav.Location = new System.Drawing.Point(231, 327);
+            this.button_db_create_table_nav.Name = "button_db_create_table_nav";
+            this.button_db_create_table_nav.Size = new System.Drawing.Size(276, 31);
+            this.button_db_create_table_nav.TabIndex = 7;
+            this.button_db_create_table_nav.Text = "Create a Table";
+            this.button_db_create_table_nav.UseVisualStyleBackColor = true;
+            this.button_db_create_table_nav.Click += new System.EventHandler(this.button_db_create_table_nav_Click);
+            // 
             // TestForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.button_db_create_table_nav);
             this.Controls.Add(this.button_db_show_all_tables);
             this.Controls.Add(this.button_db_show_all);
             this.Controls.Add(this.button_db_delete);
@@ -125,6 +138,7 @@
         private System.Windows.Forms.Button button_db_delete;
         private System.Windows.Forms.Button button_db_show_all;
         private System.Windows.Forms.Button button_db_show_all_tables;
+        private System.Windows.Forms.Button button_db_create_table_nav;
     }
 }
 

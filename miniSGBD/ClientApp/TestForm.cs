@@ -73,5 +73,11 @@ namespace ClientApp
         {
             // TODO: after create table is done   
         }
+
+        private void button_db_create_table_nav_Click(object sender, EventArgs e)
+        {
+            var createTableForm = new TestFormTables(text_db_name.Text, tcpClient);
+            createTableForm.Show();
+        }
     }
 }

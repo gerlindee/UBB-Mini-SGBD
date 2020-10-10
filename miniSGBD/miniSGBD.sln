@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30523.141
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TCPObserver", "TCPObserver\TCPObserver.csproj", "{52C6D27B-C1F9-42B9-8DE6-70C67F87E49A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utils", "TCPObserver\Utils.csproj", "{52C6D27B-C1F9-42B9-8DE6-70C67F87E49A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientApp", "ClientApp\ClientApp.csproj", "{440E8623-DC63-4775-8618-A95EEC4EACC4}"
 EndProject

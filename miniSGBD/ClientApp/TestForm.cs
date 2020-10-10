@@ -1,4 +1,5 @@
-﻿using System;
+﻿using miniSGBD;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -7,24 +8,28 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Utils;
 
 namespace ClientApp
 {
     public partial class TestForm : Form
     {
-        private Client Client; 
+        private readonly Client tcpClient; 
 
         public TestForm(Client client)
         {
-            Client = client;
-            Client.Connect();
+            tcpClient = client;
+            tcpClient.Connect();
             InitializeComponent();
         }
 
         private void button_db_name_Click(object sender, EventArgs e)
         {
-            string Message = text_db_name.Text;
-            Client.WriteToConnection(Message);
+            tcpClient.Write(Commands.CREATE_DATABASE + ";" + text_db_name.Text);
+
+            string message = Commands.MapResponseToMessage(tcpClient.ReadFromServer());
+            string caption = "Query Execution Result";
+            MessageBox.Show(message, caption, MessageBoxButtons.OK);
         }
     }
 }

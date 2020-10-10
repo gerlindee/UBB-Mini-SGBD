@@ -5,44 +5,42 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TCPObserver
+namespace Utils
 {
     public abstract class IObserver
     {
-        protected TcpClient ClientSocket
+        protected TcpClient tcpClient;
+
+        public void Write(string Message)
         {
-            get; set;
+            var stream = tcpClient.GetStream();
+            var toSend = Encoding.ASCII.GetBytes(Message.Trim() + TCPConfigs.Delimiter);
+            stream.Write(toSend, 0, toSend.Length);
+            stream.Flush();
         }
 
-        public void WriteToConnection(string Message)
+        public string Read()
         {
-            var Stream = ClientSocket.GetStream();
-            var SentContent = Encoding.ASCII.GetBytes(Message.Trim() + TCPConfigs.Delimiter);
-            Stream.Write(SentContent, 0, SentContent.Length);
-            Stream.Flush();
-        }
-
-        public string ReadFromConnection()
-        {
-            var ReceivedContent = new byte[TCPConfigs.MessageLength];
-            ClientSocket.GetStream().Read(ReceivedContent, 0, ClientSocket.ReceiveBufferSize);
-            return Encoding.ASCII.GetString(ReceivedContent).Split(TCPConfigs.Delimiter)[0].Trim();
+            var stream = tcpClient.GetStream();
+            var toReceive = new byte[TCPConfigs.MessageLength];
+            stream.Read(toReceive, 0, tcpClient.ReceiveBufferSize);
+            return Encoding.ASCII.GetString(toReceive).Split(TCPConfigs.Delimiter)[0];
         }
 
     }
 
     public abstract class Observable
     {
-        private List<IObserver> Observers = new List<IObserver>();
+        private List<IObserver> observers = new List<IObserver>();
 
-        public void AddObserver(IObserver observer)
+        public void Subscribe(IObserver observer)
         {
-            Observers.Add(observer);
+            observers.Add(observer);
         }
 
-        public void RemoveObserver(IObserver observer)
+        public void Unsubscribe(IObserver observer)
         {
-            Observers.Remove(observer);
+            observers.Remove(observer);
         }
 
 

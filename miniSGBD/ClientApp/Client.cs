@@ -3,26 +3,43 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using TCPObserver; 
+using Utils; 
 
 namespace ClientApp
 {
-    public class Client:IObserver
+    public class Client : IObserver
     {
         public Client()
         {
-            ClientSocket = new TcpClient();
+            tcpClient = new TcpClient();
         }
 
         public void Connect()
         {
-            ClientSocket.Connect(TCPConfigs.IP, TCPConfigs.Port);
+            tcpClient.Connect(TCPConfigs.IP, TCPConfigs.Port);
         }
 
         public bool IsDataAvailable()
         {
-            return ClientSocket.Available > 0;
+            return tcpClient.Available > 0;
+        }
+
+        public string ReadFromServer()
+        {
+            var stream = tcpClient.GetStream();
+            stream.ReadTimeout = stream.WriteTimeout = 50000;
+            var response = "";
+            try
+            {
+                response = Read();
+            } catch (Exception)
+            {
+                Thread.Sleep(TimeSpan.FromSeconds(10));
+                ReadFromServer();
+            }
+            return response;
         }
     }
 }

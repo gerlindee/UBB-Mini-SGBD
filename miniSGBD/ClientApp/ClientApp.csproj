@@ -47,7 +47,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Client.cs" />
-    <Compile Include="Commands.cs" />
     <Compile Include="TestForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -82,9 +81,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TCPObserver\TCPObserver.csproj">
+    <ProjectReference Include="..\TCPObserver\Utils.csproj">
       <Project>{52c6d27b-c1f9-42b9-8de6-70c67f87e49a}</Project>
-      <Name>TCPObserver</Name>
+      <Name>Utils</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

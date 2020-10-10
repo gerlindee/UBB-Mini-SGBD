@@ -4,11 +4,11 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
-using TCPObserver; 
+using Utils; 
 
 namespace ClientApp
 {
-    public class Client:IObserver
+    public class Client : IObserver
     {
         public Client()
         {

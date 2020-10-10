@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
-using TCPObserver;
+using Utils;
 
 namespace ServerApp
 {
@@ -23,9 +23,9 @@ namespace ServerApp
             tcpClient = clientSocket;
         }
 
-        public void DisplayClientRequest(string query)
+        public void DisplayClientRequest(string command, string attributes)
         {
-            Console.WriteLine("Client " + sessionID + ": " + query);
+            Console.WriteLine("Client " + sessionID + ": " + command + " with attributes " + attributes);
         }
 
         public void HandleClientRequest(string command, string attributes)

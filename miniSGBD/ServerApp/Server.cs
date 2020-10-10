@@ -5,7 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
-using TCPObserver;
+using Utils;
 
 namespace ServerApp
 {
@@ -37,9 +37,9 @@ namespace ServerApp
                             var clientStream = tcpClient.GetStream();
                             var requestReceived = new byte[TCPConfigs.MessageLength];
                             clientStream.Read(requestReceived, 0, tcpClient.ReceiveBufferSize);
-                            var clientQuery = Encoding.ASCII.GetString(requestReceived).Split(TCPConfigs.Delimiter);
+                            var clientQuery = Encoding.ASCII.GetString(requestReceived).Split(TCPConfigs.Delimiter)[0].Split(';');
 
-                            clientSession.DisplayClientRequest(clientQuery[0].Trim() + ";" + clientQuery[1].Trim());
+                            clientSession.DisplayClientRequest(clientQuery[0].Trim(), clientQuery[1].Trim());
                             clientSession.HandleClientRequest(clientQuery[0].Trim(), clientQuery[1].Trim());
 
                         }

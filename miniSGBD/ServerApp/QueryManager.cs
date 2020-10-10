@@ -14,8 +14,14 @@ namespace ServerApp
         {
             var clientQuerySplit = clientQuery.Split(';');
             var executionResponse = "";
-            if (clientQuerySplit[0] == Commands.CREATE_DATABASE)
-                executionResponse = new CreateDatabaseQuery(clientQuerySplit[1]).Execute();
+            switch (clientQuerySplit[0])
+            {
+                case Commands.CREATE_DATABASE:
+                    {
+                        executionResponse = new CreateDatabaseQuery(clientQuerySplit[1]).Execute();
+                    }
+                    break;
+            }   
             return executionResponse;
         }
     }

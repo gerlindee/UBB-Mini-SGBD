@@ -25,8 +25,7 @@ namespace ClientApp
 
         private void button_db_name_Click(object sender, EventArgs e)
         {
-            string databaseName = text_db_name.Text;
-            tcpClient.WriteToConnection(Commands.CREATE_DATABASE + databaseName);
+            tcpClient.Write(Commands.CREATE_DATABASE + ";" + text_db_name.Text);
         }
     }
 }

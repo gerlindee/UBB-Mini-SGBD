@@ -9,8 +9,8 @@ namespace Utils
     public static class Commands
     {
         // Database Commands
-        public const string CREATE_DATABASE = "CREATE_DATABASE;";
-        public const string DROP_DATABASE = "DROP_DATABASE;";
+        public const string CREATE_DATABASE = "CREATE_DATABASE";
+        public const string DROP_DATABASE = "DROP_DATABASE";
 
         // Table Commands
         public const string CREATE_TABLE = "CREATE_TABLE";

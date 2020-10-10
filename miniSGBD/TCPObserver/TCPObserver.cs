@@ -11,19 +11,20 @@ namespace Utils
     {
         protected TcpClient tcpClient;
 
-        public void WriteToConnection(string Message)
+        public void Write(string Message)
         {
-            var Stream = tcpClient.GetStream();
-            var SentContent = Encoding.ASCII.GetBytes(Message.Trim() + TCPConfigs.Delimiter);
-            Stream.Write(SentContent, 0, SentContent.Length);
-            Stream.Flush();
+            var stream = tcpClient.GetStream();
+            var toSend = Encoding.ASCII.GetBytes(Message.Trim() + TCPConfigs.Delimiter);
+            stream.Write(toSend, 0, toSend.Length);
+            stream.Flush();
         }
 
-        public string ReadFromConnection()
+        public string Read()
         {
-            var ReceivedContent = new byte[TCPConfigs.MessageLength];
-            tcpClient.GetStream().Read(ReceivedContent, 0, tcpClient.ReceiveBufferSize);
-            return Encoding.ASCII.GetString(ReceivedContent).Split(TCPConfigs.Delimiter)[0].Trim();
+            var stream = tcpClient.GetStream();
+            var toReceive = new byte[TCPConfigs.MessageLength];
+            stream.Read(toReceive, 0, tcpClient.ReceiveBufferSize);
+            return Encoding.ASCII.GetString(toReceive).Split(TCPConfigs.Delimiter)[0];
         }
 
     }

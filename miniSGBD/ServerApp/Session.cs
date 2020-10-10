@@ -23,12 +23,27 @@ namespace ServerApp
             tcpClient = clientSocket;
         }
 
-        public void DisplayClientRequest(string command, string attributes)
+        public void DisplayClientRequest(string request)
         {
-            Console.WriteLine("Client " + sessionID + ": " + command + " with attributes " + attributes);
+            Console.WriteLine(request);
+            var requestSplit = request.Split(';');
+            Console.WriteLine("Client " + sessionID + ": ");
+            int attributeIdx = 0;
+            while (attributeIdx < requestSplit.Length)
+            {
+                if (attributeIdx == 0)
+                {
+                    Console.WriteLine("\t" + "Command: " + requestSplit[attributeIdx]);
+                } 
+                else
+                {
+                    Console.WriteLine("\t" + "Attribute: " + requestSplit[attributeIdx]);
+                }
+                attributeIdx++;
+            }
         }
 
-        public void HandleClientRequest(string command, string attributes)
+        public void HandleClientRequest()
         {
 
         }

@@ -34,13 +34,8 @@ namespace ServerApp
                     {
                         try
                         {
-                            var clientStream = tcpClient.GetStream();
-                            var requestReceived = new byte[TCPConfigs.MessageLength];
-                            clientStream.Read(requestReceived, 0, tcpClient.ReceiveBufferSize);
-                            var clientQuery = Encoding.ASCII.GetString(requestReceived).Split(TCPConfigs.Delimiter)[0].Split(';');
-
-                            clientSession.DisplayClientRequest(clientQuery[0].Trim(), clientQuery[1].Trim());
-                            clientSession.HandleClientRequest(clientQuery[0].Trim(), clientQuery[1].Trim());
+                            var clientRequest = clientSession.Read();
+                            clientSession.DisplayClientRequest(clientRequest);
 
                         }
                         catch (Exception)

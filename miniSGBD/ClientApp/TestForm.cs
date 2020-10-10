@@ -25,10 +25,31 @@ namespace ClientApp
 
         private void button_db_name_Click(object sender, EventArgs e)
         {
-            tcpClient.Write(Commands.CREATE_DATABASE + ";" + text_db_name.Text);
+            DatabaseAction(Commands.CREATE_DATABASE);
+        }
 
-            string message = Commands.MapResponseToMessage(tcpClient.ReadFromServer());
-            string caption = "Query Execution Result";
+        private void button_db_delete_Click(object sender, EventArgs e)
+        {
+            DatabaseAction(Commands.DROP_DATABASE);
+        }
+
+        private void DatabaseAction(string action)
+        {
+            var databaseName = text_db_name.Text;
+            string message;
+            string caption;
+
+            if (databaseName == "")
+            {
+                message = "Database name cannot be empty!";
+                caption = "Validation Error";
+            }
+            else
+            {
+                tcpClient.Write(action + ";" + databaseName);
+                message = Responses.MapResponseToMessage(tcpClient.ReadFromServer());
+                caption = "Query Execution Result";
+            }
             MessageBox.Show(message, caption, MessageBoxButtons.OK);
         }
     }

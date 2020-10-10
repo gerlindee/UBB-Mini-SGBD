@@ -10,12 +10,12 @@ using Utils;
 
 namespace ServerApp.Queries
 {
-    public class CreateDatabaseQuery : AbstractQuery
+    class DropDatabaseQuery : AbstractQuery
     {
-        private string DatabaseName; 
-        public CreateDatabaseQuery(string _queryAttributes) : base(Commands.CREATE_DATABASE, _queryAttributes)
+        private string DatabaseName;
+        public DropDatabaseQuery(string _queryAttributes) : base(Commands.DROP_DATABASE, _queryAttributes)
         {
-            
+
         }
 
         public override void ParseAttributes()
@@ -29,22 +29,30 @@ namespace ServerApp.Queries
             xmlDocument.Load(Application.StartupPath + "\\SGBDCatalog.xml");
             XmlElement xmlRoot = xmlDocument.DocumentElement;
 
-            foreach(XmlNode childNode in xmlRoot.ChildNodes)
+            foreach (XmlNode childNode in xmlRoot.ChildNodes)
             {
                 if (childNode.Attributes.GetNamedItem("databaseName").Value.Equals(DatabaseName))
-                    return Responses.CREATE_DATABASE_ALREADY_EXISTS;
+                    return Commands.MapCommandToSuccessResponse(QueryCommand);
             }
-            return Commands.MapCommandToSuccessResponse(QueryCommand);
+            return Responses.DROP_DATABASE_DOESNT_EXIST;
         }
 
         public override void PerformXMLActions()
         {
             var xmlDocument = XDocument.Load(Application.StartupPath + "\\SGBDCatalog.xml");
-            XElement xmlElement = xmlDocument.Element("Databases");
-            xmlElement.Add(new XElement("Database", new XAttribute("databaseName", DatabaseName)));
+            XElement deletedXMLTag = null;
+            var databasesTags = xmlDocument.Element("Databases").Descendants("Database").ToArray();
+            foreach (XElement tag in databasesTags)
+            {
+                if (tag.Attribute("databaseName").Value.Equals(DatabaseName))
+                {
+                    deletedXMLTag = tag;
+                    break;
+                }
+            }
+            deletedXMLTag.Remove();
             xmlDocument.Save(Application.StartupPath + "\\SGBDCatalog.xml");
         }
-
 
     }
 }

@@ -31,6 +31,7 @@
             this.label_db_name = new System.Windows.Forms.Label();
             this.text_db_name = new System.Windows.Forms.TextBox();
             this.button_db_name = new System.Windows.Forms.Button();
+            this.button_db_delete = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label_db_name
@@ -62,12 +63,24 @@
             this.button_db_name.UseVisualStyleBackColor = true;
             this.button_db_name.Click += new System.EventHandler(this.button_db_name_Click);
             // 
+            // button_db_delete
+            // 
+            this.button_db_delete.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button_db_delete.Location = new System.Drawing.Point(403, 253);
+            this.button_db_delete.Name = "button_db_delete";
+            this.button_db_delete.Size = new System.Drawing.Size(104, 31);
+            this.button_db_delete.TabIndex = 4;
+            this.button_db_delete.Text = "Delete";
+            this.button_db_delete.UseVisualStyleBackColor = true;
+            this.button_db_delete.Click += new System.EventHandler(this.button_db_delete_Click);
+            // 
             // TestForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.button_db_delete);
             this.Controls.Add(this.button_db_name);
             this.Controls.Add(this.text_db_name);
             this.Controls.Add(this.label_db_name);
@@ -83,6 +96,7 @@
         private System.Windows.Forms.Label label_db_name;
         private System.Windows.Forms.TextBox text_db_name;
         private System.Windows.Forms.Button button_db_name;
+        private System.Windows.Forms.Button button_db_delete;
     }
 }
 

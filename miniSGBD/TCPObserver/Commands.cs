@@ -12,31 +12,35 @@ namespace Utils
         public const string CREATE_DATABASE = "CREATE_DATABASE";
         public const string DROP_DATABASE = "DROP_DATABASE";
 
-        // Table Commands
-        public const string CREATE_TABLE = "CREATE_TABLE";
-        public const string DROP_TABLE = "DROP_TABLE";
+        // Database Responses
+        public const string CREATE_DATABASE_SUCCESS = "100";
+        public const string CREATE_DATABASE_ALREADY_EXISTS = "101";
+        public const string DROP_DATABASE_SUCCESS = "110";
 
-        // Index Commands
-        public const string CREATE_INDEX = "CREATE_INDEX";
-
-        public static string MapResponse(string responseCode)
+        public static string MapResponseToMessage(string responseCode)
         {
             switch (responseCode)
             {
-                case "100": 
+                case CREATE_DATABASE_SUCCESS: 
                     return "Database created succesfully";
-                case "101":
+                case CREATE_DATABASE_ALREADY_EXISTS:
                     return "A database with the same name already exists!";
-                case "102":
+                case DROP_DATABASE_SUCCESS:
                     return "Database deleted successfully!";
-
-                case "200":
-                    return "Table created succesfully";
-                case "201":
-                    return "A table with the same name already exists in the database";
-
             }
             return ""; 
+        }
+
+        public static string GetSuccessCodeForCommand(string command)
+        {
+            switch (command)
+            {
+                case CREATE_DATABASE:
+                    return CREATE_DATABASE_SUCCESS;
+                case DROP_DATABASE:
+                    return DROP_DATABASE_SUCCESS;
+            }
+            return "";
         }
         
     }

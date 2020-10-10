@@ -9,39 +9,42 @@ namespace ServerApp.Queries
 {
     public abstract class AbstractQuery
     {
-        public string QueryType;
-        public string ResponseCode;
+        public string QueryCommand;
+        public string QueryAttributes;
+
+        public AbstractQuery(string _queryType, string _queryAttributes)
+        {
+            QueryCommand = _queryType;
+            QueryAttributes = _queryAttributes;
+        }
+
+        public AbstractQuery()
+        {
+
+        }
+
+        public abstract void ParseAttributes();
 
         // methods return String instead of Bool because they're meant to return specific response codes (see class Responses from Utils)
-        public string ValidateQuery()
+        public virtual string ValidateQuery()
         {
-            return "Correct";
+            return Commands.GetSuccessCodeForCommand(QueryCommand);
         }
 
-        public string PerformXMLActions()
+        public virtual void PerformXMLActions()
         {
-            return "Correct";
+            
         }
 
-        public void Execute()
+        public string Execute()
         {
+            ParseAttributes();
             var validationResult = ValidateQuery();
-            if (validationResult == "Correct")
+            if (validationResult == Commands.GetSuccessCodeForCommand(QueryCommand))
             {
-                var xmlResult = PerformXMLActions();
-                if (xmlResult == "Correct")
-                {
-                    ResponseCode = Commands.GetSuccessCodeForCommand(QueryType);
-                } 
-                else
-                {
-                    ResponseCode = xmlResult;
-                }
+                PerformXMLActions();
             }
-            else
-            {
-                ResponseCode = validationResult;
-            }
+            return validationResult;
         }
     }
 }

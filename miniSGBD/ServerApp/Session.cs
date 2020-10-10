@@ -25,7 +25,6 @@ namespace ServerApp
 
         public void DisplayClientRequest(string request)
         {
-            Console.WriteLine(request);
             var requestSplit = request.Split(';');
             Console.WriteLine("Client " + sessionID + ": ");
             int attributeIdx = 0;
@@ -43,9 +42,12 @@ namespace ServerApp
             }
         }
 
-        public void HandleClientRequest()
+        public string HandleClientRequest(string request)
         {
-
+            var response = QueryManager.DispatchQuery(request);
+            Console.WriteLine("Client " + sessionID + ": ");
+            Console.WriteLine("\t" + "Execution of command " + request.Split(';')[0] + " finished with status " + response);
+            return response;
         }
     }
 }

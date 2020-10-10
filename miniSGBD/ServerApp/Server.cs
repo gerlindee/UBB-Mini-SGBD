@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Xml;
 using Utils;
 
 namespace ServerApp
@@ -15,6 +18,16 @@ namespace ServerApp
 
         public void StartServer()
         {
+            if (!File.Exists(Application.StartupPath + "\\SGBDCatalog.xml"))
+            {
+                using (XmlWriter writer = XmlWriter.Create("SGBDCatalog.xml"))
+                {
+                    writer.WriteStartElement("Databases");
+                    writer.WriteEndElement();
+                    writer.Flush();
+                }
+            } 
+
             var serverListener = new TcpListener(IPAddress.Parse(TCPConfigs.IP), TCPConfigs.Port);
             serverListener.Start();
 
@@ -36,7 +49,7 @@ namespace ServerApp
                         {
                             var clientRequest = clientSession.Read();
                             clientSession.DisplayClientRequest(clientRequest);
-
+                            clientSession.HandleClientRequest(clientRequest);
                         }
                         catch (Exception)
                         {

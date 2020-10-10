@@ -21,6 +21,11 @@ namespace ServerApp
                         executionResponse = new CreateDatabaseQuery(clientQuerySplit[1]).Execute();
                     }
                     break;
+                case Commands.DROP_DATABASE:
+                    {
+                        executionResponse = new DropDatabaseQuery(clientQuerySplit[1]).Execute();
+                    }
+                    break;
             }   
             return executionResponse;
         }

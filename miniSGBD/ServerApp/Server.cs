@@ -54,7 +54,7 @@ namespace ServerApp
                         }
                         catch (Exception)
                         {
-                            break; // TODO: exception handling calumea :))) 
+                            break; // todo: error handling calume 
                         }
                     }
                     Console.WriteLine("Client disconnected with ID: " + clientSession.getSessionID());

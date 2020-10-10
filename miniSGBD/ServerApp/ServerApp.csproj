@@ -53,6 +53,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Queries\AbstractQuery.cs" />
     <Compile Include="Queries\CreateDatabaseQuery.cs" />
+    <Compile Include="Queries\DropDatabaseQuery.cs" />
     <Compile Include="QueryManager.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="Session.cs" />

@@ -28,7 +28,7 @@ namespace ServerApp.Queries
         // methods return String instead of Bool because they're meant to return specific response codes (see class Responses from Utils)
         public virtual string ValidateQuery()
         {
-            return Commands.GetSuccessCodeForCommand(QueryCommand);
+            return Commands.MapCommandToSuccessResponse(QueryCommand);
         }
 
         public virtual void PerformXMLActions()
@@ -40,7 +40,7 @@ namespace ServerApp.Queries
         {
             ParseAttributes();
             var validationResult = ValidateQuery();
-            if (validationResult == Commands.GetSuccessCodeForCommand(QueryCommand))
+            if (validationResult == Commands.MapCommandToSuccessResponse(QueryCommand))
             {
                 PerformXMLActions();
             }

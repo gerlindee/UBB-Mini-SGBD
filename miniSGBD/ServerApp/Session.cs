@@ -44,9 +44,9 @@ namespace ServerApp
 
         public string HandleClientRequest(string request)
         {
-            var response = QueryManager.DispatchQuery(request);
+            var response = DatabaseManager.ExecuteCommand(request);
             Console.WriteLine("Client " + sessionID + ": ");
-            Console.WriteLine("\t" + "Execution of command " + request.Split(';')[0] + " finished with status " + response);
+            Console.WriteLine("\t" + "Execution of command " + request.Split(';')[0] + " finished with status " + response.Split(';')[0]);
             return response;
         }
     }

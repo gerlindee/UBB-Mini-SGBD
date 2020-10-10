@@ -25,32 +25,59 @@ namespace ClientApp
 
         private void button_db_name_Click(object sender, EventArgs e)
         {
-            DatabaseAction(Commands.CREATE_DATABASE);
+            DisplayQueryResult(Commands.CREATE_DATABASE);
         }
 
         private void button_db_delete_Click(object sender, EventArgs e)
         {
-            DatabaseAction(Commands.DROP_DATABASE);
+            DisplayQueryResult(Commands.DROP_DATABASE);
         }
 
-        private void DatabaseAction(string action)
+        private void DisplayQueryResult(string action)
         {
             var databaseName = text_db_name.Text;
             string message;
             string caption;
+            MessageBoxIcon type;
 
             if (databaseName == "")
             {
                 message = "Database name cannot be empty!";
                 caption = "Validation Error";
+                type = MessageBoxIcon.Exclamation;
             }
             else
             {
                 tcpClient.Write(action + ";" + databaseName);
-                message = Responses.MapResponseToMessage(tcpClient.ReadFromServer());
+                var serverResponse = tcpClient.ReadFromServer();
+                message = Responses.MapResponseToMessage(serverResponse);
                 caption = "Query Execution Result";
+                if (serverResponse != Commands.MapCommandToSuccessResponse(action))
+                    type = MessageBoxIcon.Error;
+                else
+                    type = MessageBoxIcon.Information;
+
+
             }
-            MessageBox.Show(message, caption, MessageBoxButtons.OK);
+            MessageBox.Show(message, caption, MessageBoxButtons.OK, type);
+        }
+
+        private void button_db_show_all_Click(object sender, EventArgs e)
+        {
+            tcpClient.Write(Commands.GET_ALL_DATABASES);
+            var response = tcpClient.ReadFromServer().Split(';');
+            MessageBox.Show(response[1], "All Database Names", MessageBoxButtons.OK);
+        }
+
+        private void button_db_show_all_tables_Click(object sender, EventArgs e)
+        {
+            // TODO: after create table is done   
+        }
+
+        private void button_db_create_table_nav_Click(object sender, EventArgs e)
+        {
+            var createTableForm = new TestFormTables(text_db_name.Text, tcpClient);
+            createTableForm.Show();
         }
     }
 }

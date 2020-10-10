@@ -11,6 +11,7 @@ namespace Utils
         // Database Commands
         public const string CREATE_DATABASE = "CREATE_DATABASE";
         public const string DROP_DATABASE = "DROP_DATABASE";
+        public const string GET_ALL_DATABASES = "GET_ALL_DATABASES";
 
         public static string MapCommandToSuccessResponse(string command)
         {
@@ -28,8 +29,9 @@ namespace Utils
 
     public static class Responses
     {
-        // General Error Response
+        // General Responses
         public const string GENERAL_SERVER_ERROR = "000";
+        public const string GENERAL_DISPLAY_ENTRIES = "001";
 
         // Database Responses
         public const string CREATE_DATABASE_SUCCESS = "100";

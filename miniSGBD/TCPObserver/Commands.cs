@@ -30,31 +30,13 @@ namespace Utils
     public static class Responses
     {
         // General Responses
-        public const string GENERAL_SERVER_ERROR = "000";
-        public const string GENERAL_DISPLAY_ENTRIES = "001";
+        public const string GENERAL_SERVER_ERROR = "Server disconnected due to internal error!";
+        public const string GENERAL_DISPLAY_ENTRIES = "Entries retrieved succesfully";
 
         // Database Responses
-        public const string CREATE_DATABASE_SUCCESS = "100";
-        public const string CREATE_DATABASE_ALREADY_EXISTS = "101";
-        public const string DROP_DATABASE_SUCCESS = "110";
-        public const string DROP_DATABASE_DOESNT_EXIST = "111";
-
-        public static string MapResponseToMessage(string responseCode)
-        {
-            switch (responseCode)
-            {
-                case GENERAL_SERVER_ERROR:
-                    return "Server disconnected due to internal error!";
-                case CREATE_DATABASE_SUCCESS:
-                    return "Database created succesfully";
-                case CREATE_DATABASE_ALREADY_EXISTS:
-                    return "A database with the same name already exists!";
-                case DROP_DATABASE_SUCCESS:
-                    return "Database deleted successfully!";
-                case DROP_DATABASE_DOESNT_EXIST:
-                    return "A database with the given name does not exist!";
-            }
-            return "";
-        }
+        public const string CREATE_DATABASE_SUCCESS = "Database created succesfully";
+        public const string CREATE_DATABASE_ALREADY_EXISTS = "A database with the same name already exists!";
+        public const string DROP_DATABASE_SUCCESS = "Database deleted successfully!";
+        public const string DROP_DATABASE_DOESNT_EXIST = "A database with the given name does not exist!";
     }
 }

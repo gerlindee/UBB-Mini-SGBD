@@ -21,13 +21,12 @@ namespace miniSGBD
         private CheckBox[] columnPrimaryKeys;
         private ComboBox[] columnTypes;
         private TextBox[] columnLengths;
-        private TextBox[] columnPrecisions;
         private CheckBox[] columnUniques;
         private CheckBox[] columnNotNulls;
         private ComboBox[] columnForeignKeys;
 
         private int rowCount = 0;
-        private int rowIndex = 10;
+        private int rowIndex ;
         private int maxColumns = 9; // TODO: find how to get rid of maxrows 
 
         public TestFormTables(string _databaseName, Client _tcpClient)
@@ -62,7 +61,6 @@ namespace miniSGBD
             columnPrimaryKeys = new CheckBox[maxColumns];
             columnTypes = new ComboBox[maxColumns];
             columnLengths = new TextBox[maxColumns];
-            columnPrecisions = new TextBox[maxColumns];
             columnUniques = new CheckBox[maxColumns];
             columnNotNulls = new CheckBox[maxColumns];
             columnForeignKeys = new ComboBox[maxColumns];
@@ -85,7 +83,6 @@ namespace miniSGBD
                 columnPrimaryKeys[rowCount] = new CheckBox();
                 columnTypes[rowCount] = SetupColumnTypes();
                 columnLengths[rowCount] = new TextBox();
-                columnPrecisions[rowCount] = new TextBox();
                 columnUniques[rowCount] = new CheckBox();
                 columnNotNulls[rowCount] = new CheckBox();
                 columnForeignKeys[rowCount] = new ComboBox();
@@ -98,7 +95,6 @@ namespace miniSGBD
                 columnPrimaryKeys[rowCount].Dock = DockStyle.None;
                 columnTypes[rowCount].Dock = DockStyle.None;
                 columnLengths[rowCount].Dock = DockStyle.None;
-                columnPrecisions[rowCount].Dock = DockStyle.None;
                 columnUniques[rowCount].Dock = DockStyle.None;
                 columnNotNulls[rowCount].Dock = DockStyle.None;
                 columnForeignKeys[rowCount].Dock = DockStyle.None;
@@ -107,7 +103,6 @@ namespace miniSGBD
                 columnPrimaryKeys[rowCount].Anchor = AnchorStyles.None;
                 columnTypes[rowCount].Anchor = AnchorStyles.None;
                 columnLengths[rowCount].Anchor = AnchorStyles.None;
-                columnPrecisions[rowCount].Anchor = AnchorStyles.None;
                 columnUniques[rowCount].Anchor = AnchorStyles.None;
                 columnNotNulls[rowCount].Anchor = AnchorStyles.None;
                 columnForeignKeys[rowCount].Anchor = AnchorStyles.None;
@@ -116,10 +111,9 @@ namespace miniSGBD
                 panel_table_column.Controls.Add(columnPrimaryKeys[rowCount], 1, rowIndex);
                 panel_table_column.Controls.Add(columnTypes[rowCount], 2, rowIndex);
                 panel_table_column.Controls.Add(columnLengths[rowCount], 3, rowIndex);
-                panel_table_column.Controls.Add(columnPrecisions[rowCount], 4, rowIndex);
-                panel_table_column.Controls.Add(columnUniques[rowCount], 5, rowIndex);
-                panel_table_column.Controls.Add(columnNotNulls[rowCount], 6, rowIndex);
-                panel_table_column.Controls.Add(columnForeignKeys[rowCount], 7, rowIndex);
+                panel_table_column.Controls.Add(columnUniques[rowCount], 4, rowIndex);
+                panel_table_column.Controls.Add(columnNotNulls[rowCount], 5, rowIndex);
+                panel_table_column.Controls.Add(columnForeignKeys[rowCount], 6, rowIndex);
                 panel_table_column.Visible = true;
 
                 rowCount++;

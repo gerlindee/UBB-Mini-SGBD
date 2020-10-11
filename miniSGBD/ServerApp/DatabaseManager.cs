@@ -33,6 +33,11 @@ namespace ServerApp
                         executionResponse = new DropDatabaseQuery(commandSplit[1]).Execute();
                     }
                     break;
+                case Commands.CREATE_TABLE:
+                    {
+                        executionResponse = new CreateTableQuery(commandSplit[1]).Execute();
+                    }
+                    break;
             }
             return executionResponse;
         }

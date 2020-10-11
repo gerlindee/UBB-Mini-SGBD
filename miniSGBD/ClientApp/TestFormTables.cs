@@ -119,5 +119,33 @@ namespace miniSGBD
                 rowCount++;
             }
         }
+
+        private void button_table_create_Click(object sender, EventArgs e)
+        {
+            // TODO: validations
+            var message = Commands.CREATE_TABLE + ";" + databaseName + "#" + text_table_name.Text + "#";
+
+            for(int idx = 0; idx < rowCount; idx++)
+            {
+                message += columnNames[idx].Text + "|" + columnPrimaryKeys[idx].Checked.ToString() + "|"
+                               + columnTypes[idx].SelectedItem.ToString() + "|" + columnLengths[idx].Text + "|"
+                               + columnUniques[idx].Checked.ToString() + "|" + columnNotNulls[idx].Checked.ToString() + "|";
+
+                if (columnForeignKeys[idx].SelectedItem == null)
+                {
+                    message += "Empty#";
+                }
+                else
+                {
+                    message += columnForeignKeys[idx].SelectedItem.ToString() + "#";
+                }
+            }
+            tcpClient.Write(message); 
+        }
+
+        private void button_table_cancel_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
     }
 }

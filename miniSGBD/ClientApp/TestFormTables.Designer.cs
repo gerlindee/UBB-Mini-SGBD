@@ -172,6 +172,7 @@
             this.button_table_cancel.TabIndex = 24;
             this.button_table_cancel.Text = "Cancel";
             this.button_table_cancel.UseVisualStyleBackColor = true;
+            this.button_table_cancel.Click += new System.EventHandler(this.button_table_cancel_Click);
             // 
             // button_table_create
             // 
@@ -182,6 +183,7 @@
             this.button_table_create.TabIndex = 23;
             this.button_table_create.Text = "Create";
             this.button_table_create.UseVisualStyleBackColor = true;
+            this.button_table_create.Click += new System.EventHandler(this.button_table_create_Click);
             // 
             // TestFormTables
             // 

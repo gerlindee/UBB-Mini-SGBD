@@ -88,8 +88,71 @@ namespace ServerApp.Queries
             }
 
             XElement newTableNode = new XElement("Table", new XAttribute("tableName", TableName));
+            newTableNode.SetAttributeValue("fileName", TableName + ".kv");
+            XElement structureNode = new XElement("Structure");
+            XElement primaryKeyNode = new XElement("PrimaryKey");
+            XElement indexFilesAttribute = new XElement("IndexFiles");
+            XElement foreignKeysNode = new XElement("ForeignKeys"); 
+            XElement uniqueKeysNode = new XElement("UniqueKeys"); ;
+            newTableNode.Add(structureNode);
+            newTableNode.Add(primaryKeyNode);
+            if (AreThereForeignKeys())
+            {
+                newTableNode.Add(foreignKeysNode);
+            }
+            if (AreThereUniqueKeys())
+            {
+                newTableNode.Add(uniqueKeysNode);
+            }
+            newTableNode.Add(indexFilesAttribute);
+
+            int rowLength = 0;
+            foreach(TableColumn tableColumn in Columns)
+            {
+                XElement columnNode = new XElement("Column",
+                                            new XAttribute("notNull", tableColumn.IsNotNull),
+                                            new XAttribute("length", tableColumn.Length),
+                                            new XAttribute("type", tableColumn.Type),
+                                            new XAttribute("columnName", tableColumn.Name));
+                structureNode.Add(columnNode);
+                rowLength += tableColumn.Length;
+
+                if (tableColumn.IsPrimaryKey)
+                {
+                    XElement pkColumnNode = new XElement("PrimaryKeyColumn", tableColumn.Name);
+                    primaryKeyNode.Add(pkColumnNode);
+                }
+
+                if (tableColumn.IsUnique)
+                {
+                    XElement uniqueColumnNode = new XElement("UniqueKeyColumn", tableColumn.Name);
+                    uniqueKeysNode.Add(uniqueColumnNode);
+                }
+            }
+
+            newTableNode.SetAttributeValue("rowLength", rowLength);
             givenDatabaseNode.Add(newTableNode);
             xmlDocument.Save(Application.StartupPath + "\\SGBDCatalog.xml");
+        }
+
+        private bool AreThereUniqueKeys()
+        {
+            foreach(TableColumn tableColumn in Columns)
+            {
+                if (tableColumn.IsUnique)
+                    return true;
+            }
+            return false;
+        }
+
+        public bool AreThereForeignKeys()
+        {
+            foreach(TableColumn tableColumn in Columns)
+            {
+                if (tableColumn.ForeignKey != "Empty")
+                    return true;
+            }
+            return false;
         }
     }
 }

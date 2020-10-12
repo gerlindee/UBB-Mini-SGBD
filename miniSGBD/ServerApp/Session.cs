@@ -34,9 +34,9 @@ namespace ServerApp
                 {
                     Console.WriteLine("\t" + "Command: " + requestSplit[attributeIdx]);
                 } 
-                else
-                {
-                    Console.WriteLine("\t" + "Attribute: " + requestSplit[attributeIdx]);
+                else 
+                {   if(requestSplit[attributeIdx].Length != 0)
+                        Console.WriteLine("\t" + "Attribute: " + requestSplit[attributeIdx]);
                 }
                 attributeIdx++;
             }

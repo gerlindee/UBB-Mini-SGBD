@@ -1,4 +1,4 @@
-﻿using miniSGBD;
+﻿using ClientApp;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -10,27 +10,25 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Utils;
 
-namespace ClientApp
+namespace miniSGBD
 {
-    public partial class TestForm : Form
+    public partial class AddDatabaseForm : Form
     {
-        private readonly Client tcpClient; 
-
-        public TestForm(Client client)
+        private readonly Client tcpClient;
+        public AddDatabaseForm(Client client)
         {
             tcpClient = client;
-            tcpClient.Connect();
             InitializeComponent();
         }
 
-        private void button_db_name_Click(object sender, EventArgs e)
+        private void create_db_btn_Click(object sender, EventArgs e)
         {
             DisplayQueryResult(Commands.CREATE_DATABASE);
         }
 
-        private void button_db_delete_Click(object sender, EventArgs e)
+        private void cancel_db_btn_Click(object sender, EventArgs e)
         {
-            DisplayQueryResult(Commands.DROP_DATABASE);
+            this.Close();
         }
 
         private void DisplayQueryResult(string action)
@@ -60,29 +58,7 @@ namespace ClientApp
 
             }
             MessageBox.Show(message, caption, MessageBoxButtons.OK, type);
-        }
-
-        private void button_db_show_all_Click(object sender, EventArgs e)
-        {
-            tcpClient.Write(Commands.GET_ALL_DATABASES);
-            var response = tcpClient.ReadFromServer().Split(';');
-            MessageBox.Show(response[1], "All Database Names", MessageBoxButtons.OK);
-        }
-
-        private void button_db_show_all_tables_Click(object sender, EventArgs e)
-        {
-            // TODO: after create table is done   
-        }
-
-        private void button_db_create_table_nav_Click(object sender, EventArgs e)
-        {
-            var createTableForm = new TestFormTables(text_db_name.Text, tcpClient);
-            createTableForm.Show();
-        }
-
-        private void text_db_name_TextChanged(object sender, EventArgs e)
-        {
-
+            this.Close();
         }
     }
 }

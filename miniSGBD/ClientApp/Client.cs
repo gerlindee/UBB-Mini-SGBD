@@ -41,5 +41,21 @@ namespace ClientApp
             }
             return response;
         }
+        public string ReadCatalogFromServer()
+        {
+            var stream = tcpClient.GetStream();
+            stream.ReadTimeout = stream.WriteTimeout = 50000;
+            var response = "";
+            try
+            {
+                response = Read();
+            }
+            catch (Exception)
+            {
+                Thread.Sleep(TimeSpan.FromSeconds(10));
+                ReadFromServer();
+            }
+            return response;
+        }
     }
 }

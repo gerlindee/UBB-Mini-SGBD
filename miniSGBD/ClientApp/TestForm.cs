@@ -78,5 +78,10 @@ namespace ClientApp
             var createTableForm = new TestFormTables(text_db_name.Text, tcpClient);
             createTableForm.Show();
         }
+
+        private void text_db_name_TextChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using miniSGBD;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,7 +17,7 @@ namespace ClientApp
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new TestForm(new Client()));
+            Application.Run(new MainForm(new Client()));
         }
     }
 }

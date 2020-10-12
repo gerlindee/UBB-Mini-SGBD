@@ -22,7 +22,7 @@ namespace miniSGBD
         private ComboBox[] columnTypes;
         private TextBox[] columnLengths;
         private CheckBox[] columnUniques;
-        private CheckBox[] columnNotNulls;
+        private CheckBox[] columnAllowNulls;
         private ComboBox[] columnForeignKeys;
 
         private int rowCount = 0;
@@ -65,7 +65,7 @@ namespace miniSGBD
             columnTypes = new ComboBox[maxColumns];
             columnLengths = new TextBox[maxColumns];
             columnUniques = new CheckBox[maxColumns];
-            columnNotNulls = new CheckBox[maxColumns];
+            columnAllowNulls = new CheckBox[maxColumns];
             columnForeignKeys = new ComboBox[maxColumns];
     }
 
@@ -87,7 +87,7 @@ namespace miniSGBD
                 columnTypes[rowCount] = SetupColumnTypes();
                 columnLengths[rowCount] = new TextBox();
                 columnUniques[rowCount] = new CheckBox();
-                columnNotNulls[rowCount] = new CheckBox();
+                columnAllowNulls[rowCount] = new CheckBox();
                 columnForeignKeys[rowCount] = new ComboBox();
 
                 rowIndex = panel_table_column.RowCount++;
@@ -99,7 +99,7 @@ namespace miniSGBD
                 panel_table_column.Controls.Add(columnTypes[rowCount], 2, rowIndex);
                 panel_table_column.Controls.Add(columnLengths[rowCount], 3, rowIndex);
                 panel_table_column.Controls.Add(columnUniques[rowCount], 4, rowIndex);
-                panel_table_column.Controls.Add(columnNotNulls[rowCount], 5, rowIndex);
+                panel_table_column.Controls.Add(columnAllowNulls[rowCount], 5, rowIndex);
                 panel_table_column.Controls.Add(columnForeignKeys[rowCount], 6, rowIndex);
                 panel_table_column.Visible = true;
 
@@ -116,7 +116,7 @@ namespace miniSGBD
             {
                 message += columnNames[idx].Text + "|" + columnPrimaryKeys[idx].Checked.ToString() + "|"
                                + columnTypes[idx].SelectedItem.ToString() + "|" + columnLengths[idx].Text + "|"
-                               + columnUniques[idx].Checked.ToString() + "|" + columnNotNulls[idx].Checked.ToString() + "|";
+                               + columnUniques[idx].Checked.ToString() + "|" + columnAllowNulls[idx].Checked.ToString() + "|";
 
                 if (columnForeignKeys[idx].SelectedItem == null)
                 {

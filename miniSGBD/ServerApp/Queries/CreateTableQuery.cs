@@ -34,9 +34,9 @@ namespace ServerApp.Queries
                 var columnType = columnAttributes[2];
                 int.TryParse(columnAttributes[3], out var columnLength);
                 var columnUnique = bool.Parse(columnAttributes[4]);
-                var columnNotNull = bool.Parse(columnAttributes[5]);
+                var columnAllowNull = bool.Parse(columnAttributes[5]);
                 var columnFK = columnAttributes[6];
-                Columns.Add(new TableColumn(columnName, columnPK, columnType, columnLength, columnUnique, columnNotNull, columnFK));
+                Columns.Add(new TableColumn(columnName, columnPK, columnType, columnLength, columnUnique, columnAllowNull, columnFK));
             }
         }
 
@@ -87,8 +87,7 @@ namespace ServerApp.Queries
                 }
             }
 
-            XElement newTableNode = new XElement("Table", new XAttribute("tableName", TableName));
-            newTableNode.SetAttributeValue("fileName", TableName + ".kv");
+            XElement newTableNode = new XElement("Table");
             XElement structureNode = new XElement("Structure");
             XElement primaryKeyNode = new XElement("PrimaryKey");
             XElement indexFilesAttribute = new XElement("IndexFiles");
@@ -110,7 +109,7 @@ namespace ServerApp.Queries
             foreach(TableColumn tableColumn in Columns)
             {
                 XElement columnNode = new XElement("Column",
-                                            new XAttribute("notNull", tableColumn.IsNotNull),
+                                            new XAttribute("notNull", tableColumn.AllowNull),
                                             new XAttribute("length", tableColumn.Length),
                                             new XAttribute("type", tableColumn.Type),
                                             new XAttribute("columnName", tableColumn.Name));
@@ -131,6 +130,8 @@ namespace ServerApp.Queries
             }
 
             newTableNode.SetAttributeValue("rowLength", rowLength);
+            newTableNode.SetAttributeValue("fileName", TableName + ".kv");
+            newTableNode.SetAttributeValue("tableName", TableName);
             givenDatabaseNode.Add(newTableNode);
             xmlDocument.Save(Application.StartupPath + "\\SGBDCatalog.xml");
         }

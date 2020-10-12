@@ -15,7 +15,7 @@ namespace ServerApp.Queries
         private string TableName;
         private List<TableColumn> Columns;
 
-        public CreateTableQuery(string _queryAttributes) : base(Commands.CREATE_TABLE, _queryAttributes)
+        public CreateTableQuery(string _queryAttributes) : base(Commands.CREATE_TABLE)
         {
 
         }

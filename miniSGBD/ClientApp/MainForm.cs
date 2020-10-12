@@ -23,12 +23,14 @@ namespace miniSGBD
 
         private static string selectedDatabase = "";
 
-        MenuItem createDBMenuItem = new MenuItem(CREATE_DATABASE);
-        ContextMenu cm = new ContextMenu();
+        MenuItem deleteTableMenuItem = new MenuItem(DELETE_TABLE);
+        ContextMenu cm3 = new ContextMenu();
 
         MenuItem deleteDBMenuItem = new MenuItem(DELETE_DATABASE);
         MenuItem createTBMenuItem = new MenuItem(CREATE_TABLE);
         ContextMenu cm2 = new ContextMenu();
+
+
 
         public MainForm(Client client)
         {
@@ -36,10 +38,11 @@ namespace miniSGBD
             tcpClient.Connect();
             InitializeComponent();
 
-            cm.MenuItems.Add(createDBMenuItem);
+            cm3.MenuItems.Add(deleteTableMenuItem);
             cm2.MenuItems.Add(deleteDBMenuItem);
             cm2.MenuItems.Add(createTBMenuItem);
             deleteDBMenuItem.Click += new EventHandler(contextMenu_deleteDB);
+            deleteTableMenuItem.Click += new EventHandler(contextMenu_deleteTB);
 
             addTable_btn.Visible = false;
 
@@ -86,6 +89,14 @@ namespace miniSGBD
             }
         }
 
+        private void tablesList_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left && tablesList.FocusedItem.Bounds.Contains(e.Location))
+            {
+                cm3.Show(tablesList, e.Location);
+            }
+        }
+
         private void addDB_buttonClick(object sender, EventArgs e)
         {
             AddDatabaseForm createDBForm = new AddDatabaseForm(tcpClient);
@@ -98,7 +109,19 @@ namespace miniSGBD
             var selectedDBName = databasesList.FocusedItem.Text;
             tcpClient.Write(Commands.DROP_DATABASE + ";" + selectedDBName);
             var serverResponse = tcpClient.ReadFromServer();
+            MessageBox.Show(serverResponse, "Execution result", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
             populateDatabases();
+        }
+
+        private void contextMenu_deleteTB(object sender, EventArgs e)
+        {
+            var selectedTBName = tablesList.FocusedItem.Text;
+            tcpClient.Write(Commands.DROP_TABLE + ';' + selectedDatabase +";" + selectedTBName);
+            var serverResponse = tcpClient.ReadFromServer();
+            MessageBox.Show(serverResponse, "Execution result", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            populateTables();
         }
 
         private void addTB_Click(object sender, EventArgs e)

@@ -40,6 +40,11 @@
             this.button_table_add_row = new System.Windows.Forms.Button();
             this.button_table_cancel = new System.Windows.Forms.Button();
             this.button_table_create = new System.Windows.Forms.Button();
+            this.button_table_remove_row = new System.Windows.Forms.Button();
+            this.button_add_reference = new System.Windows.Forms.Button();
+            this.button_remove_reference = new System.Windows.Forms.Button();
+            this.list_related_tables = new System.Windows.Forms.ListView();
+            this.list_referenced_tables = new System.Windows.Forms.ListView();
             this.panel_table_column.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -172,12 +177,76 @@
             this.button_table_create.UseVisualStyleBackColor = true;
             this.button_table_create.Click += new System.EventHandler(this.button_table_create_Click);
             // 
+            // button_table_remove_row
+            // 
+            this.button_table_remove_row.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button_table_remove_row.Location = new System.Drawing.Point(927, 156);
+            this.button_table_remove_row.Margin = new System.Windows.Forms.Padding(4);
+            this.button_table_remove_row.Name = "button_table_remove_row";
+            this.button_table_remove_row.Size = new System.Drawing.Size(51, 44);
+            this.button_table_remove_row.TabIndex = 25;
+            this.button_table_remove_row.Text = "-";
+            this.button_table_remove_row.UseVisualStyleBackColor = true;
+            this.button_table_remove_row.Click += new System.EventHandler(this.button_table_remove_row_Click);
+            // 
+            // button_add_reference
+            // 
+            this.button_add_reference.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button_add_reference.Location = new System.Drawing.Point(365, 558);
+            this.button_add_reference.Margin = new System.Windows.Forms.Padding(4);
+            this.button_add_reference.Name = "button_add_reference";
+            this.button_add_reference.Size = new System.Drawing.Size(51, 44);
+            this.button_add_reference.TabIndex = 28;
+            this.button_add_reference.Text = ">";
+            this.button_add_reference.UseVisualStyleBackColor = true;
+            this.button_add_reference.Click += new System.EventHandler(this.button_add_reference_Click);
+            // 
+            // button_remove_reference
+            // 
+            this.button_remove_reference.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button_remove_reference.Location = new System.Drawing.Point(365, 610);
+            this.button_remove_reference.Margin = new System.Windows.Forms.Padding(4);
+            this.button_remove_reference.Name = "button_remove_reference";
+            this.button_remove_reference.Size = new System.Drawing.Size(51, 44);
+            this.button_remove_reference.TabIndex = 29;
+            this.button_remove_reference.Text = "<";
+            this.button_remove_reference.UseVisualStyleBackColor = true;
+            this.button_remove_reference.Click += new System.EventHandler(this.button_remove_reference_Click);
+            // 
+            // list_related_tables
+            // 
+            this.list_related_tables.FullRowSelect = true;
+            this.list_related_tables.HideSelection = false;
+            this.list_related_tables.Location = new System.Drawing.Point(19, 496);
+            this.list_related_tables.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
+            this.list_related_tables.MultiSelect = false;
+            this.list_related_tables.Name = "list_related_tables";
+            this.list_related_tables.Size = new System.Drawing.Size(298, 193);
+            this.list_related_tables.TabIndex = 30;
+            this.list_related_tables.UseCompatibleStateImageBehavior = false;
+            this.list_related_tables.View = System.Windows.Forms.View.List;
+            // 
+            // list_referenced_tables
+            // 
+            this.list_referenced_tables.HideSelection = false;
+            this.list_referenced_tables.Location = new System.Drawing.Point(466, 497);
+            this.list_referenced_tables.Name = "list_referenced_tables";
+            this.list_referenced_tables.Size = new System.Drawing.Size(303, 192);
+            this.list_referenced_tables.TabIndex = 31;
+            this.list_referenced_tables.UseCompatibleStateImageBehavior = false;
+            this.list_referenced_tables.View = System.Windows.Forms.View.List;
+            // 
             // TestFormTables
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.ClientSize = new System.Drawing.Size(1031, 513);
+            this.ClientSize = new System.Drawing.Size(1014, 710);
+            this.Controls.Add(this.list_referenced_tables);
+            this.Controls.Add(this.list_related_tables);
+            this.Controls.Add(this.button_remove_reference);
+            this.Controls.Add(this.button_add_reference);
+            this.Controls.Add(this.button_table_remove_row);
             this.Controls.Add(this.button_table_cancel);
             this.Controls.Add(this.button_table_create);
             this.Controls.Add(this.button_table_add_row);
@@ -207,5 +276,10 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button button_table_remove_row;
+        private System.Windows.Forms.Button button_add_reference;
+        private System.Windows.Forms.Button button_remove_reference;
+        private System.Windows.Forms.ListView list_related_tables;
+        private System.Windows.Forms.ListView list_referenced_tables;
     }
 }

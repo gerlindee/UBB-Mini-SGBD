@@ -17,12 +17,12 @@ namespace miniSGBD
         private string databaseName;
         private Client tcpClient;
 
-        private TextBox[] columnNames;
-        private CheckBox[] columnPrimaryKeys;
-        private ComboBox[] columnTypes;
-        private TextBox[] columnLengths;
-        private CheckBox[] columnUniques;
-        private CheckBox[] columnAllowNulls;
+        private List<TextBox> columnNames;
+        private List<CheckBox> columnPrimaryKeys;
+        private List<ComboBox> columnTypes;
+        private List<TextBox> columnLengths;
+        private List<CheckBox> columnUniques;
+        private List<CheckBox> columnAllowNulls;
 
         private int rowCount = 0;
         private int rowIndex ;
@@ -35,8 +35,7 @@ namespace miniSGBD
            
             InitializeItemArrays();
             InitializeComponent();
-
-            this.Text = databaseName;
+            InitializeRelatedTables();
         }
 
         private ComboBox SetupColumnTypes()
@@ -59,17 +58,23 @@ namespace miniSGBD
 
         private void InitializeItemArrays()
         {
-            columnNames = new TextBox[maxColumns];
-            columnPrimaryKeys = new CheckBox[maxColumns];
-            columnTypes = new ComboBox[maxColumns];
-            columnLengths = new TextBox[maxColumns];
-            columnUniques = new CheckBox[maxColumns];
-            columnAllowNulls = new CheckBox[maxColumns];
-    }
+            columnNames = new List<TextBox>(maxColumns);
+            columnPrimaryKeys = new List<CheckBox>(maxColumns);
+            columnTypes = new List<ComboBox>(maxColumns);
+            columnLengths = new List<TextBox>(maxColumns);
+            columnUniques = new List<CheckBox>(maxColumns);
+            columnAllowNulls = new List<CheckBox>(maxColumns);
+        }
 
-        private void SetupColumnForeignKeys(int row)
+        private void InitializeRelatedTables()
         {
-            // TODO: once creating tables is a thing 
+            tcpClient.Write(Commands.GET_ALL_TABLES + ';' + databaseName);
+            var serverResponse = tcpClient.ReadFromServer();
+            var tableNames = serverResponse.Split(';')[1].Split('|');
+            foreach(string tableName in tableNames)
+            {
+                list_related_tables.Items.Add(tableName);
+            }
         }
 
         private void button_table_add_row_Click(object sender, EventArgs e)
@@ -80,12 +85,12 @@ namespace miniSGBD
             }
             else
             {
-                columnNames[rowCount] = new TextBox();
-                columnPrimaryKeys[rowCount] = new CheckBox();
-                columnTypes[rowCount] = SetupColumnTypes();
-                columnLengths[rowCount] = new TextBox();
-                columnUniques[rowCount] = new CheckBox();
-                columnAllowNulls[rowCount] = new CheckBox();
+                columnNames.Add(new TextBox());
+                columnPrimaryKeys.Add(new CheckBox());
+                columnTypes.Add(SetupColumnTypes());
+                columnLengths.Add(new TextBox());
+                columnUniques.Add(new CheckBox());
+                columnAllowNulls.Add(new CheckBox());
 
                 rowIndex = panel_table_column.RowCount++;
                 panel_table_column.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
@@ -116,6 +121,25 @@ namespace miniSGBD
             }
             tcpClient.Write(message);
             Close();
+        }
+
+        private void button_table_remove_row_Click(object sender, EventArgs e)
+        {
+            // TODO: daca mai e timp, sa se scoata ultima coloana adaugata
+        }
+
+        private void button_add_reference_Click(object sender, EventArgs e)
+        {
+            var selectedTable = list_related_tables.SelectedItems[0];
+            list_referenced_tables.Items.Add(selectedTable.Text);
+            list_related_tables.Items.Remove(selectedTable);
+        }
+
+        private void button_remove_reference_Click(object sender, EventArgs e)
+        {
+            var selectedTable = list_referenced_tables.SelectedItems[0];
+            list_related_tables.Items.Add(selectedTable.Text);
+            list_referenced_tables.Items.Remove(selectedTable);
         }
 
         private void button_table_cancel_Click(object sender, EventArgs e)

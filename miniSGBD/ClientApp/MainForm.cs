@@ -19,7 +19,7 @@ namespace miniSGBD
         private static string CREATE_DATABASE = "Create Database";
         private static string DELETE_DATABASE = "Delete Database";
         private static string CREATE_TABLE = "Create Table";
-        private static string DELETE_TABLE = "Deelete Table";
+        private static string DELETE_TABLE = "Delete Table";
 
         private static string selectedDatabase = "";
 

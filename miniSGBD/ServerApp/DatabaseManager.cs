@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
+using System.Xml.Linq;
 using Utils;
 
 namespace ServerApp
@@ -38,6 +39,11 @@ namespace ServerApp
                         executionResponse = new CreateTableQuery(commandSplit[1]).Execute();
                     }
                     break;
+                case Commands.GET_ALL_TABLES:
+                    {
+                        executionResponse = FetchTables(commandSplit[1]);
+                    }
+                    break;
             }
             return executionResponse;
         }
@@ -51,9 +57,28 @@ namespace ServerApp
 
             foreach (XmlNode childNode in xmlRoot.ChildNodes)
             {
-                databaseNames = databaseNames + childNode.Attributes.GetNamedItem("databaseName").Value + '|';
+                databaseNames += childNode.Attributes.GetNamedItem("databaseName").Value + '|';
             }
-            return databaseNames;
+            return databaseNames.Remove(databaseNames.Length -1);
+        }
+
+        private static string FetchTables(string dbName)
+        {
+            var tableNames = Responses.GENERAL_DISPLAY_ENTRIES + ';';
+            var xmlDocument = XDocument.Load(Application.StartupPath + "\\SGBDCatalog.xml");
+
+            XElement givenDatabaseNode = null;
+            XElement[] databasesNodes = xmlDocument.Element("Databases").Descendants("Database").ToArray();
+            XElement givenDB = Array.Find(databasesNodes, elem => elem.Attribute("databaseName").Value.Equals(dbName));
+
+            XElement[] databasesTables = givenDB.Descendants("Table").ToArray();
+
+            foreach(var table in databasesTables)
+            {
+                tableNames += table.Attribute("tableName").Value + "|";
+            }
+
+            return tableNames;//.Remove(tableNames.Length -1);
         }
     }
 }

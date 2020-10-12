@@ -23,7 +23,6 @@ namespace miniSGBD
         private TextBox[] columnLengths;
         private CheckBox[] columnUniques;
         private CheckBox[] columnAllowNulls;
-        private ComboBox[] columnForeignKeys;
 
         private int rowCount = 0;
         private int rowIndex ;
@@ -66,7 +65,6 @@ namespace miniSGBD
             columnLengths = new TextBox[maxColumns];
             columnUniques = new CheckBox[maxColumns];
             columnAllowNulls = new CheckBox[maxColumns];
-            columnForeignKeys = new ComboBox[maxColumns];
     }
 
         private void SetupColumnForeignKeys(int row)
@@ -88,7 +86,6 @@ namespace miniSGBD
                 columnLengths[rowCount] = new TextBox();
                 columnUniques[rowCount] = new CheckBox();
                 columnAllowNulls[rowCount] = new CheckBox();
-                columnForeignKeys[rowCount] = new ComboBox();
 
                 rowIndex = panel_table_column.RowCount++;
                 panel_table_column.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
@@ -100,7 +97,6 @@ namespace miniSGBD
                 panel_table_column.Controls.Add(columnLengths[rowCount], 3, rowIndex);
                 panel_table_column.Controls.Add(columnUniques[rowCount], 4, rowIndex);
                 panel_table_column.Controls.Add(columnAllowNulls[rowCount], 5, rowIndex);
-                panel_table_column.Controls.Add(columnForeignKeys[rowCount], 6, rowIndex);
                 panel_table_column.Visible = true;
 
                 rowCount++;
@@ -117,15 +113,6 @@ namespace miniSGBD
                 message += columnNames[idx].Text + "|" + columnPrimaryKeys[idx].Checked.ToString() + "|"
                                + columnTypes[idx].SelectedItem.ToString() + "|" + columnLengths[idx].Text + "|"
                                + columnUniques[idx].Checked.ToString() + "|" + columnAllowNulls[idx].Checked.ToString() + "|";
-
-                if (columnForeignKeys[idx].SelectedItem == null)
-                {
-                    message += "Empty#";
-                }
-                else
-                {
-                    message += columnForeignKeys[idx].SelectedItem.ToString() + "#";
-                }
             }
             tcpClient.Write(message);
             Close();

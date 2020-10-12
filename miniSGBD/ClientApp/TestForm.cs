@@ -49,10 +49,9 @@ namespace ClientApp
             else
             {
                 tcpClient.Write(action + ";" + databaseName);
-                var serverResponse = tcpClient.ReadFromServer();
-                message = Responses.MapResponseToMessage(serverResponse);
+                message = tcpClient.ReadFromServer();
                 caption = "Query Execution Result";
-                if (serverResponse != Commands.MapCommandToSuccessResponse(action))
+                if (message != Commands.MapCommandToSuccessResponse(action))
                     type = MessageBoxIcon.Error;
                 else
                     type = MessageBoxIcon.Information;

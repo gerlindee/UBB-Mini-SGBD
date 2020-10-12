@@ -53,6 +53,7 @@
             this.tablesList.Size = new System.Drawing.Size(161, 367);
             this.tablesList.TabIndex = 1;
             this.tablesList.UseCompatibleStateImageBehavior = false;
+            this.tablesList.View = System.Windows.Forms.View.List;
             // 
             // addDB_btn
             // 
@@ -72,7 +73,7 @@
             this.addTable_btn.TabIndex = 3;
             this.addTable_btn.Text = "Add";
             this.addTable_btn.UseVisualStyleBackColor = true;
-            this.addTable_btn.Click += new System.EventHandler(this.button1_Click);
+            this.addTable_btn.Click += new System.EventHandler(this.addTB_Click);
             // 
             // MainForm
             // 

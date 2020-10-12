@@ -33,8 +33,11 @@ namespace miniSGBD
         {
             databaseName = _databaseName;
             tcpClient = _tcpClient;
+           
             InitializeItemArrays();
             InitializeComponent();
+
+            this.Text = databaseName;
         }
 
         private ComboBox SetupColumnTypes()
@@ -91,22 +94,6 @@ namespace miniSGBD
                 panel_table_column.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
                 panel_table_column.Visible = false;
 
-                columnNames[rowCount].Dock = DockStyle.None;
-                columnPrimaryKeys[rowCount].Dock = DockStyle.None;
-                columnTypes[rowCount].Dock = DockStyle.None;
-                columnLengths[rowCount].Dock = DockStyle.None;
-                columnUniques[rowCount].Dock = DockStyle.None;
-                columnNotNulls[rowCount].Dock = DockStyle.None;
-                columnForeignKeys[rowCount].Dock = DockStyle.None;
-
-                columnNames[rowCount].Anchor = AnchorStyles.None;
-                columnPrimaryKeys[rowCount].Anchor = AnchorStyles.None;
-                columnTypes[rowCount].Anchor = AnchorStyles.None;
-                columnLengths[rowCount].Anchor = AnchorStyles.None;
-                columnUniques[rowCount].Anchor = AnchorStyles.None;
-                columnNotNulls[rowCount].Anchor = AnchorStyles.None;
-                columnForeignKeys[rowCount].Anchor = AnchorStyles.None;
-
                 panel_table_column.Controls.Add(columnNames[rowCount], 0, rowIndex);
                 panel_table_column.Controls.Add(columnPrimaryKeys[rowCount], 1, rowIndex);
                 panel_table_column.Controls.Add(columnTypes[rowCount], 2, rowIndex);
@@ -140,7 +127,8 @@ namespace miniSGBD
                     message += columnForeignKeys[idx].SelectedItem.ToString() + "#";
                 }
             }
-            tcpClient.Write(message); 
+            tcpClient.Write(message);
+            Close();
         }
 
         private void button_table_cancel_Click(object sender, EventArgs e)

@@ -13,7 +13,7 @@ namespace ServerApp
         public string Type { get; }
         public int Length { get; }
         public bool IsUnique { get; }
-        public bool IsNotNull { get; }
+        public bool AllowNull { get; }
         public string ForeignKey { get; }
 
         public TableColumn(string _name, bool _isPrimaryKey, string _type, int _length, bool _isUnique, bool _isNotNull, string _foreignKey)
@@ -23,7 +23,7 @@ namespace ServerApp
             Type = _type;
             Length = _length;
             IsUnique = _isUnique;
-            IsNotNull = _isNotNull;
+            AllowNull = _isNotNull;
             ForeignKey = _foreignKey;
         }
         

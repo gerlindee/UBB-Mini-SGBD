@@ -15,6 +15,7 @@ namespace Utils
 
         // Table Commands
         public const string CREATE_TABLE = "CREATE_TABLE";
+        public const string GET_ALL_TABLES = "GET_ALL_TABLES";
 
         public static string MapCommandToSuccessResponse(string command)
         {

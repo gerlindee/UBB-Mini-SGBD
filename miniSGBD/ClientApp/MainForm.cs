@@ -21,6 +21,8 @@ namespace miniSGBD
         private static string CREATE_TABLE = "Create Table";
         private static string DELETE_TABLE = "Deelete Table";
 
+        private static string selectedDatabase = "";
+
         MenuItem createDBMenuItem = new MenuItem(CREATE_DATABASE);
         ContextMenu cm = new ContextMenu();
 
@@ -39,15 +41,16 @@ namespace miniSGBD
             cm2.MenuItems.Add(createTBMenuItem);
             deleteDBMenuItem.Click += new EventHandler(contextMenu_deleteDB);
 
+            addTable_btn.Visible = false;
+
             populateDatabases();
         }
 
         private void populateDatabases()
         {
             databasesList.Clear();
-            tcpClient.Write(Commands.GET_ALL_DATABASES + ";");
+            tcpClient.Write(Commands.GET_ALL_DATABASES + ';');
             var serverResponse = tcpClient.ReadFromServer();
-            //string message = Responses.MapResponseToMessage(serverResponse);
 
             var commandSplit = serverResponse.Split(';');
             var databasesNames = commandSplit[1].Split('|');
@@ -58,7 +61,15 @@ namespace miniSGBD
 
         private void populateTables()
         {
+            tablesList.Clear();
+            tcpClient.Write(Commands.GET_ALL_TABLES + ';' + selectedDatabase);
+            var serverResponse = tcpClient.ReadFromServer();
 
+            var commandSplit = serverResponse.Split(';');
+            var tableNames = commandSplit[1].Split('|');
+
+            foreach (var tName in tableNames)
+                tablesList.Items.Add(tName);
         }
 
         private void databasesList_MouseClick(object sender, MouseEventArgs e)
@@ -69,6 +80,8 @@ namespace miniSGBD
             }
             else if (e.Button == MouseButtons.Left && databasesList.FocusedItem.Bounds.Contains(e.Location))
             {
+                addTable_btn.Visible = true;
+                selectedDatabase = databasesList.FocusedItem.Text;
                 populateTables();
             }
         }
@@ -88,9 +101,13 @@ namespace miniSGBD
             populateDatabases();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void addTB_Click(object sender, EventArgs e)
         {
-
+            TestFormTables addTableForm = new TestFormTables(selectedDatabase, tcpClient);
+            addTableForm.ShowDialog(this);
+            var serverResponse = tcpClient.ReadFromServer();
+            MessageBox.Show(serverResponse, "Execution result", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            populateTables();
         }
     }
 }

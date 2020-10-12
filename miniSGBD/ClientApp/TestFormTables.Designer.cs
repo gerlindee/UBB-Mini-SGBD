@@ -31,13 +31,13 @@
             this.text_table_name = new System.Windows.Forms.TextBox();
             this.label_table_name = new System.Windows.Forms.Label();
             this.panel_table_column = new System.Windows.Forms.TableLayoutPanel();
-            this.label8 = new System.Windows.Forms.Label();
-            this.label7 = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
             this.button_table_add_row = new System.Windows.Forms.Button();
             this.button_table_cancel = new System.Windows.Forms.Button();
             this.button_table_create = new System.Windows.Forms.Button();
@@ -88,33 +88,6 @@
             this.panel_table_column.Size = new System.Drawing.Size(903, 377);
             this.panel_table_column.TabIndex = 21;
             // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(777, 0);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(84, 17);
-            this.label8.TabIndex = 32;
-            this.label8.Text = "Foreign Key";
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(648, 0);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(57, 17);
-            this.label7.TabIndex = 31;
-            this.label7.Text = "Not-null";
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(519, 0);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(53, 17);
-            this.label6.TabIndex = 30;
-            this.label6.Text = "Unique";
-            // 
             // label4
             // 
             this.label4.AutoSize = true;
@@ -150,6 +123,33 @@
             this.label1.Size = new System.Drawing.Size(45, 17);
             this.label1.TabIndex = 25;
             this.label1.Text = "Name";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(519, 0);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(53, 17);
+            this.label6.TabIndex = 30;
+            this.label6.Text = "Unique";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(648, 0);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(68, 17);
+            this.label7.TabIndex = 31;
+            this.label7.Text = "Allow Null";
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(777, 0);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(84, 17);
+            this.label8.TabIndex = 32;
+            this.label8.Text = "Foreign Key";
             // 
             // button_table_add_row
             // 

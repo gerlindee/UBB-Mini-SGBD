@@ -104,7 +104,7 @@ namespace miniSGBD
 
         private void tablesList_MouseClick(object sender, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Right && tablesList.FocusedItem.Bounds.Contains(e.Location))
+            if (e.Button == MouseButtons.Left && tablesList.FocusedItem.Bounds.Contains(e.Location))
             {
                 cm3.Show(tablesList, e.Location);
             }

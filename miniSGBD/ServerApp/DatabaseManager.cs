@@ -64,7 +64,7 @@ namespace ServerApp
             {
                 databaseNames += childNode.Attributes.GetNamedItem("databaseName").Value + '|';
             }
-            return databaseNames.Remove(databaseNames.Length -1);
+            return databaseNames.Remove(databaseNames.Length - 1);
         }
 
         private static string FetchTables(string dbName)

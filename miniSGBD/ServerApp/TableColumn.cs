@@ -13,18 +13,16 @@ namespace ServerApp
         public string Type { get; }
         public int Length { get; }
         public bool IsUnique { get; }
-        public bool IsNotNull { get; }
-        public string ForeignKey { get; }
+        public bool AllowsNulls { get; }
 
-        public TableColumn(string _name, bool _isPrimaryKey, string _type, int _length, bool _isUnique, bool _isNotNull, string _foreignKey)
+        public TableColumn(string _name, bool _isPrimaryKey, string _type, int _length, bool _isUnique, bool _allowsNulls)
         {
             Name = _name;
             IsPrimaryKey = _isPrimaryKey;
             Type = _type;
             Length = _length;
             IsUnique = _isUnique;
-            IsNotNull = _isNotNull;
-            ForeignKey = _foreignKey;
+            AllowsNulls = _allowsNulls;
         }
         
     }

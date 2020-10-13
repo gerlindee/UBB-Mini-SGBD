@@ -54,6 +54,8 @@
             this.tablesList.TabIndex = 1;
             this.tablesList.UseCompatibleStateImageBehavior = false;
             this.tablesList.View = System.Windows.Forms.View.List;
+            this.tablesList.MouseClick += new System.Windows.Forms.MouseEventHandler(this.tablesList_MouseClick);
+
             // 
             // addDB_btn
             // 

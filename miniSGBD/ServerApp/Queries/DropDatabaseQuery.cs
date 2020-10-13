@@ -13,7 +13,7 @@ namespace ServerApp.Queries
     class DropDatabaseQuery : AbstractQuery
     {
         private string DatabaseName;
-        public DropDatabaseQuery(string _queryAttributes) : base(Commands.DROP_DATABASE, _queryAttributes)
+        public DropDatabaseQuery(string _queryAttributes) : base(Commands.DROP_DATABASE)
         {
 
         }

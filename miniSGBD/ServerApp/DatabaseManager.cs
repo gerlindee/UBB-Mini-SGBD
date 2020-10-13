@@ -72,7 +72,6 @@ namespace ServerApp
             var tableNames = Responses.GENERAL_DISPLAY_ENTRIES + ';';
             var xmlDocument = XDocument.Load(Application.StartupPath + "\\SGBDCatalog.xml");
 
-            XElement givenDatabaseNode = null;
             XElement[] databasesNodes = xmlDocument.Element("Databases").Descendants("Database").ToArray();
             XElement givenDB = Array.Find(databasesNodes, elem => elem.Attribute("databaseName").Value.Equals(dbName));
 
@@ -84,6 +83,31 @@ namespace ServerApp
             }
 
             return tableNames.Remove(tableNames.Length -1);
+        }
+
+        private static string FetchTableInformation(string databaseName, string tableName)
+        {
+            var columnInfo = Responses.GENERAL_DISPLAY_ENTRIES + ';';
+            var xmlDocument = XDocument.Load(Application.StartupPath + "\\SGBDCatalog.xml");
+
+            XElement[] databasesNodes = xmlDocument.Element("Databases").Descendants("Database").ToArray();
+            XElement givenDatabase = Array.Find(databasesNodes, elem => elem.Attribute("databaseName").Value.Equals(databaseName));
+            XElement[] databasesTables = givenDatabase.Descendants("Table").ToArray();
+            XElement givenTable = Array.Find(databasesTables, elem => elem.Attribute("tableName").Value.Equals(tableName));
+
+            XElement[] tableColumnsNodes = givenTable.Descendants("Structure").Descendants("Column").ToArray();
+
+            // Get the names of the columns that are primary keys
+            var primaryKeyNames = new List<string>();
+            XElement[] primaryKeyNodes = givenTable.Descendants("PrimaryKey").Descendants("PrimaryKeyColumn").ToArray();
+
+
+            // Get the names of the columns that are unique 
+
+            // Get column structure information
+
+
+            return columnInfo;
         }
     }
 }

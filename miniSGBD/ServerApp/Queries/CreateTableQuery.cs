@@ -123,9 +123,14 @@ namespace ServerApp.Queries
             {
                 XElement columnNode = new XElement("Column",
                                             new XAttribute("allowsNulls", tableColumn.AllowsNulls),
-                                            new XAttribute("length", tableColumn.Length),
                                             new XAttribute("type", tableColumn.Type),
                                             new XAttribute("columnName", tableColumn.Name));
+
+                if (tableColumn.Length != 0)
+                {
+                    columnNode.SetAttributeValue("length", tableColumn.Length);
+                }
+
                 structureNode.Add(columnNode);
                 rowLength += tableColumn.Length;
 
@@ -142,6 +147,7 @@ namespace ServerApp.Queries
                 }
             }
 
+            // Create the Foreign Key tags 
             if (AreThereForeignKeys())
             {
                 foreach (string reference in ReferencedTables)
@@ -149,9 +155,7 @@ namespace ServerApp.Queries
                     XElement foreignKeyNode = new XElement("ForeignKey");
                     foreignKeysNode.Add(foreignKeyNode);
 
-                    XElement referencesNode = new XElement("References");
-                    foreignKeyNode.Add(referencesNode);
-                    referencesNode.Add(new XElement("ReferencedTable", reference));
+                    foreignKeyNode.Add(new XElement("ReferencedTable", reference));
 
                     foreach (TableColumn foreignKey in GetPrimaryKeysOfGivenTable(reference, givenDatabaseNode))
                     {

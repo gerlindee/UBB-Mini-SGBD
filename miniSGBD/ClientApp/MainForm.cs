@@ -120,6 +120,8 @@ namespace miniSGBD
         {
             AddDatabaseForm createDBForm = new AddDatabaseForm(tcpClient);
             createDBForm.ShowDialog(this);
+            var serverResponse = tcpClient.ReadFromServer();	            
+            MessageBox.Show(serverResponse, "Execution result", MessageBoxButtons.OK, MessageBoxIcon.Information);
             populateDatabases();
         }
 

@@ -61,10 +61,10 @@
             // label_table_name
             // 
             this.label_table_name.AutoSize = true;
-            this.label_table_name.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label_table_name.Location = new System.Drawing.Point(12, 21);
+            this.label_table_name.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label_table_name.Location = new System.Drawing.Point(15, 30);
             this.label_table_name.Name = "label_table_name";
-            this.label_table_name.Size = new System.Drawing.Size(148, 29);
+            this.label_table_name.Size = new System.Drawing.Size(101, 20);
             this.label_table_name.TabIndex = 19;
             this.label_table_name.Text = "Table name:";
             // 
@@ -262,7 +262,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.BackColor = System.Drawing.SystemColors.MenuBar;
             this.ClientSize = new System.Drawing.Size(1014, 710);
             this.Controls.Add(this.label8);
             this.Controls.Add(this.label5);
@@ -278,7 +278,7 @@
             this.Controls.Add(this.text_table_name);
             this.Controls.Add(this.label_table_name);
             this.Name = "TestFormTables";
-            this.Text = "TestFormTables";
+            this.Text = "Create Table";
             this.panel_table_column.ResumeLayout(false);
             this.panel_table_column.PerformLayout();
             this.ResumeLayout(false);

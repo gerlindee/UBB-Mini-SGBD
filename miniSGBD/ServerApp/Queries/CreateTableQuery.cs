@@ -149,12 +149,6 @@ namespace ServerApp.Queries
                     XElement foreignKeyNode = new XElement("ForeignKey");
                     foreignKeysNode.Add(foreignKeyNode);
 
-                    foreach (TableColumn primaryKey in GetPrimaryKeysCurrentTable())
-                    {
-                        XElement fkAttributeNode = new XElement("ForeignKeyColumn", primaryKey.Name);
-                        foreignKeyNode.Add(fkAttributeNode);
-                    }
-
                     XElement referencesNode = new XElement("References");
                     foreignKeyNode.Add(referencesNode);
                     referencesNode.Add(new XElement("ReferencedTable", reference));

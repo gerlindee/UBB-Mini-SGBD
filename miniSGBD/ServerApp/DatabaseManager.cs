@@ -41,7 +41,7 @@ namespace ServerApp
                     break;
                 case Commands.DROP_TABLE:
                     {
-                        executionResponse = new DropTableQuery(commandSplit[1],  commandSplit[2]).Execute();
+                        executionResponse = new DropTableQuery(commandSplit[1], commandSplit[2]).Execute();
                     }
                     break;
                 case Commands.GET_ALL_TABLES:

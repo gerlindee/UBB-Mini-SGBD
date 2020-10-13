@@ -15,15 +15,16 @@ namespace ServerApp.Queries
         private string TableName;
         private List<TableColumn> Columns;
         private List<string> ReferencedTables;
+        private string QueryAttributes;
 
         public CreateTableQuery(string _queryAttributes) : base(Commands.CREATE_TABLE)
         {
-
+            QueryAttributes = _queryAttributes;
         }
 
         public override void ParseAttributes()
         {
-            var tableAttributes = base.QueryAttributes.Split('#');
+            var tableAttributes = QueryAttributes.Split('#');
             DatabaseName = tableAttributes[0];
             TableName = tableAttributes[1];
             Columns = new List<TableColumn>();

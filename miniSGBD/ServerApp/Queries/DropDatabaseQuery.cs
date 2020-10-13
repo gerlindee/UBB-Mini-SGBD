@@ -15,12 +15,12 @@ namespace ServerApp.Queries
         private string DatabaseName;
         public DropDatabaseQuery(string _queryAttributes) : base(Commands.DROP_DATABASE)
         {
-
+            DatabaseName = _queryAttributes;
         }
 
         public override void ParseAttributes()
         {
-            DatabaseName = base.QueryAttributes;
+            
         }
 
         public override string ValidateQuery()

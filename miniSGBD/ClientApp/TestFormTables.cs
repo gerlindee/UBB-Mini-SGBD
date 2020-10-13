@@ -155,7 +155,16 @@ namespace miniSGBD
             }
 
             tcpClient.Write(message);
-            Close();
+            var serverResponse = tcpClient.ReadFromServer();
+            if (serverResponse == Commands.MapCommandToSuccessResponse(Commands.CREATE_DATABASE))
+            {
+                MessageBox.Show(serverResponse, "Query Execution Result", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Close();
+            } 
+            else
+            {
+                MessageBox.Show(serverResponse, "Query Execution Result", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
         
         public bool validateColumn()

@@ -61,10 +61,7 @@ namespace miniSGBD
                 foreach (var dbName in databasesNames)
                     databasesList.Items.Add(dbName);
             }
-            catch (Exception) 
-            {
-                // No databases have been added yet 
-            }
+            catch (Exception) {}
         }
 
         private void populateTables()
@@ -72,20 +69,15 @@ namespace miniSGBD
             tablesList.Clear();
             tcpClient.Write(Commands.GET_ALL_TABLES + ';' + selectedDatabase);
             var serverResponse = tcpClient.ReadFromServer();
-
             var commandSplit = serverResponse.Split(';');
 
             try
             {
                 var tableNames = commandSplit[1].Split('|');
-
                 foreach (var tName in tableNames)
                     tablesList.Items.Add(tName);
             }
-            catch (Exception)
-            {
-                // No tables have been added yet 
-            }
+            catch (Exception) {}
         }
 
         private void databasesList_MouseClick(object sender, MouseEventArgs e)
@@ -104,7 +96,7 @@ namespace miniSGBD
 
         private void tablesList_MouseClick(object sender, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Left && tablesList.FocusedItem.Bounds.Contains(e.Location))
+            if (e.Button == MouseButtons.Right && tablesList.FocusedItem.Bounds.Contains(e.Location))
             {
                 cm3.Show(tablesList, e.Location);
             }

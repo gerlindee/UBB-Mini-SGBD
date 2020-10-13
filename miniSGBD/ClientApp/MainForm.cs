@@ -112,8 +112,6 @@ namespace miniSGBD
         {
             AddDatabaseForm createDBForm = new AddDatabaseForm(tcpClient);
             createDBForm.ShowDialog(this);
-            var serverResponse = tcpClient.ReadFromServer();	            
-            MessageBox.Show(serverResponse, "Execution result", MessageBoxButtons.OK, MessageBoxIcon.Information);
             populateDatabases();
         }
 
@@ -121,6 +119,8 @@ namespace miniSGBD
         {
             var selectedDBName = databasesList.FocusedItem.Text;
             tcpClient.Write(Commands.DROP_DATABASE + ";" + selectedDBName);
+            var serverResponse = tcpClient.ReadFromServer();
+            MessageBox.Show(serverResponse, "Query Execution Result", MessageBoxButtons.OK, MessageBoxIcon.Information);
             populateDatabases();
         }
 
@@ -130,7 +130,6 @@ namespace miniSGBD
             tcpClient.Write(Commands.DROP_TABLE + ';' + selectedDatabase +";" + selectedTBName);
             var serverResponse = tcpClient.ReadFromServer();
             MessageBox.Show(serverResponse, "Execution result", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
             populateTables();
         }
 
@@ -138,8 +137,6 @@ namespace miniSGBD
         {
             TestFormTables addTableForm = new TestFormTables(selectedDatabase, tcpClient);
             addTableForm.ShowDialog(this);
-            var serverResponse = tcpClient.ReadFromServer();
-            MessageBox.Show(serverResponse, "Execution result", MessageBoxButtons.OK, MessageBoxIcon.Information);
             populateTables();
         }
     }

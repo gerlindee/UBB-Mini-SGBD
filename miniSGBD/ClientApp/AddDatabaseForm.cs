@@ -55,7 +55,6 @@ namespace miniSGBD
                     type = MessageBoxIcon.Information;
             }
             MessageBox.Show(message, caption, MessageBoxButtons.OK, type);
-            this.Close();
         }
     }
 }

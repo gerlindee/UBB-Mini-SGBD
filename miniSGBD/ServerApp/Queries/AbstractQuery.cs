@@ -10,7 +10,6 @@ namespace ServerApp.Queries
     public abstract class AbstractQuery
     {
         public string QueryCommand;
-        public string QueryAttributes;
 
         public AbstractQuery(string _queryType)
         {

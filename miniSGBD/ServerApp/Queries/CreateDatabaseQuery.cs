@@ -15,12 +15,12 @@ namespace ServerApp.Queries
         private string DatabaseName; 
         public CreateDatabaseQuery(string _queryAttributes) : base(Commands.CREATE_DATABASE)
         {
-            
+            DatabaseName = _queryAttributes;
         }
 
         public override void ParseAttributes()
         {
-            DatabaseName = base.QueryAttributes;
+            
         }
 
         public override string ValidateQuery()

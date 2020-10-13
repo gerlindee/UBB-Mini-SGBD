@@ -16,12 +16,12 @@ namespace miniSGBD
     {
         private readonly Client tcpClient;
         private TreeNode rootNode = new TreeNode("Databases");
-        private static string CREATE_DATABASE = "Create Database";
         private static string DELETE_DATABASE = "Delete Database";
         private static string CREATE_TABLE = "Create Table";
         private static string DELETE_TABLE = "Delete Table";
 
         private static string selectedDatabase = "";
+        private static string selectedTable = "";
 
         MenuItem deleteTableMenuItem = new MenuItem(DELETE_TABLE);
         ContextMenu cm3 = new ContextMenu();
@@ -29,8 +29,6 @@ namespace miniSGBD
         MenuItem deleteDBMenuItem = new MenuItem(DELETE_DATABASE);
         MenuItem createTBMenuItem = new MenuItem(CREATE_TABLE);
         ContextMenu cm2 = new ContextMenu();
-
-
 
         public MainForm(Client client)
         {
@@ -56,10 +54,17 @@ namespace miniSGBD
             var serverResponse = tcpClient.ReadFromServer();
 
             var commandSplit = serverResponse.Split(';');
-            var databasesNames = commandSplit[1].Split('|');
 
-            foreach (var dbName in databasesNames)
-                databasesList.Items.Add(dbName);
+            try
+            {
+                var databasesNames = commandSplit[1].Split('|');
+                foreach (var dbName in databasesNames)
+                    databasesList.Items.Add(dbName);
+            }
+            catch (Exception) 
+            {
+                // No databases have been added yet 
+            }
         }
 
         private void populateTables()
@@ -69,10 +74,18 @@ namespace miniSGBD
             var serverResponse = tcpClient.ReadFromServer();
 
             var commandSplit = serverResponse.Split(';');
-            var tableNames = commandSplit[1].Split('|');
 
-            foreach (var tName in tableNames)
-                tablesList.Items.Add(tName);
+            try
+            {
+                var tableNames = commandSplit[1].Split('|');
+
+                foreach (var tName in tableNames)
+                    tablesList.Items.Add(tName);
+            }
+            catch (Exception)
+            {
+                // No tables have been added yet 
+            }
         }
 
         private void databasesList_MouseClick(object sender, MouseEventArgs e)
@@ -91,9 +104,15 @@ namespace miniSGBD
 
         private void tablesList_MouseClick(object sender, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Left && tablesList.FocusedItem.Bounds.Contains(e.Location))
+            if (e.Button == MouseButtons.Right && tablesList.FocusedItem.Bounds.Contains(e.Location))
             {
                 cm3.Show(tablesList, e.Location);
+            }
+            else if (e.Button == MouseButtons.Left && tablesList.FocusedItem.Bounds.Contains(e.Location))
+            {
+                // get the columns for the table 
+                selectedTable = tablesList.FocusedItem.Text;
+
             }
         }
 
@@ -128,8 +147,8 @@ namespace miniSGBD
         {
             TestFormTables addTableForm = new TestFormTables(selectedDatabase, tcpClient);
             addTableForm.ShowDialog(this);
-            var serverResponse = tcpClient.ReadFromServer();
-            MessageBox.Show(serverResponse, "Execution result", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            // var serverResponse = tcpClient.ReadFromServer();
+            // MessageBox.Show(serverResponse, "Execution result", MessageBoxButtons.OK, MessageBoxIcon.Information);
             populateTables();
         }
     }

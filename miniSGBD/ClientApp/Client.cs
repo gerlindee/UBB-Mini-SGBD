@@ -34,6 +34,7 @@ namespace ClientApp
             try
             {
                 response = Read();
+
             } catch (Exception)
             {
                 Thread.Sleep(TimeSpan.FromSeconds(10));

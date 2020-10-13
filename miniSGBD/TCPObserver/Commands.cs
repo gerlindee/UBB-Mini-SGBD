@@ -17,6 +17,7 @@ namespace Utils
         public const string CREATE_TABLE = "CREATE_TABLE";
         public const string GET_ALL_TABLES = "GET_ALL_TABLES";
         public const string DROP_TABLE = "DROP_TABLE";
+        public const string GET_TABLE_INFORMATION = "GET_TABLE_INFORMATION";
 
         public static string MapCommandToSuccessResponse(string command)
         {

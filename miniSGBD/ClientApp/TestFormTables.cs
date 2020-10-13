@@ -70,13 +70,20 @@ namespace miniSGBD
         {
             tcpClient.Write(Commands.GET_ALL_TABLES + ';' + databaseName);
             var serverResponse = tcpClient.ReadFromServer();
-            var tableNames = serverResponse.Split(';')[1].Split('|');
-            foreach(string tableName in tableNames)
+            try
             {
-                if (tableName != "")
+                var tableNames = serverResponse.Split(';')[1].Split('|');
+                foreach (string tableName in tableNames)
                 {
-                    list_related_tables.Items.Add(tableName);
+                    if (tableName != "")
+                    {
+                        list_related_tables.Items.Add(tableName);
+                    }
                 }
+            }
+            catch (Exception)
+            {
+                // There are no tables in the database 
             }
         }
 
@@ -141,16 +148,22 @@ namespace miniSGBD
 
         private void button_add_reference_Click(object sender, EventArgs e)
         {
-            var selectedTable = list_related_tables.SelectedItems[0];
-            list_referenced_tables.Items.Add(selectedTable.Text);
-            list_related_tables.Items.Remove(selectedTable);
+            if (list_related_tables.Items.Count > 0)
+            {
+                var selectedTable = list_related_tables.SelectedItems[0];
+                list_referenced_tables.Items.Add(selectedTable.Text);
+                list_related_tables.Items.Remove(selectedTable);
+            }
         }
 
         private void button_remove_reference_Click(object sender, EventArgs e)
         {
-            var selectedTable = list_referenced_tables.SelectedItems[0];
-            list_related_tables.Items.Add(selectedTable.Text);
-            list_referenced_tables.Items.Remove(selectedTable);
+            if (list_referenced_tables.Items.Count > 0)
+            {
+                var selectedTable = list_referenced_tables.SelectedItems[0];
+                list_related_tables.Items.Add(selectedTable.Text);
+                list_referenced_tables.Items.Remove(selectedTable);
+            }
         }
 
         private void button_table_cancel_Click(object sender, EventArgs e)

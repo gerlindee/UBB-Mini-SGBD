@@ -39,6 +39,11 @@ namespace ServerApp
                         executionResponse = new CreateTableQuery(commandSplit[1]).Execute();
                     }
                     break;
+                case Commands.DROP_TABLE:
+                    {
+                        executionResponse = new DropTableQuery(commandSplit[1],  commandSplit[2]).Execute();
+                    }
+                    break;
                 case Commands.GET_ALL_TABLES:
                     {
                         executionResponse = FetchTables(commandSplit[1]);
@@ -78,7 +83,7 @@ namespace ServerApp
                 tableNames += table.Attribute("tableName").Value + "|";
             }
 
-            return tableNames;//.Remove(tableNames.Length -1);
+            return tableNames.Remove(tableNames.Length -1);
         }
     }
 }

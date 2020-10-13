@@ -13,7 +13,7 @@ namespace ServerApp.Queries
     public class CreateDatabaseQuery : AbstractQuery
     {
         private string DatabaseName; 
-        public CreateDatabaseQuery(string _queryAttributes) : base(Commands.CREATE_DATABASE, _queryAttributes)
+        public CreateDatabaseQuery(string _queryAttributes) : base(Commands.CREATE_DATABASE)
         {
             
         }

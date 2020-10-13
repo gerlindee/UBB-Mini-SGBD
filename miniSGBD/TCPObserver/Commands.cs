@@ -16,6 +16,7 @@ namespace Utils
         // Table Commands
         public const string CREATE_TABLE = "CREATE_TABLE";
         public const string GET_ALL_TABLES = "GET_ALL_TABLES";
+        public const string DROP_TABLE = "DROP_TABLE";
 
         public static string MapCommandToSuccessResponse(string command)
         {
@@ -27,6 +28,8 @@ namespace Utils
                     return Responses.DROP_DATABASE_SUCCESS;
                 case CREATE_TABLE:
                     return Responses.CREATE_TABLE_SUCCESS;
+                case DROP_TABLE:
+                    return Responses.DROP_TABLE_SUCCESS;
             }
             return "";
         }
@@ -48,5 +51,7 @@ namespace Utils
         // Table Responses
         public const string CREATE_TABLE_SUCCESS = "Table created successfully!";
         public const string CREATE_TABLE_ALREADY_EXISTS = "A table with the given name alredy exists in the specified database!";
+        public const string DROP_TABLE_SUCCESS = "Table deleted successfully!";
+        public const string DROP_TABLE_DOESNT_EXIST = "A table with the given name does not exist!";
     }
 }

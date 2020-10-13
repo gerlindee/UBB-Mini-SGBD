@@ -34,8 +34,8 @@
             this.addTable_btn = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.listView1 = new System.Windows.Forms.ListView();
-            this.listView2 = new System.Windows.Forms.ListView();
+            this.table_structure_list = new System.Windows.Forms.ListView();
+            this.table_contents_list = new System.Windows.Forms.ListView();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.SuspendLayout();
@@ -106,25 +106,25 @@
             this.label2.TabIndex = 5;
             this.label2.Text = "Tables";
             // 
-            // listView1
+            // table_structure_list
             // 
-            this.listView1.HideSelection = false;
-            this.listView1.Location = new System.Drawing.Point(352, 47);
-            this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(379, 142);
-            this.listView1.TabIndex = 6;
-            this.listView1.UseCompatibleStateImageBehavior = false;
-            this.listView1.View = System.Windows.Forms.View.List;
+            this.table_structure_list.HideSelection = false;
+            this.table_structure_list.Location = new System.Drawing.Point(352, 47);
+            this.table_structure_list.Name = "table_structure_list";
+            this.table_structure_list.Size = new System.Drawing.Size(379, 142);
+            this.table_structure_list.TabIndex = 6;
+            this.table_structure_list.UseCompatibleStateImageBehavior = false;
+            this.table_structure_list.View = System.Windows.Forms.View.List;
             // 
-            // listView2
+            // table_contents_list
             // 
-            this.listView2.HideSelection = false;
-            this.listView2.Location = new System.Drawing.Point(352, 233);
-            this.listView2.Name = "listView2";
-            this.listView2.Size = new System.Drawing.Size(379, 142);
-            this.listView2.TabIndex = 7;
-            this.listView2.UseCompatibleStateImageBehavior = false;
-            this.listView2.View = System.Windows.Forms.View.List;
+            this.table_contents_list.HideSelection = false;
+            this.table_contents_list.Location = new System.Drawing.Point(352, 233);
+            this.table_contents_list.Name = "table_contents_list";
+            this.table_contents_list.Size = new System.Drawing.Size(379, 142);
+            this.table_contents_list.TabIndex = 7;
+            this.table_contents_list.UseCompatibleStateImageBehavior = false;
+            this.table_contents_list.View = System.Windows.Forms.View.List;
             // 
             // label3
             // 
@@ -153,8 +153,8 @@
             this.ClientSize = new System.Drawing.Size(752, 387);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
-            this.Controls.Add(this.listView2);
-            this.Controls.Add(this.listView1);
+            this.Controls.Add(this.table_contents_list);
+            this.Controls.Add(this.table_structure_list);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.addTable_btn);
@@ -177,8 +177,8 @@
         private System.Windows.Forms.Button addTable_btn;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.ListView listView1;
-        private System.Windows.Forms.ListView listView2;
+        private System.Windows.Forms.ListView table_structure_list;
+        private System.Windows.Forms.ListView table_contents_list;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
     }

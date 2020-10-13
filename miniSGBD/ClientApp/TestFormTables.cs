@@ -25,7 +25,7 @@ namespace miniSGBD
         private List<CheckBox> columnAllowNulls;
 
         private int rowCount = 0;
-        private int rowIndex ;
+        private int rowIndex;
         private int maxColumns = 9; // TODO: find how to get rid of maxrows 
 
         public TestFormTables(string _databaseName, Client _tcpClient)
@@ -141,7 +141,7 @@ namespace miniSGBD
             var message = Commands.CREATE_TABLE + ";" + databaseName + "#" + text_table_name.Text + "#";
 
             // Adding column values to the message
-            for(int idx = 0; idx < rowCount; idx++)
+            for(int idx = 0; idx <= rowCount; idx++)
             {
                 message += columnNames[idx].Text + "|" + columnPrimaryKeys[idx].Checked.ToString() + "|"
                                + columnTypes[idx].SelectedItem.ToString() + "|" + columnLengths[idx].Text + "|"
@@ -156,7 +156,7 @@ namespace miniSGBD
 
             tcpClient.Write(message);
             var serverResponse = tcpClient.ReadFromServer();
-            if (serverResponse == Commands.MapCommandToSuccessResponse(Commands.CREATE_DATABASE))
+            if (serverResponse == Commands.MapCommandToSuccessResponse(Commands.CREATE_TABLE))
             {
                 MessageBox.Show(serverResponse, "Query Execution Result", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 Close();

@@ -14,6 +14,7 @@ namespace ServerApp.Queries
         private string DatabaseName;
         private string TableName;
         private List<TableColumn> Columns;
+        private List<string> ReferencedTables;
 
         public CreateTableQuery(string _queryAttributes) : base(Commands.CREATE_TABLE, _queryAttributes)
         {
@@ -26,6 +27,7 @@ namespace ServerApp.Queries
             DatabaseName = tableAttributes[0];
             TableName = tableAttributes[1];
             Columns = new List<TableColumn>();
+            ReferencedTables = new List<string>();
             for (int idx = 2; idx < tableAttributes.Length - 1; idx++)
             {
                 var columnAttributes = tableAttributes[idx].Split('|');
@@ -35,8 +37,19 @@ namespace ServerApp.Queries
                 int.TryParse(columnAttributes[3], out var columnLength);
                 var columnUnique = bool.Parse(columnAttributes[4]);
                 var columnAllowNull = bool.Parse(columnAttributes[5]);
-                var columnFK = columnAttributes[6];
-                Columns.Add(new TableColumn(columnName, columnPK, columnType, columnLength, columnUnique, columnAllowNull, columnFK));
+                Columns.Add(new TableColumn(columnName, columnPK, columnType, columnLength, columnUnique, columnAllowNull));
+            }
+
+            if (tableAttributes[tableAttributes.Length - 1] != "")
+            {
+                var refTables = tableAttributes[tableAttributes.Length - 1].Split('|');
+                foreach (string tableName in refTables)
+                {
+                    if (tableName != "")
+                    {
+                        ReferencedTables.Add(tableName);
+                    }
+                }
             }
         }
 
@@ -109,7 +122,7 @@ namespace ServerApp.Queries
             foreach(TableColumn tableColumn in Columns)
             {
                 XElement columnNode = new XElement("Column",
-                                            new XAttribute("notNull", tableColumn.AllowNull),
+                                            new XAttribute("allowsNulls", tableColumn.AllowsNulls),
                                             new XAttribute("length", tableColumn.Length),
                                             new XAttribute("type", tableColumn.Type),
                                             new XAttribute("columnName", tableColumn.Name));
@@ -128,6 +141,49 @@ namespace ServerApp.Queries
                     uniqueKeysNode.Add(uniqueColumnNode);
                 }
             }
+
+            if (AreThereForeignKeys())
+            {
+                foreach (string reference in ReferencedTables)
+                {
+                    XElement foreignKeyNode = new XElement("ForeignKey");
+                    foreignKeysNode.Add(foreignKeyNode);
+
+                    XElement referencesNode = new XElement("References");
+                    foreignKeyNode.Add(referencesNode);
+                    referencesNode.Add(new XElement("ReferencedTable", reference));
+
+                    foreach (TableColumn foreignKey in GetPrimaryKeysOfGivenTable(reference, givenDatabaseNode))
+                    {
+                        XElement referencedColumn = new XElement("ReferencedColumn", foreignKey.Name);
+                        referencesNode.Add(referencedColumn);
+
+                        // Also add the PK field to the table structure as a column
+                        structureNode.Add( new XElement("Column",
+                                                new XAttribute("allowsNulls", foreignKey.AllowsNulls),
+                                                new XAttribute("length", foreignKey.Length),
+                                                new XAttribute("type", foreignKey.Type),
+                                                new XAttribute("columnName", foreignKey.Name)));
+                    }
+                }
+            }
+
+            // Create a unique index for the primary keys of the table
+            XElement primaryKeyIndexNode = new XElement("IndexFile");
+            int indexLength = 0;
+            string indexName = "Index_" + TableName + "_"; 
+            foreach (TableColumn primaryKey in GetPrimaryKeysCurrentTable())
+            {
+                indexLength += primaryKey.Length;
+                indexName += primaryKey.Name + "_";
+
+                primaryKeyIndexNode.Add(new XElement("IndexAttribute", primaryKey.Name));
+            }
+            primaryKeyIndexNode.SetAttributeValue("indexType", "BTree");
+            primaryKeyIndexNode.SetAttributeValue("keyLength", indexLength);
+            primaryKeyIndexNode.SetAttributeValue("isUnique", true.ToString());
+            primaryKeyIndexNode.SetAttributeValue("indexName", indexName.Remove(indexName.Length - 1));
+            indexFilesAttribute.Add(primaryKeyIndexNode);
 
             newTableNode.SetAttributeValue("rowLength", rowLength);
             newTableNode.SetAttributeValue("fileName", TableName + ".kv");
@@ -148,12 +204,55 @@ namespace ServerApp.Queries
 
         public bool AreThereForeignKeys()
         {
-            foreach(TableColumn tableColumn in Columns)
+            return ReferencedTables.Count > 0; 
+        }
+
+        public List<TableColumn> GetPrimaryKeysCurrentTable()
+        {
+            var primaryKeys = new List<TableColumn>();
+            foreach (TableColumn tableColumn in Columns)
             {
-                if (tableColumn.ForeignKey != "Empty")
-                    return true;
+                if (tableColumn.IsPrimaryKey)
+                    primaryKeys.Add(tableColumn);
             }
-            return false;
+            return primaryKeys;
+        }
+
+        public List<TableColumn> GetPrimaryKeysOfGivenTable(string tableName, XElement databaseNode)
+        {
+            var primaryKeys = new List<string>();
+            
+            XElement givenTable = null;
+            XElement[] tableNodes = databaseNode.Descendants("Table").ToArray();
+            for (int i = 0; i < tableNodes.Length; i++)
+            {
+                if (tableNodes[i].Attribute("tableName").Value.Equals(tableName))
+                {
+                    givenTable = tableNodes[i];
+                    break;
+                }
+            }
+
+            XElement[] primaryKeyNodes = givenTable.Descendants("PrimaryKey").Descendants("PrimaryKeyColumn").ToArray();
+            foreach (XElement pkNode in primaryKeyNodes)
+            {
+                primaryKeys.Add(pkNode.Value);
+            }
+
+            List<TableColumn> primaryKeysObjects = new List<TableColumn>();
+            XElement[] tableColumnsNodes = givenTable.Descendants("Structure").Descendants("Column").ToArray();
+            foreach (XElement column in tableColumnsNodes)
+            {
+                var columnName = column.Attribute("columnName").Value;
+                if (primaryKeys.Contains(columnName))
+                {
+                    var columnLength = column.Attribute("length").Value;
+                    var columnType = column.Attribute("type").Value;
+                    var columnAllowsNulls = column.Attribute("allowsNulls").Value;
+                    primaryKeysObjects.Add(new TableColumn(columnName, false, columnType, int.Parse(columnLength), false, bool.Parse(columnAllowsNulls)));
+                }
+            }
+            return primaryKeysObjects;
         }
     }
 }

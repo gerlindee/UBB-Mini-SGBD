@@ -149,9 +149,9 @@ namespace ServerApp.Queries
                     XElement foreignKeyNode = new XElement("ForeignKey");
                     foreignKeysNode.Add(foreignKeyNode);
 
-                    foreach (string primaryKey in GetPrimaryKeysCurrentTable())
+                    foreach (TableColumn primaryKey in GetPrimaryKeysCurrentTable())
                     {
-                        XElement fkAttributeNode = new XElement("ForeignKeyColumn", primaryKey);
+                        XElement fkAttributeNode = new XElement("ForeignKeyColumn", primaryKey.Name);
                         foreignKeyNode.Add(fkAttributeNode);
                     }
 
@@ -173,6 +173,23 @@ namespace ServerApp.Queries
                     }
                 }
             }
+
+            // Create a unique index for the primary keys of the table
+            XElement primaryKeyIndexNode = new XElement("IndexFile");
+            int indexLength = 0;
+            string indexName = "Index_" + TableName + "_"; 
+            foreach (TableColumn primaryKey in GetPrimaryKeysCurrentTable())
+            {
+                indexLength += primaryKey.Length;
+                indexName += primaryKey.Name + "_";
+
+                primaryKeyIndexNode.Add(new XElement("IndexAttribute", primaryKey.Name));
+            }
+            primaryKeyIndexNode.SetAttributeValue("indexType", "BTree");
+            primaryKeyIndexNode.SetAttributeValue("keyLength", indexLength);
+            primaryKeyIndexNode.SetAttributeValue("isUnique", true.ToString());
+            primaryKeyIndexNode.SetAttributeValue("indexName", indexName.Remove(indexName.Length - 1));
+            indexFilesAttribute.Add(primaryKeyIndexNode);
 
             newTableNode.SetAttributeValue("rowLength", rowLength);
             newTableNode.SetAttributeValue("fileName", TableName + ".kv");
@@ -196,13 +213,13 @@ namespace ServerApp.Queries
             return ReferencedTables.Count > 0; 
         }
 
-        public List<string> GetPrimaryKeysCurrentTable()
+        public List<TableColumn> GetPrimaryKeysCurrentTable()
         {
-            var primaryKeys = new List<string>();
+            var primaryKeys = new List<TableColumn>();
             foreach (TableColumn tableColumn in Columns)
             {
                 if (tableColumn.IsPrimaryKey)
-                    primaryKeys.Add(tableColumn.Name);
+                    primaryKeys.Add(tableColumn);
             }
             return primaryKeys;
         }

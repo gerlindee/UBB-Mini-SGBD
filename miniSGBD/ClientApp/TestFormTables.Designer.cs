@@ -45,6 +45,8 @@
             this.button_remove_reference = new System.Windows.Forms.Button();
             this.list_related_tables = new System.Windows.Forms.ListView();
             this.list_referenced_tables = new System.Windows.Forms.ListView();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
             this.panel_table_column.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -236,12 +238,34 @@
             this.list_referenced_tables.UseCompatibleStateImageBehavior = false;
             this.list_referenced_tables.View = System.Windows.Forms.View.List;
             // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.BackColor = System.Drawing.SystemColors.HighlightText;
+            this.label5.Location = new System.Drawing.Point(23, 496);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(104, 17);
+            this.label5.TabIndex = 32;
+            this.label5.Text = "Related Tables";
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.BackColor = System.Drawing.SystemColors.HighlightText;
+            this.label8.Location = new System.Drawing.Point(470, 497);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(129, 17);
+            this.label8.TabIndex = 33;
+            this.label8.Text = "Referenced Tables";
+            // 
             // TestFormTables
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.ClientSize = new System.Drawing.Size(1014, 710);
+            this.Controls.Add(this.label8);
+            this.Controls.Add(this.label5);
             this.Controls.Add(this.list_referenced_tables);
             this.Controls.Add(this.list_related_tables);
             this.Controls.Add(this.button_remove_reference);
@@ -281,5 +305,7 @@
         private System.Windows.Forms.Button button_remove_reference;
         private System.Windows.Forms.ListView list_related_tables;
         private System.Windows.Forms.ListView list_referenced_tables;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label8;
     }
 }

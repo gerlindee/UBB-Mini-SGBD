@@ -48,8 +48,8 @@ namespace miniSGBD
             typesComboBox.Items.Add("LONGTEXT");
             typesComboBox.Items.Add("BOOLEAN");
             typesComboBox.Items.Add("INT");
-            typesComboBox.Items.Add("FLOAT");  // doesn't need size, but needs precesion
-            typesComboBox.Items.Add("DOUBLE"); // needs both size and precision
+            typesComboBox.Items.Add("FLOAT");  
+            typesComboBox.Items.Add("DOUBLE");
             typesComboBox.Items.Add("DATE"); 
             typesComboBox.Items.Add("TIME");
             typesComboBox.Items.Add("DATETIME");
@@ -73,7 +73,10 @@ namespace miniSGBD
             var tableNames = serverResponse.Split(';')[1].Split('|');
             foreach(string tableName in tableNames)
             {
-                list_related_tables.Items.Add(tableName);
+                if (tableName != "")
+                {
+                    list_related_tables.Items.Add(tableName);
+                }
             }
         }
 

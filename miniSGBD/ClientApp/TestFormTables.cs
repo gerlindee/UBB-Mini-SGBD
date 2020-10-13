@@ -113,12 +113,20 @@ namespace miniSGBD
             // TODO: validations
             var message = Commands.CREATE_TABLE + ";" + databaseName + "#" + text_table_name.Text + "#";
 
+            // Adding column values to the message
             for(int idx = 0; idx < rowCount; idx++)
             {
                 message += columnNames[idx].Text + "|" + columnPrimaryKeys[idx].Checked.ToString() + "|"
                                + columnTypes[idx].SelectedItem.ToString() + "|" + columnLengths[idx].Text + "|"
-                               + columnUniques[idx].Checked.ToString() + "|" + columnAllowNulls[idx].Checked.ToString() + "|";
+                               + columnUniques[idx].Checked.ToString() + "|" + columnAllowNulls[idx].Checked.ToString() + "#";
             }
+
+            // Adding FKs at the end of the message 
+            foreach (ListViewItem referencedTables in list_referenced_tables.Items)
+            {
+                message += referencedTables.Text + "|";
+            }
+
             tcpClient.Write(message);
             Close();
         }

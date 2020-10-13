@@ -160,7 +160,7 @@ namespace ServerApp.Queries
                     foreach (TableColumn foreignKey in GetPrimaryKeysOfGivenTable(reference, givenDatabaseNode))
                     {
                         XElement referencedColumn = new XElement("ReferencedColumn", foreignKey.Name);
-                        referencesNode.Add(referencedColumn);
+                        foreignKeyNode.Add(referencedColumn);
 
                         // Also add the PK field to the table structure as a column
                         structureNode.Add( new XElement("Column",

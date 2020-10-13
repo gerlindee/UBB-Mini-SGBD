@@ -73,7 +73,6 @@ namespace miniSGBD
         {
             tcpClient.Write(Commands.GET_ALL_TABLES + ';' + databaseName);
             var serverResponse = tcpClient.ReadFromServer();
-
             try
             {
                 var tableNames = serverResponse.Split(';')[1].Split('|');

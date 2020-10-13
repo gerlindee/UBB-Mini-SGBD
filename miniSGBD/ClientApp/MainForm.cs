@@ -16,12 +16,12 @@ namespace miniSGBD
     {
         private readonly Client tcpClient;
         private TreeNode rootNode = new TreeNode("Databases");
-        private static string CREATE_DATABASE = "Create Database";
         private static string DELETE_DATABASE = "Delete Database";
         private static string CREATE_TABLE = "Create Table";
         private static string DELETE_TABLE = "Delete Table";
 
         private static string selectedDatabase = "";
+        private static string selectedTable = "";
 
         MenuItem deleteTableMenuItem = new MenuItem(DELETE_TABLE);
         ContextMenu cm3 = new ContextMenu();
@@ -29,8 +29,6 @@ namespace miniSGBD
         MenuItem deleteDBMenuItem = new MenuItem(DELETE_DATABASE);
         MenuItem createTBMenuItem = new MenuItem(CREATE_TABLE);
         ContextMenu cm2 = new ContextMenu();
-
-
 
         public MainForm(Client client)
         {
@@ -72,6 +70,7 @@ namespace miniSGBD
             tcpClient.Write(Commands.GET_ALL_TABLES + ';' + selectedDatabase);
             var serverResponse = tcpClient.ReadFromServer();
             var commandSplit = serverResponse.Split(';');
+
             try
             {
                 var tableNames = commandSplit[1].Split('|');
@@ -101,12 +100,20 @@ namespace miniSGBD
             {
                 cm3.Show(tablesList, e.Location);
             }
+            else if (e.Button == MouseButtons.Left && tablesList.FocusedItem.Bounds.Contains(e.Location))
+            {
+                // get the columns for the table 
+                selectedTable = tablesList.FocusedItem.Text;
+
+            }
         }
 
         private void addDB_buttonClick(object sender, EventArgs e)
         {
             AddDatabaseForm createDBForm = new AddDatabaseForm(tcpClient);
             createDBForm.ShowDialog(this);
+            var serverResponse = tcpClient.ReadFromServer();	            
+            MessageBox.Show(serverResponse, "Execution result", MessageBoxButtons.OK, MessageBoxIcon.Information);
             populateDatabases();
         }
 
@@ -114,9 +121,6 @@ namespace miniSGBD
         {
             var selectedDBName = databasesList.FocusedItem.Text;
             tcpClient.Write(Commands.DROP_DATABASE + ";" + selectedDBName);
-            var serverResponse = tcpClient.ReadFromServer();
-            MessageBox.Show(serverResponse, "Execution result", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
             populateDatabases();
         }
 

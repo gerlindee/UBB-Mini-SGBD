@@ -63,7 +63,7 @@ namespace miniSGBD
             }
 
             var tableColumns = "";
-            var indexName = "INDEX_" + tablename + '_';
+            var indexName = "Index_" + tablename + '_';
             foreach (var item in checkedItems)
             {
                 tableColumns += item.ToString() + '|';

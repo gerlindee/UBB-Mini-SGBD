@@ -19,7 +19,7 @@ namespace miniSGBD
         private static string DELETE_DATABASE = "Delete Database";
         private static string CREATE_TABLE = "Create Table";
         private static string DELETE_TABLE = "Delete Table";
-        private static string CREATE_INDEX = "Create index";
+        private static string CREATE_INDEX = "Create Index";
 
         private static string selectedDatabase = "";
         private static string selectedTable = "";
@@ -100,15 +100,25 @@ namespace miniSGBD
 
         private void tablesList_MouseClick(object sender, MouseEventArgs e)
         {
+            selectedTable = tablesList.FocusedItem.Text;
             if (e.Button == MouseButtons.Right && tablesList.FocusedItem.Bounds.Contains(e.Location))
             {
                 cm3.Show(tablesList, e.Location);
             }
             else if (e.Button == MouseButtons.Left && tablesList.FocusedItem.Bounds.Contains(e.Location))
             {
-                // get the columns for the table 
+                table_structure_list.Clear();
+
+                // Get info about the structure of the clicked table
                 selectedTable = tablesList.FocusedItem.Text;
 
+                tcpClient.Write(Commands.GET_TABLE_INFORMATION + ";" + selectedDatabase + ";" + selectedTable);
+                var serverResponse = tcpClient.ReadFromServer().Split(';');
+                var retreivedInformation = serverResponse[1].Split('|');
+                foreach (string tableInfo in retreivedInformation)
+                {
+                    table_structure_list.Items.Add(tableInfo);
+                }
             }
         }
 
@@ -139,14 +149,8 @@ namespace miniSGBD
 
         private void contextMenu_createIN(object sender, EventArgs e)
         {
-
             IndexForm1 createDBForm = new IndexForm1(tcpClient, selectedDatabase, selectedTable);
             createDBForm.ShowDialog(this);
-
-           /* var selectedTBName = tablesList.FocusedItem.Text;
-            tcpClient.Write(Commands.CREATE_INDEX + ';' + selectedDatabase + ";" + selectedTBName);
-            var serverResponse = tcpClient.ReadFromServer();
-            MessageBox.Show(serverResponse, "Execution result", MessageBoxButtons.OK, MessageBoxIcon.Information);*/
         }
 
         private void addTB_Click(object sender, EventArgs e)

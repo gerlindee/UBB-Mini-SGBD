@@ -64,6 +64,11 @@ namespace ServerApp
                         executionResponse = new CreateIndexQuery(commandSplit[0], true, commandSplit[1], commandSplit[2], commandSplit[3], commandSplit[4]).Execute();
                     }
                     break;
+                case Commands.GET_TABLE_INFORMATION:
+                    {
+                        executionResponse = FetchTableStructureInformation(commandSplit[1], commandSplit[2]);
+                    }
+                    break;
             }
             return executionResponse;
         }
@@ -119,7 +124,7 @@ namespace ServerApp
             return columnNames.Remove(columnNames.Length - 1);
         }
 
-        private static string FetchTableInformation(string databaseName, string tableName)
+        private static string FetchTableStructureInformation(string databaseName, string tableName)
         {
             var columnInfo = Responses.GENERAL_DISPLAY_ENTRIES + ';';
             var xmlDocument = XDocument.Load(Application.StartupPath + "\\SGBDCatalog.xml");
@@ -134,12 +139,81 @@ namespace ServerApp
             // Get the names of the columns that are primary keys
             var primaryKeyNames = new List<string>();
             XElement[] primaryKeyNodes = givenTable.Descendants("PrimaryKey").Descendants("PrimaryKeyColumn").ToArray();
-
+            foreach (var primaryKey in primaryKeyNodes)
+            {
+                primaryKeyNames.Add(primaryKey.Value);
+            }
 
             // Get the names of the columns that are unique 
+            var uniqueKeysNames = new List<string>();
+            XElement[] uniqueKeyNodes = givenTable.Descendants("UniqueKeys").Descendants("UniqueKeyColumn").ToArray();
+            foreach (var uniqueKey in uniqueKeyNodes)
+            {
+                uniqueKeysNames.Add(uniqueKey.Value);
+            }
+
+            // Get the data about columns that are FKs
+            var fkTableNames = new List<string>();
+            var fkColumnNames = new List<string>();
+            XElement[] foreignKeysNodes = givenTable.Descendants("ForeignKeys").Descendants("ForeignKey").ToArray();
+            foreach (var foreignKey in foreignKeysNodes)
+            {
+                var fkTableName = foreignKey.Descendants("ReferencedTable").ToArray()[0].Value;
+                fkTableNames.Add(fkTableName);
+
+                var fkColumnName = foreignKey.Descendants("ReferencedColumn").ToArray()[0].Value;
+                fkColumnNames.Add(fkColumnName);
+            }
 
             // Get column structure information
+            foreach (var column in tableColumnsNodes)
+            {
+                columnInfo += column.Attribute("columnName").Value;
+                if (primaryKeyNames.Contains(column.Attribute("columnName").Value))
+                {
+                    columnInfo += "(PK): ";
+                }
+                else
+                {
+                    columnInfo += ": ";
+                }
+                columnInfo += column.Attribute("type").Value + "(" + column.Attribute("length").Value + "), ";
+                if (uniqueKeysNames.Contains(column.Attribute("columnName").Value))
+                {
+                    columnInfo += "Unique, ";
+                }
+                if (bool.Parse(column.Attribute("allowsNulls").Value))
+                {
+                    columnInfo += "Allows NULLs, ";
+                }
+                for (int idx = 0; idx < fkColumnNames.Count; idx++)
+                {
+                    if (fkColumnNames[idx] == column.Attribute("columnName").Value)
+                    {
+                        columnInfo += "FK referencing table " + fkTableNames[idx] + ", ";
+                    }
+                }
+                // Remove the last semicolon 
+                columnInfo = columnInfo.Remove(columnInfo.Length - 2);
+                columnInfo += "|";
+            }
 
+            // Get index information
+            XElement[] indexNodes = givenTable.Descendants("IndexFiles").Descendants("IndexFile").ToArray();
+            foreach (var indexFile in indexNodes)
+            {
+                columnInfo += indexFile.Attribute("indexName").Value + ": ";
+                if (bool.Parse(indexFile.Attribute("isUnique").Value))
+                {
+                    columnInfo += "Unique Index" + "|";
+                }
+                else
+                {
+                    columnInfo += "Non-unique Index" + "|";
+                }
+            }
+            // Remove the last separator
+            columnInfo = columnInfo.Remove(columnInfo.Length - 1);
 
             return columnInfo;
         }

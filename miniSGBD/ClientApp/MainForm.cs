@@ -45,7 +45,7 @@ namespace miniSGBD
             deleteDBMenuItem.Click += new EventHandler(contextMenu_deleteDB);
             deleteTableMenuItem.Click += new EventHandler(contextMenu_deleteTB);
             createIndexMenuItem.Click += new EventHandler(contextMenu_createIN);
-
+            createTBMenuItem.Click += new EventHandler(addTB_Click);
             addTable_btn.Visible = false;
 
             populateDatabases();
@@ -92,6 +92,7 @@ namespace miniSGBD
             }
             else if (e.Button == MouseButtons.Left && databasesList.FocusedItem.Bounds.Contains(e.Location))
             {
+                table_structure_list.Clear();
                 addTable_btn.Visible = true;
                 selectedDatabase = databasesList.FocusedItem.Text;
                 populateTables();

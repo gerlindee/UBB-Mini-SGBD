@@ -28,27 +28,18 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.text_db_name = new System.Windows.Forms.TextBox();
             this.create_db_btn = new System.Windows.Forms.Button();
             this.cancel_db_btn = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
+            this.text_db_name = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
-            // 
-            // text_db_name
-            // 
-            this.text_db_name.Font = new System.Drawing.Font("Mongolian Baiti", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.text_db_name.Location = new System.Drawing.Point(32, 73);
-            this.text_db_name.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.text_db_name.Name = "text_db_name";
-            this.text_db_name.Size = new System.Drawing.Size(259, 23);
-            this.text_db_name.TabIndex = 0;
             // 
             // create_db_btn
             // 
             this.create_db_btn.Location = new System.Drawing.Point(32, 118);
             this.create_db_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.create_db_btn.Name = "create_db_btn";
-            this.create_db_btn.Size = new System.Drawing.Size(92, 25);
+            this.create_db_btn.Size = new System.Drawing.Size(128, 31);
             this.create_db_btn.TabIndex = 1;
             this.create_db_btn.Text = "Create";
             this.create_db_btn.UseVisualStyleBackColor = true;
@@ -56,10 +47,10 @@
             // 
             // cancel_db_btn
             // 
-            this.cancel_db_btn.Location = new System.Drawing.Point(190, 118);
+            this.cancel_db_btn.Location = new System.Drawing.Point(166, 118);
             this.cancel_db_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.cancel_db_btn.Name = "cancel_db_btn";
-            this.cancel_db_btn.Size = new System.Drawing.Size(100, 25);
+            this.cancel_db_btn.Size = new System.Drawing.Size(124, 31);
             this.cancel_db_btn.TabIndex = 2;
             this.cancel_db_btn.Text = "Cancel";
             this.cancel_db_btn.UseVisualStyleBackColor = true;
@@ -75,16 +66,24 @@
             this.label1.TabIndex = 3;
             this.label1.Text = "Database name:";
             // 
+            // text_db_name
+            // 
+            this.text_db_name.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.text_db_name.Location = new System.Drawing.Point(32, 74);
+            this.text_db_name.Name = "text_db_name";
+            this.text_db_name.Size = new System.Drawing.Size(258, 26);
+            this.text_db_name.TabIndex = 21;
+            // 
             // AddDatabaseForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.SystemColors.MenuBar;
+            this.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ClientSize = new System.Drawing.Size(336, 195);
+            this.Controls.Add(this.text_db_name);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.cancel_db_btn);
             this.Controls.Add(this.create_db_btn);
-            this.Controls.Add(this.text_db_name);
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "AddDatabaseForm";
             this.Text = "Create Database";
@@ -94,10 +93,9 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.TextBox text_db_name;
         private System.Windows.Forms.Button create_db_btn;
         private System.Windows.Forms.Button cancel_db_btn;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TextBox text_db_name;
     }
 }

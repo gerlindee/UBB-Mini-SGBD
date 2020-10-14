@@ -66,23 +66,25 @@
             // 
             // addDB_btn
             // 
+            this.addDB_btn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.addDB_btn.Location = new System.Drawing.Point(12, 345);
             this.addDB_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.addDB_btn.Name = "addDB_btn";
             this.addDB_btn.Size = new System.Drawing.Size(143, 33);
             this.addDB_btn.TabIndex = 2;
-            this.addDB_btn.Text = "Add";
+            this.addDB_btn.Text = "+";
             this.addDB_btn.UseVisualStyleBackColor = true;
             this.addDB_btn.Click += new System.EventHandler(this.addDB_buttonClick);
             // 
             // addTable_btn
             // 
+            this.addTable_btn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.addTable_btn.Location = new System.Drawing.Point(180, 346);
             this.addTable_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.addTable_btn.Name = "addTable_btn";
             this.addTable_btn.Size = new System.Drawing.Size(144, 32);
             this.addTable_btn.TabIndex = 3;
-            this.addTable_btn.Text = "Add";
+            this.addTable_btn.Text = "+";
             this.addTable_btn.UseVisualStyleBackColor = true;
             this.addTable_btn.Click += new System.EventHandler(this.addTB_Click);
             // 
@@ -150,6 +152,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ClientSize = new System.Drawing.Size(752, 387);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);

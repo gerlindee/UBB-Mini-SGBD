@@ -50,10 +50,10 @@
             // 
             // text_table_name
             // 
-            this.text_table_name.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.text_table_name.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.text_table_name.Location = new System.Drawing.Point(17, 53);
             this.text_table_name.Name = "text_table_name";
-            this.text_table_name.Size = new System.Drawing.Size(276, 30);
+            this.text_table_name.Size = new System.Drawing.Size(276, 26);
             this.text_table_name.TabIndex = 20;
             // 
             // label_table_name
@@ -157,7 +157,7 @@
             // 
             // button_table_cancel
             // 
-            this.button_table_cancel.Location = new System.Drawing.Point(820, 53);
+            this.button_table_cancel.Location = new System.Drawing.Point(820, 51);
             this.button_table_cancel.Margin = new System.Windows.Forms.Padding(4);
             this.button_table_cancel.Name = "button_table_cancel";
             this.button_table_cancel.Size = new System.Drawing.Size(100, 28);
@@ -168,7 +168,7 @@
             // 
             // button_table_create
             // 
-            this.button_table_create.Location = new System.Drawing.Point(712, 53);
+            this.button_table_create.Location = new System.Drawing.Point(712, 51);
             this.button_table_create.Margin = new System.Windows.Forms.Padding(4);
             this.button_table_create.Name = "button_table_create";
             this.button_table_create.Size = new System.Drawing.Size(100, 28);
@@ -192,7 +192,7 @@
             // button_add_reference
             // 
             this.button_add_reference.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button_add_reference.Location = new System.Drawing.Point(365, 558);
+            this.button_add_reference.Location = new System.Drawing.Point(365, 547);
             this.button_add_reference.Margin = new System.Windows.Forms.Padding(4);
             this.button_add_reference.Name = "button_add_reference";
             this.button_add_reference.Size = new System.Drawing.Size(51, 44);
@@ -204,7 +204,7 @@
             // button_remove_reference
             // 
             this.button_remove_reference.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button_remove_reference.Location = new System.Drawing.Point(365, 610);
+            this.button_remove_reference.Location = new System.Drawing.Point(365, 599);
             this.button_remove_reference.Margin = new System.Windows.Forms.Padding(4);
             this.button_remove_reference.Name = "button_remove_reference";
             this.button_remove_reference.Size = new System.Drawing.Size(51, 44);
@@ -240,7 +240,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.SystemColors.MenuBar;
+            this.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ClientSize = new System.Drawing.Size(1014, 710);
             this.Controls.Add(this.list_referenced_tables);
             this.Controls.Add(this.list_related_tables);

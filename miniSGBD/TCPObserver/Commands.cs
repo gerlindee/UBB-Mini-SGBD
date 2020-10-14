@@ -19,6 +19,11 @@ namespace Utils
         public const string DROP_TABLE = "DROP_TABLE";
         public const string GET_TABLE_INFORMATION = "GET_TABLE_INFORMATION";
 
+        //Index Commands
+        public const string CREATE_INDEX = "CREATE_INDEX";
+        public const string CREATE_NONUNIQUE_INDEX = "CREATE_NONUNIQUE_INDEX";
+        public const string CREATE_UNIQUE_INDEX = "CREATE_UNIQUE_INDEX";
+
         public static string MapCommandToSuccessResponse(string command)
         {
             switch (command)
@@ -31,6 +36,11 @@ namespace Utils
                     return Responses.CREATE_TABLE_SUCCESS;
                 case DROP_TABLE:
                     return Responses.DROP_TABLE_SUCCESS;
+                case CREATE_NONUNIQUE_INDEX:
+                    return Responses.CREATE_INDEX_SUCCESS;
+                case CREATE_UNIQUE_INDEX:
+                    return Responses.CREATE_INDEX_SUCCESS;
+
             }
             return "";
         }
@@ -54,5 +64,9 @@ namespace Utils
         public const string CREATE_TABLE_ALREADY_EXISTS = "A table with the given name alredy exists in the specified database!";
         public const string DROP_TABLE_SUCCESS = "Table deleted successfully!";
         public const string DROP_TABLE_DOESNT_EXIST = "A table with the given name does not exist!";
+
+        //Index Responses
+        public const string CREATE_INDEX_SUCCESS = "Index created successfully!";
+
     }
 }

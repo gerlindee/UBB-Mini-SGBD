@@ -177,15 +177,26 @@ namespace ServerApp
                 {
                     columnInfo += ": ";
                 }
-                columnInfo += column.Attribute("type").Value + "(" + column.Attribute("length").Value + "), ";
+
+                try
+                {
+                    columnInfo += column.Attribute("type").Value + "(" + column.Attribute("length").Value + "), ";
+                }
+                catch (System.NullReferenceException)
+                {
+                    columnInfo += column.Attribute("type").Value + ", ";
+                }
+
                 if (uniqueKeysNames.Contains(column.Attribute("columnName").Value))
                 {
                     columnInfo += "Unique, ";
                 }
+
                 if (bool.Parse(column.Attribute("allowsNulls").Value))
                 {
                     columnInfo += "Allows NULLs, ";
                 }
+
                 for (int idx = 0; idx < fkColumnNames.Count; idx++)
                 {
                     if (fkColumnNames[idx] == column.Attribute("columnName").Value)

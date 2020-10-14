@@ -102,16 +102,9 @@ namespace miniSGBD
             }
             else if (e.Button == MouseButtons.Left && tablesList.FocusedItem.Bounds.Contains(e.Location))
             {
-                table_structure_list.Clear();
-                // Get info about the clicked table structure 
+                // get the columns for the table 
                 selectedTable = tablesList.FocusedItem.Text;
-                tcpClient.Write(Commands.GET_TABLE_INFORMATION + ";" + selectedDatabase + ";" + selectedTable);
-                var serverResponse = tcpClient.ReadFromServer().Split(';');
-                var retreivedInformation = serverResponse[1].Split('|');
-                foreach (string tableInfo in retreivedInformation)
-                {
-                    table_structure_list.Items.Add(tableInfo);
-                }
+
             }
         }
 

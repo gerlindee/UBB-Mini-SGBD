@@ -49,6 +49,21 @@ namespace ServerApp
                         executionResponse = FetchTables(commandSplit[1]);
                     }
                     break;
+                case Commands.CREATE_INDEX:
+                    {
+                        executionResponse = FetchColumns(commandSplit[1], commandSplit[2]);
+                    }
+                    break;
+                case Commands.CREATE_NONUNIQUE_INDEX:
+                    {
+                        executionResponse = new CreateIndexQuery(commandSplit[0], false, commandSplit[1], commandSplit[2], commandSplit[3], commandSplit[4]).Execute();
+                    }
+                    break;
+                case Commands.CREATE_UNIQUE_INDEX:
+                    {
+                        executionResponse = new CreateIndexQuery(commandSplit[0], true, commandSplit[1], commandSplit[2], commandSplit[3], commandSplit[4]).Execute();
+                    }
+                    break;
             }
             return executionResponse;
         }
@@ -83,6 +98,25 @@ namespace ServerApp
             }
 
             return tableNames.Remove(tableNames.Length -1);
+        }
+
+        private static string FetchColumns(string dbName, string tbName)
+        {
+            var columnNames = Responses.GENERAL_DISPLAY_ENTRIES + ';';
+            var xmlDocument = XDocument.Load(Application.StartupPath + "\\SGBDCatalog.xml");
+
+            XElement[] databasesNodes = xmlDocument.Element("Databases").Descendants("Database").ToArray();
+            XElement givenDB = Array.Find(databasesNodes, elem => elem.Attribute("databaseName").Value.Equals(dbName));
+            XElement[] databasesTables = givenDB.Descendants("Table").ToArray();
+            XElement givenTable = Array.Find(databasesTables, elem => elem.Attribute("tableName").Value.Equals(tbName));
+            XElement[] tableColumnsNodes = givenTable.Descendants("Structure").Descendants("Column").ToArray();
+
+            foreach (var col in tableColumnsNodes)
+            {
+                columnNames += col.Attribute("columnName").Value + "|";
+            }
+
+            return columnNames.Remove(columnNames.Length - 1);
         }
 
         private static string FetchTableInformation(string databaseName, string tableName)

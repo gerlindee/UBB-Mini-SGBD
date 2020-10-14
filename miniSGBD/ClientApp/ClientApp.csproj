@@ -53,6 +53,12 @@
       <DependentUpon>AddDatabaseForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Client.cs" />
+    <Compile Include="IndexForm1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IndexForm1.Designer.cs">
+      <DependentUpon>IndexForm1.cs</DependentUpon>
+    </Compile>
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -69,6 +75,9 @@
     </Compile>
     <EmbeddedResource Include="AddDatabaseForm.resx">
       <DependentUpon>AddDatabaseForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IndexForm1.resx">
+      <DependentUpon>IndexForm1.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>

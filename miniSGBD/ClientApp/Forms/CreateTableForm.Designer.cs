@@ -1,6 +1,6 @@
 ﻿namespace miniSGBD
 {
-    partial class TestFormTables
+    partial class CreateTableForm
     {
         /// <summary>
         /// Required designer variable.

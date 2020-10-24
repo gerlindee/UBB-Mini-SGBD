@@ -12,10 +12,10 @@ using Utils;
 
 namespace miniSGBD
 {
-    public partial class AddDatabaseForm : Form
+    public partial class CreateDatabaseForm : Form
     {
         private readonly Client tcpClient;
-        public AddDatabaseForm(Client client)
+        public CreateDatabaseForm(Client client)
         {
             tcpClient = client;
             InitializeComponent();

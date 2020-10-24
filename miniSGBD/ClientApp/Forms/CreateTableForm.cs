@@ -12,7 +12,7 @@ using Utils;
 
 namespace miniSGBD
 {
-    public partial class TestFormTables : Form
+    public partial class CreateTableForm : Form
     {
         private string databaseName;
         private Client tcpClient;
@@ -28,7 +28,7 @@ namespace miniSGBD
         private int rowIndex;
         private int maxColumns = 9; // TODO: find how to get rid of maxrows 
 
-        public TestFormTables(string _databaseName, Client _tcpClient)
+        public CreateTableForm(string _databaseName, Client _tcpClient)
         {
             databaseName = _databaseName;
             tcpClient = _tcpClient;

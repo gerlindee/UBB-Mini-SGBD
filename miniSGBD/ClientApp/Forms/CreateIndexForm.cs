@@ -12,7 +12,7 @@ using Utils;
 
 namespace miniSGBD
 {
-    public partial class IndexForm1 : Form
+    public partial class CreateIndexForm : Form
     {
         private string databaseName;
         private string tablename;
@@ -21,7 +21,7 @@ namespace miniSGBD
         private string uniqueIndex = "UNIQUE INDEX";
         private string nonUniqueIndex = "NONUNIQUE INDEX";
 
-        public IndexForm1(Client cl, string db, string tb)
+        public CreateIndexForm(Client cl, string db, string tb)
         {
             databaseName = db;
             tablename = tb;

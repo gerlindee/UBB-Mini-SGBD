@@ -1,6 +1,6 @@
 ﻿namespace miniSGBD
 {
-    partial class MainForm
+    partial class MainMenuForm
     {
         /// <summary>
         /// Required designer variable.

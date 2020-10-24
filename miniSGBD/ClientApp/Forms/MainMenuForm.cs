@@ -12,7 +12,7 @@ using Utils;
 
 namespace miniSGBD
 {
-    public partial class MainForm : Form
+    public partial class MainMenuForm : Form
     {
         private readonly Client tcpClient;
         private TreeNode rootNode = new TreeNode("Databases");
@@ -32,7 +32,7 @@ namespace miniSGBD
         MenuItem createTBMenuItem = new MenuItem(CREATE_TABLE);
         ContextMenu cm2 = new ContextMenu();
 
-        public MainForm(Client client)
+        public MainMenuForm(Client client)
         {
             tcpClient = client;
             tcpClient.Connect();
@@ -125,7 +125,7 @@ namespace miniSGBD
 
         private void addDB_buttonClick(object sender, EventArgs e)
         {
-            AddDatabaseForm createDBForm = new AddDatabaseForm(tcpClient);
+            CreateDatabaseForm createDBForm = new CreateDatabaseForm(tcpClient);
             createDBForm.ShowDialog(this);
             populateDatabases();
         }
@@ -150,13 +150,13 @@ namespace miniSGBD
 
         private void contextMenu_createIN(object sender, EventArgs e)
         {
-            IndexForm1 createDBForm = new IndexForm1(tcpClient, selectedDatabase, selectedTable);
+            CreateIndexForm createDBForm = new CreateIndexForm(tcpClient, selectedDatabase, selectedTable);
             createDBForm.ShowDialog(this);
         }
 
         private void addTB_Click(object sender, EventArgs e)
         {
-            TestFormTables addTableForm = new TestFormTables(selectedDatabase, tcpClient);
+            CreateTableForm addTableForm = new CreateTableForm(selectedDatabase, tcpClient);
             addTableForm.ShowDialog(this);
             populateTables();
         }

@@ -173,25 +173,8 @@ namespace ServerApp.Queries
                 }
             }
 
-            // Create a unique index for the primary keys of the table
-            XElement primaryKeyIndexNode = new XElement("IndexFile");
-            int indexLength = 0;
-            string indexName = "Index_" + TableName + "_"; 
-            foreach (TableColumn primaryKey in GetPrimaryKeysCurrentTable())
-            {
-                indexLength += primaryKey.Length;
-                indexName += primaryKey.Name + "_";
-
-                primaryKeyIndexNode.Add(new XElement("IndexAttribute", primaryKey.Name));
-            }
-            primaryKeyIndexNode.SetAttributeValue("indexType", "BTree");
-            primaryKeyIndexNode.SetAttributeValue("keyLength", indexLength);
-            primaryKeyIndexNode.SetAttributeValue("isUnique", true.ToString());
-            primaryKeyIndexNode.SetAttributeValue("indexName", indexName.Remove(indexName.Length - 1));
-            indexFilesAttribute.Add(primaryKeyIndexNode);
-
             newTableNode.SetAttributeValue("rowLength", rowLength);
-            newTableNode.SetAttributeValue("fileName", TableName + ".kv");
+            newTableNode.SetAttributeValue("fileName", DatabaseName + "." + TableName);
             newTableNode.SetAttributeValue("tableName", TableName);
             givenDatabaseNode.Add(newTableNode);
             xmlDocument.Save(Application.StartupPath + "\\SGBDCatalog.xml");

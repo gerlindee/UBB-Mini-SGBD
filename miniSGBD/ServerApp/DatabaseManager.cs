@@ -69,6 +69,11 @@ namespace ServerApp
                         executionResponse = FetchTableStructureInformation(commandSplit[1], commandSplit[2]);
                     }
                     break;
+                case Commands.INSERT_INTO_TABLE:
+                    {
+                        executionResponse = new InsertQuery(commandSplit[1], commandSplit[2], commandSplit[3]).Execute();
+                    }
+                    break;
             }
             return executionResponse;
         }

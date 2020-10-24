@@ -42,11 +42,12 @@
             // 
             // databasesList
             // 
+            this.databasesList.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.databasesList.HideSelection = false;
             this.databasesList.Location = new System.Drawing.Point(12, 47);
             this.databasesList.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.databasesList.Name = "databasesList";
-            this.databasesList.Size = new System.Drawing.Size(143, 294);
+            this.databasesList.Size = new System.Drawing.Size(143, 547);
             this.databasesList.TabIndex = 0;
             this.databasesList.UseCompatibleStateImageBehavior = false;
             this.databasesList.View = System.Windows.Forms.View.List;
@@ -54,11 +55,12 @@
             // 
             // tablesList
             // 
+            this.tablesList.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tablesList.HideSelection = false;
             this.tablesList.Location = new System.Drawing.Point(180, 47);
             this.tablesList.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tablesList.Name = "tablesList";
-            this.tablesList.Size = new System.Drawing.Size(144, 294);
+            this.tablesList.Size = new System.Drawing.Size(144, 547);
             this.tablesList.TabIndex = 1;
             this.tablesList.UseCompatibleStateImageBehavior = false;
             this.tablesList.View = System.Windows.Forms.View.List;
@@ -67,7 +69,7 @@
             // addDB_btn
             // 
             this.addDB_btn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.addDB_btn.Location = new System.Drawing.Point(12, 345);
+            this.addDB_btn.Location = new System.Drawing.Point(12, 598);
             this.addDB_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.addDB_btn.Name = "addDB_btn";
             this.addDB_btn.Size = new System.Drawing.Size(143, 33);
@@ -79,7 +81,7 @@
             // addTable_btn
             // 
             this.addTable_btn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.addTable_btn.Location = new System.Drawing.Point(180, 346);
+            this.addTable_btn.Location = new System.Drawing.Point(180, 598);
             this.addTable_btn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.addTable_btn.Name = "addTable_btn";
             this.addTable_btn.Size = new System.Drawing.Size(144, 32);
@@ -110,10 +112,11 @@
             // 
             // table_structure_list
             // 
+            this.table_structure_list.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.table_structure_list.HideSelection = false;
             this.table_structure_list.Location = new System.Drawing.Point(352, 47);
             this.table_structure_list.Name = "table_structure_list";
-            this.table_structure_list.Size = new System.Drawing.Size(379, 142);
+            this.table_structure_list.Size = new System.Drawing.Size(686, 256);
             this.table_structure_list.TabIndex = 6;
             this.table_structure_list.UseCompatibleStateImageBehavior = false;
             this.table_structure_list.View = System.Windows.Forms.View.List;
@@ -121,9 +124,9 @@
             // table_contents_list
             // 
             this.table_contents_list.HideSelection = false;
-            this.table_contents_list.Location = new System.Drawing.Point(352, 233);
+            this.table_contents_list.Location = new System.Drawing.Point(352, 342);
             this.table_contents_list.Name = "table_contents_list";
-            this.table_contents_list.Size = new System.Drawing.Size(379, 142);
+            this.table_contents_list.Size = new System.Drawing.Size(686, 288);
             this.table_contents_list.TabIndex = 7;
             this.table_contents_list.UseCompatibleStateImageBehavior = false;
             this.table_contents_list.View = System.Windows.Forms.View.List;
@@ -142,18 +145,18 @@
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(348, 210);
+            this.label4.Location = new System.Drawing.Point(348, 319);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(122, 20);
             this.label4.TabIndex = 9;
             this.label4.Text = "Table Contents";
             // 
-            // MainForm
+            // MainMenuForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            this.ClientSize = new System.Drawing.Size(752, 387);
+            this.ClientSize = new System.Drawing.Size(1050, 642);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.table_contents_list);
@@ -165,7 +168,7 @@
             this.Controls.Add(this.tablesList);
             this.Controls.Add(this.databasesList);
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.Name = "MainForm";
+            this.Name = "MainMenuForm";
             this.Text = "DBMS Main Menu";
             this.ResumeLayout(false);
             this.PerformLayout();

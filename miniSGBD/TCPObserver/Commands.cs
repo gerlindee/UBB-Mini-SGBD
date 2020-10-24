@@ -67,7 +67,7 @@ namespace Utils
         public const string CREATE_TABLE_ALREADY_EXISTS = "A table with the given name alredy exists in the specified database!";
         public const string DROP_TABLE_SUCCESS = "Table deleted successfully!";
         public const string DROP_TABLE_DOESNT_EXIST = "A table with the given name does not exist!";
-        public const string INSERT_INTO_TABLE_SUCCESS = "New records created successfully!";
+        public const string INSERT_INTO_TABLE_SUCCESS = "New records added successfully!";
 
         //Index Responses
         public const string CREATE_INDEX_SUCCESS = "Index created successfully!";

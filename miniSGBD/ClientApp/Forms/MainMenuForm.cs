@@ -161,6 +161,8 @@ namespace miniSGBD
         private void contextMenu_insertRecords(object sender, EventArgs e)
         {
             tcpClient.Write(Commands.INSERT_INTO_TABLE + ';' + selectedDatabase + ';' + selectedTable + ";hello|me");
+            var serverResponse = tcpClient.ReadFromServer();
+            MessageBox.Show(serverResponse, "Execution result", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void addTB_Click(object sender, EventArgs e)

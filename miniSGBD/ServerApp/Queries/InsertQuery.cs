@@ -15,6 +15,7 @@ namespace ServerApp.Queries
         private string TableName;
         private string RecordsString;
         private string[] Records;
+        private MongoDBAcess MongoDB; 
 
         public InsertQuery(string _databaseName, string _tableName, string _records) : base(Commands.INSERT_INTO_TABLE)
         {
@@ -28,13 +29,23 @@ namespace ServerApp.Queries
             Records = RecordsString.Split('|');
         }
 
+        public override string ValidateQuery()
+        {
+            try
+            {
+                MongoDB = new MongoDBAcess(DatabaseName, TableName);
+
+            } catch (Exception ex)
+            {
+                return ex.Message;
+            }
+
+            return Responses.INSERT_INTO_TABLE_SUCCESS;
+        }
+
         public override void PerformXMLActions()
         {
-            var mongoClient = new MongoClient("mongodb+srv://mongo_user:parolaMongo@cluster0.qsvie.mongodb.net/" + DatabaseName + "?retryWrites=true&w=majority");
-            var mongoDatabase = mongoClient.GetDatabase(DatabaseName);
-            var mongoCollection = mongoDatabase.GetCollection<BsonDocument>(TableName);
-            BsonDocument newRecord = new BsonDocument().Add("_id", "2").Add("value", "test");
-            mongoCollection.InsertOne(newRecord);
+            MongoDB.InsertKVIntoCollection("4", "test#test#test");
         }
     }
 }

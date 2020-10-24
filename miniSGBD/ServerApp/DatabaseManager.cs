@@ -10,7 +10,7 @@ using System.Xml.Linq;
 using Utils;
 
 namespace ServerApp
-{
+{ 
     static class DatabaseManager
     {
         public static string ExecuteCommand(string command)

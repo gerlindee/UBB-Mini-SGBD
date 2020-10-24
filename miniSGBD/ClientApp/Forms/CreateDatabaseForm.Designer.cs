@@ -1,6 +1,6 @@
 ﻿namespace miniSGBD
 {
-    partial class AddDatabaseForm
+    partial class CreateDatabaseForm
     {
         /// <summary>
         /// Required designer variable.

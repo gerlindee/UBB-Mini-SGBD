@@ -1,6 +1,6 @@
 ﻿namespace miniSGBD
 {
-    partial class IndexForm1
+    partial class CreateIndexForm
     {
         /// <summary>
         /// Required designer variable.

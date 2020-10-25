@@ -23,23 +23,11 @@ namespace ServerApp.Queries
 
         public override void ParseAttributes()
         {
-            /*DBName = _queryAttributesDB;
-            TableName = */
+
         }
 
         public override string ValidateQuery()
         {
-            /* var xmlDocument = new XmlDocument();
-             xmlDocument.Load(Application.StartupPath + "\\SGBDCatalog.xml");
-             XmlElement xmlRoot = xmlDocument.DocumentElement;
-
-             foreach (XmlNode childNode in xmlRoot.ChildNodes)
-             {
-                 if (childNode.Attributes.GetNamedItem("databaseName").Value.Equals(DatabaseName))
-                     return Commands.MapCommandToSuccessResponse(QueryCommand);
-             }
-             //return Responses.DROP_DATABASE_DOESNT_EXIST;*/
-
             return Commands.MapCommandToSuccessResponse(QueryCommand);
         }
 

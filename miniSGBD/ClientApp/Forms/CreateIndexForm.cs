@@ -83,6 +83,7 @@ namespace miniSGBD
             
             var serverResponse = tcpClient.ReadFromServer();
             MessageBox.Show(serverResponse, "Query Execution Result", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            this.Close();
         }
 
         private void cancelIndex_btn_Click(object sender, EventArgs e)

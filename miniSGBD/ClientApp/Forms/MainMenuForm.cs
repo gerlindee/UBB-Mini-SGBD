@@ -106,24 +106,23 @@ namespace miniSGBD
         private void tablesList_MouseClick(object sender, MouseEventArgs e)
         {
             selectedTable = tablesList.FocusedItem.Text;
-            if (e.Button == MouseButtons.Right && tablesList.FocusedItem.Bounds.Contains(e.Location))
+
+            table_structure_list.Clear();
+
+            // Get info about the structure of the clicked table
+            tcpClient.Write(Commands.GET_TABLE_INFORMATION + ";" + selectedDatabase + ";" + selectedTable);
+            var serverResponse = tcpClient.ReadFromServer().Split(';');
+            var retreivedInformation = serverResponse[1].Split('|');
+            foreach (string tableInfo in retreivedInformation)
             {
-                cm3.Show(tablesList, e.Location);
+                table_structure_list.Items.Add(tableInfo);
             }
-            else if (e.Button == MouseButtons.Left && tablesList.FocusedItem.Bounds.Contains(e.Location))
-            {
-                table_structure_list.Clear();
 
-                // Get info about the structure of the clicked table
-                selectedTable = tablesList.FocusedItem.Text;
+            // Get the records for the clicked table
 
-                tcpClient.Write(Commands.GET_TABLE_INFORMATION + ";" + selectedDatabase + ";" + selectedTable);
-                var serverResponse = tcpClient.ReadFromServer().Split(';');
-                var retreivedInformation = serverResponse[1].Split('|');
-                foreach (string tableInfo in retreivedInformation)
-                {
-                    table_structure_list.Items.Add(tableInfo);
-                }
+            if (e.Button == MouseButtons.Right && tablesList.FocusedItem.Bounds.Contains(e.Location))
+            { 
+                cm3.Show(tablesList, e.Location);
             }
         }
 
@@ -150,6 +149,7 @@ namespace miniSGBD
             var serverResponse = tcpClient.ReadFromServer();
             MessageBox.Show(serverResponse, "Execution result", MessageBoxButtons.OK, MessageBoxIcon.Information);
             populateTables();
+            table_structure_list.Clear();
         }
 
         private void contextMenu_createIN(object sender, EventArgs e)

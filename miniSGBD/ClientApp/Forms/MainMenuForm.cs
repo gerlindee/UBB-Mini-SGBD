@@ -97,6 +97,8 @@ namespace miniSGBD
             else if (e.Button == MouseButtons.Left && databasesList.FocusedItem.Bounds.Contains(e.Location))
             {
                 table_structure_list.Clear();
+                table_contents_list.DataSource = null;
+                table_contents_list.Rows.Clear();
                 addTable_btn.Visible = true;
                 selectedDatabase = databasesList.FocusedItem.Text;
                 populateTables();
@@ -108,18 +110,21 @@ namespace miniSGBD
             selectedTable = tablesList.FocusedItem.Text;
 
             table_structure_list.Clear();
-            table_contents_list.Clear();
+            table_contents_list.DataSource = null;
+            table_contents_list.Rows.Clear();
+            var recordsDataTable = new DataTable(); // for displaying the DataGridView of the table contents 
 
-            // Get info about the structure of the clicked table
+            // Display the info about the structure of the clicked table
             tcpClient.Write(Commands.GET_TABLE_INFORMATION + ";" + selectedDatabase + ";" + selectedTable);
             var serverResponse = tcpClient.ReadFromServer().Split(';');
             var retreivedInformation = serverResponse[1].Split('|');
             foreach (string tableInfo in retreivedInformation)
             {
                 table_structure_list.Items.Add(tableInfo);
+                recordsDataTable.Columns.Add(tableInfo.Split(':')[0]);
             }
 
-            // Get the records for the clicked table
+            // Display the records for the clicked table
             tcpClient.Write(Commands.SELECT_RECORDS + ";" + selectedDatabase + ";" + selectedTable);
             serverResponse = tcpClient.ReadFromServer().Split(';');
             if (serverResponse[0] == Commands.MapCommandToSuccessResponse(Commands.SELECT_RECORDS))
@@ -127,8 +132,18 @@ namespace miniSGBD
                 var retrievedRecords = serverResponse[1].Split('|');
                 foreach (string tableRecord in retrievedRecords)
                 {
-                    table_contents_list.Items.Add(tableRecord);
+                    if (tableRecord != "")
+                    {
+                        var tableRecordSplit = tableRecord.Split('#');
+                        var row = recordsDataTable.NewRow();
+                        for (int idx = 0; idx < tableRecordSplit.Length; idx++)
+                        {
+                            row[idx] = tableRecordSplit[idx];
+                        }
+                        recordsDataTable.Rows.Add(row);
+                    }
                 }
+                table_contents_list.DataSource = recordsDataTable;
             }
             else
             {
@@ -165,6 +180,8 @@ namespace miniSGBD
             MessageBox.Show(serverResponse, "Execution result", MessageBoxButtons.OK, MessageBoxIcon.Information);
             populateTables();
             table_structure_list.Clear();
+            table_contents_list.DataSource = null;
+            table_contents_list.Rows.Clear();
         }
 
         private void contextMenu_createIN(object sender, EventArgs e)

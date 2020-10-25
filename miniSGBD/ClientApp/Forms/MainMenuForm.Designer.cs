@@ -35,9 +35,10 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.table_structure_list = new System.Windows.Forms.ListView();
-            this.table_contents_list = new System.Windows.Forms.ListView();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
+            this.table_contents_list = new System.Windows.Forms.DataGridView();
+            ((System.ComponentModel.ISupportInitialize)(this.table_contents_list)).BeginInit();
             this.SuspendLayout();
             // 
             // databasesList
@@ -121,16 +122,6 @@
             this.table_structure_list.UseCompatibleStateImageBehavior = false;
             this.table_structure_list.View = System.Windows.Forms.View.List;
             // 
-            // table_contents_list
-            // 
-            this.table_contents_list.HideSelection = false;
-            this.table_contents_list.Location = new System.Drawing.Point(352, 342);
-            this.table_contents_list.Name = "table_contents_list";
-            this.table_contents_list.Size = new System.Drawing.Size(686, 288);
-            this.table_contents_list.TabIndex = 7;
-            this.table_contents_list.UseCompatibleStateImageBehavior = false;
-            this.table_contents_list.View = System.Windows.Forms.View.List;
-            // 
             // label3
             // 
             this.label3.AutoSize = true;
@@ -151,15 +142,30 @@
             this.label4.TabIndex = 9;
             this.label4.Text = "Table Contents";
             // 
+            // table_contents_list
+            // 
+            this.table_contents_list.AllowUserToAddRows = false;
+            this.table_contents_list.AllowUserToDeleteRows = false;
+            this.table_contents_list.BackgroundColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.table_contents_list.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.table_contents_list.Location = new System.Drawing.Point(352, 342);
+            this.table_contents_list.Name = "table_contents_list";
+            this.table_contents_list.ReadOnly = true;
+            this.table_contents_list.RowHeadersVisible = false;
+            this.table_contents_list.RowHeadersWidth = 51;
+            this.table_contents_list.RowTemplate.Height = 24;
+            this.table_contents_list.Size = new System.Drawing.Size(686, 289);
+            this.table_contents_list.TabIndex = 10;
+            // 
             // MainMenuForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ClientSize = new System.Drawing.Size(1050, 642);
+            this.Controls.Add(this.table_contents_list);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
-            this.Controls.Add(this.table_contents_list);
             this.Controls.Add(this.table_structure_list);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
@@ -170,6 +176,7 @@
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "MainMenuForm";
             this.Text = "DBMS Main Menu";
+            ((System.ComponentModel.ISupportInitialize)(this.table_contents_list)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -184,8 +191,8 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ListView table_structure_list;
-        private System.Windows.Forms.ListView table_contents_list;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.DataGridView table_contents_list;
     }
 }

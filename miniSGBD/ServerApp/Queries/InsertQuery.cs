@@ -33,7 +33,7 @@ namespace ServerApp.Queries
         {
             try
             {
-                MongoDB = new MongoDBAcess(DatabaseName, TableName);
+                MongoDB = new MongoDBAcess(DatabaseName);
 
             } 
             catch (Exception ex)
@@ -48,7 +48,7 @@ namespace ServerApp.Queries
         {
             try
             {
-                MongoDB.InsertKVIntoCollection("5", "test#test#test");
+                MongoDB.InsertKVIntoCollection("5", "test#test#test", TableName);
             }
             catch (Exception ex)
             {

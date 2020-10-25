@@ -1,6 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Driver;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,13 +12,11 @@ namespace ServerApp
     class MongoDBAcess
     {
         private string DatabaseName;
-        private string CollectionName;
-        private IMongoCollection<BsonDocument> MongoCollection; 
+        private IMongoDatabase MongoDatabase;
 
-        public MongoDBAcess(string _databaseName, string _collectionName)
+        public MongoDBAcess(string _databaseName)
         {
             DatabaseName = _databaseName;
-            CollectionName = _collectionName;
             CreateDBConnection();
         }
 
@@ -26,7 +25,7 @@ namespace ServerApp
             try
             {
                 var mongoClient = new MongoClient("mongodb+srv://mongo_user:parolaMongo@cluster0.qsvie.mongodb.net/" + DatabaseName + "?retryWrites=true&w=majority");
-                MongoCollection = mongoClient.GetDatabase(DatabaseName).GetCollection<BsonDocument>(CollectionName);
+                MongoDatabase = mongoClient.GetDatabase(DatabaseName);
             }
             catch (Exception)
             {
@@ -34,16 +33,30 @@ namespace ServerApp
             }
         }
 
-        public void InsertKVIntoCollection(string key, string value)
+        public void InsertKVIntoCollection(string collectionName, string key, string value)
         {
             try
             {
+                var mongoCollection = MongoDatabase.GetCollection<BsonDocument>(collectionName);
                 BsonDocument newRecord = new BsonDocument().Add("_id", key).Add("value", value);
-                MongoCollection.InsertOne(newRecord);
+                mongoCollection.InsertOne(newRecord);
             }
             catch (Exception)
             {
-                throw new Exception("Could not add Key-Value pair to MongoDB cluster");
+                throw new Exception("Could not add Key-Value pair to MongoDB Cluster");
+            }
+        }
+
+        public List<BsonDocument> GetEntireCollection(string collectionName)
+        {
+            try
+            {
+                var mongoCollection = MongoDatabase.GetCollection<BsonDocument>(collectionName);
+                return mongoCollection.Find(new BsonDocument()).ToList();
+            }
+            catch (Exception)
+            {
+                throw new Exception("Could not retrieve the contents of MongoDB Collection: " + collectionName);
             }
         }
     }

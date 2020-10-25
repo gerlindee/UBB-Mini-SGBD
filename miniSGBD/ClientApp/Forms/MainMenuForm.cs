@@ -108,6 +108,7 @@ namespace miniSGBD
             selectedTable = tablesList.FocusedItem.Text;
 
             table_structure_list.Clear();
+            table_contents_list.Clear();
 
             // Get info about the structure of the clicked table
             tcpClient.Write(Commands.GET_TABLE_INFORMATION + ";" + selectedDatabase + ";" + selectedTable);
@@ -119,6 +120,20 @@ namespace miniSGBD
             }
 
             // Get the records for the clicked table
+            tcpClient.Write(Commands.SELECT_RECORDS + ";" + selectedDatabase + ";" + selectedTable);
+            serverResponse = tcpClient.ReadFromServer().Split(';');
+            if (serverResponse[0] == Commands.MapCommandToSuccessResponse(Commands.SELECT_RECORDS))
+            {
+                var retrievedRecords = serverResponse[1].Split('|');
+                foreach (string tableRecord in retrievedRecords)
+                {
+                    table_contents_list.Items.Add(tableRecord);
+                }
+            }
+            else
+            {
+                MessageBox.Show(serverResponse[0], "Query Execution Result", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
 
             if (e.Button == MouseButtons.Right && tablesList.FocusedItem.Bounds.Contains(e.Location))
             { 

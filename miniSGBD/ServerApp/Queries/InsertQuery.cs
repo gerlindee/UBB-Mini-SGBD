@@ -35,7 +35,8 @@ namespace ServerApp.Queries
             {
                 MongoDB = new MongoDBAcess(DatabaseName, TableName);
 
-            } catch (Exception ex)
+            } 
+            catch (Exception ex)
             {
                 return ex.Message;
             }
@@ -45,7 +46,14 @@ namespace ServerApp.Queries
 
         public override void PerformXMLActions()
         {
-            MongoDB.InsertKVIntoCollection("4", "test#test#test");
+            try
+            {
+                MongoDB.InsertKVIntoCollection("5", "test#test#test");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

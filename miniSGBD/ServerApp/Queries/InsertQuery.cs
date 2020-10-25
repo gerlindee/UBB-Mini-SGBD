@@ -34,14 +34,13 @@ namespace ServerApp.Queries
             try
             {
                 MongoDB = new MongoDBAcess(DatabaseName);
+                return Responses.INSERT_INTO_TABLE_SUCCESS;
 
             } 
             catch (Exception ex)
             {
                 return ex.Message;
             }
-
-            return Responses.INSERT_INTO_TABLE_SUCCESS;
         }
 
         public override void PerformXMLActions()

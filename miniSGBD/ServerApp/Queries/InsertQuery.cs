@@ -15,7 +15,6 @@ namespace ServerApp.Queries
         private string TableName;
         private string RecordsString;
         private string[] Records;
-        private MongoDBAcess MongoDB; 
 
         public InsertQuery(string _databaseName, string _tableName, string _records) : base(Commands.INSERT_INTO_TABLE)
         {
@@ -29,25 +28,12 @@ namespace ServerApp.Queries
             Records = RecordsString.Split('|');
         }
 
-        public override string ValidateQuery()
-        {
-            try
-            {
-                MongoDB = new MongoDBAcess(DatabaseName);
-                return Responses.INSERT_INTO_TABLE_SUCCESS;
-
-            } 
-            catch (Exception ex)
-            {
-                return ex.Message;
-            }
-        }
-
         public override void PerformXMLActions()
         {
             try
             {
-                MongoDB.InsertKVIntoCollection("5", "test#test#test", TableName);
+                var mongoDB = new MongoDBAcess(DatabaseName);
+                mongoDB.InsertKVIntoCollection("5", "test#test#test", TableName);
             }
             catch (Exception ex)
             {

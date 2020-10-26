@@ -154,6 +154,7 @@
             this.table_contents_list.RowHeadersVisible = false;
             this.table_contents_list.RowHeadersWidth = 51;
             this.table_contents_list.RowTemplate.Height = 24;
+            this.table_contents_list.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.table_contents_list.Size = new System.Drawing.Size(686, 289);
             this.table_contents_list.TabIndex = 10;
             // 

@@ -69,6 +69,11 @@ namespace ServerApp
                         executionResponse = FetchTableStructureInformation(commandSplit[1], commandSplit[2]);
                     }
                     break;
+                case Commands.GET_TABLE_COLUMNS:
+                    {
+                        executionResponse = FetchTableColumns(commandSplit[1], commandSplit[2]);
+                    }
+                    break;
             }
             return executionResponse;
         }
@@ -144,7 +149,6 @@ namespace ServerApp
                 primaryKeyNames.Add(primaryKey.Value);
             }
 
-            // Get the names of the columns that are unique 
             var uniqueKeysNames = new List<string>();
             XElement[] uniqueKeyNodes = givenTable.Descendants("UniqueKeys").Descendants("UniqueKeyColumn").ToArray();
             foreach (var uniqueKey in uniqueKeyNodes)
@@ -152,7 +156,6 @@ namespace ServerApp
                 uniqueKeysNames.Add(uniqueKey.Value);
             }
 
-            // Get the data about columns that are FKs
             var fkTableNames = new List<string>();
             var fkColumnNames = new List<string>();
             XElement[] foreignKeysNodes = givenTable.Descendants("ForeignKeys").Descendants("ForeignKey").ToArray();
@@ -201,7 +204,7 @@ namespace ServerApp
                 {
                     if (fkColumnNames[idx] == column.Attribute("columnName").Value)
                     {
-                        columnInfo += "FK referencing table " + fkTableNames[idx] + ", ";
+                       columnInfo += "FK referencing table " + fkTableNames[idx] + ", ";
                     }
                 }
                 // Remove the last semicolon 
@@ -224,9 +227,85 @@ namespace ServerApp
                 }
             }
             // Remove the last separator
-            columnInfo = columnInfo.Remove(columnInfo.Length - 1);
+            return columnInfo.Remove(columnInfo.Length - 1);
+        }
 
-            return columnInfo;
+        private static string FetchTableColumns(string databaseName, string tableName)
+        {
+            var columnInfo = Responses.GENERAL_DISPLAY_ENTRIES + ';';
+            var xmlDocument = XDocument.Load(Application.StartupPath + "\\SGBDCatalog.xml");
+
+            XElement[] databasesNodes = xmlDocument.Element("Databases").Descendants("Database").ToArray();
+            XElement givenDatabase = Array.Find(databasesNodes, elem => elem.Attribute("databaseName").Value.Equals(databaseName));
+            XElement[] databasesTables = givenDatabase.Descendants("Table").ToArray();
+            XElement givenTable = Array.Find(databasesTables, elem => elem.Attribute("tableName").Value.Equals(tableName));
+
+            XElement[] tableColumnsNodes = givenTable.Descendants("Structure").Descendants("Column").ToArray();
+
+            // Get the names of the columns that are primary keys
+            var primaryKeyNames = new List<string>();
+            XElement[] primaryKeyNodes = givenTable.Descendants("PrimaryKey").Descendants("PrimaryKeyColumn").ToArray();
+            foreach (var primaryKey in primaryKeyNodes)
+            {
+                primaryKeyNames.Add(primaryKey.Value);
+            }
+
+            // Get the names of the columns that are unique 
+            var uniqueKeysNames = new List<string>();
+            XElement[] uniqueKeyNodes = givenTable.Descendants("UniqueKeys").Descendants("UniqueKeyColumn").ToArray();
+            foreach (var uniqueKey in uniqueKeyNodes)
+            {
+                uniqueKeysNames.Add(uniqueKey.Value);
+            }
+
+            var fkTableNames = new List<string>();
+            var fkColumnNames = new List<string>();
+            XElement[] foreignKeysNodes = givenTable.Descendants("ForeignKeys").Descendants("ForeignKey").ToArray();
+            foreach (var foreignKey in foreignKeysNodes)
+            {
+                var fkTableName = foreignKey.Descendants("ReferencedTable").ToArray()[0].Value;
+                fkTableNames.Add(fkTableName);
+
+                var fkColumnName = foreignKey.Descendants("ReferencedColumn").ToArray()[0].Value;
+                fkColumnNames.Add(fkColumnName);
+            }
+
+            // Get column structure information
+            foreach (var column in tableColumnsNodes)
+            {
+                columnInfo += column.Attribute("columnName").Value;
+                if (primaryKeyNames.Contains(column.Attribute("columnName").Value))
+                {
+                    columnInfo += "#" + ColumnInformation.PK;
+                }
+
+                if (uniqueKeysNames.Contains(column.Attribute("columnName").Value))
+                {
+                    columnInfo += "#" + ColumnInformation.UNQ;
+                }
+
+                if (bool.Parse(column.Attribute("allowsNulls").Value))
+                {
+                    columnInfo += "#" + ColumnInformation.NULL;
+                }
+
+                if (fkColumnNames.Exists(c => c == column.Attribute("columnName").Value))
+                {
+                    columnInfo += "#" + ColumnInformation.FK;
+                }
+
+                try
+                {
+                    columnInfo += "#" + column.Attribute("type").Value + '-' + column.Attribute("length").Value;
+                }
+                catch (System.NullReferenceException)
+                {
+                    columnInfo += "#" + column.Attribute("type").Value;
+                }
+
+                columnInfo += "|";
+            }
+            return columnInfo.Remove(columnInfo.Length - 1);
         }
     }
 }

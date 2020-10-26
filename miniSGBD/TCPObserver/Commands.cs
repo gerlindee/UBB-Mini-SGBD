@@ -18,6 +18,7 @@ namespace Utils
         public const string GET_ALL_TABLES = "GET_ALL_TABLES";
         public const string DROP_TABLE = "DROP_TABLE";
         public const string GET_TABLE_INFORMATION = "GET_TABLE_INFORMATION";
+        public const string GET_TABLE_COLUMNS = "GET_TABLE_COLUMNS";
 
         //Index Commands
         public const string CREATE_INDEX = "CREATE_INDEX";
@@ -68,5 +69,13 @@ namespace Utils
         //Index Responses
         public const string CREATE_INDEX_SUCCESS = "Index created successfully!";
 
+    }
+
+    public static class ColumnInformation
+    {
+        public const string PK = "PK";
+        public const string FK = "FK";
+        public const string UNQ = "UNQ";
+        public const string NULL = "NULL";
     }
 }

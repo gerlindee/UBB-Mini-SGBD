@@ -74,6 +74,16 @@ namespace ServerApp
                         executionResponse = FetchTableColumns(commandSplit[1], commandSplit[2]);
                     }
                     break;
+                case Commands.INSERT_INTO_TABLE:
+                    {
+                        executionResponse = new InsertQuery(commandSplit[1], commandSplit[2], commandSplit[3]).Execute();
+                    }
+                    break;
+                case Commands.SELECT_RECORDS:
+                    {
+                        executionResponse = new SelectQuery(commandSplit[1], commandSplit[2]).Execute();
+                    }
+                    break;
             }
             return executionResponse;
         }
@@ -232,7 +242,9 @@ namespace ServerApp
 
         private static string FetchTableColumns(string databaseName, string tableName)
         {
-            var columnInfo = Responses.GENERAL_DISPLAY_ENTRIES + ';';
+            string pkString = "";
+            string columnInfo = "";
+            var messageInfo = Responses.GENERAL_DISPLAY_ENTRIES + ';';
             var xmlDocument = XDocument.Load(Application.StartupPath + "\\SGBDCatalog.xml");
 
             XElement[] databasesNodes = xmlDocument.Element("Databases").Descendants("Database").ToArray();
@@ -273,39 +285,69 @@ namespace ServerApp
             // Get column structure information
             foreach (var column in tableColumnsNodes)
             {
-                columnInfo += column.Attribute("columnName").Value;
                 if (primaryKeyNames.Contains(column.Attribute("columnName").Value))
                 {
-                    columnInfo += "#" + ColumnInformation.PK;
-                }
+                    pkString += column.Attribute("columnName").Value;
+                    pkString += "#" + ColumnInformation.PK;
 
-                if (uniqueKeysNames.Contains(column.Attribute("columnName").Value))
-                {
-                    columnInfo += "#" + ColumnInformation.UNQ;
-                }
 
-                if (bool.Parse(column.Attribute("allowsNulls").Value))
-                {
-                    columnInfo += "#" + ColumnInformation.NULL;
-                }
+                    if (uniqueKeysNames.Contains(column.Attribute("columnName").Value))
+                    {
+                        pkString += "#" + ColumnInformation.UNQ;
+                    }
 
-                if (fkColumnNames.Exists(c => c == column.Attribute("columnName").Value))
-                {
-                    columnInfo += "#" + ColumnInformation.FK;
-                }
+                    if (bool.Parse(column.Attribute("allowsNulls").Value))
+                    {
+                        pkString += "#" + ColumnInformation.NULL;
+                    }
 
-                try
-                {
-                    columnInfo += "#" + column.Attribute("type").Value + '-' + column.Attribute("length").Value;
-                }
-                catch (System.NullReferenceException)
-                {
-                    columnInfo += "#" + column.Attribute("type").Value;
-                }
+                    if (fkColumnNames.Exists(c => c == column.Attribute("columnName").Value))
+                    {
+                        pkString += "#" + ColumnInformation.FK;
+                    }
 
-                columnInfo += "|";
+                    try
+                    {
+                        pkString += "#" + column.Attribute("type").Value + '-' + column.Attribute("length").Value;
+                    }
+                    catch (System.NullReferenceException)
+                    {
+                        pkString += "#" + column.Attribute("type").Value;
+                    }
+                    pkString += '|';
+                }
+                else
+                {
+                    columnInfo += column.Attribute("columnName").Value;
+
+                    if (uniqueKeysNames.Contains(column.Attribute("columnName").Value))
+                    {
+                        columnInfo += "#" + ColumnInformation.UNQ;
+                    }
+
+                    if (bool.Parse(column.Attribute("allowsNulls").Value))
+                    {
+                        columnInfo += "#" + ColumnInformation.NULL;
+                    }
+
+                    if (fkColumnNames.Exists(c => c == column.Attribute("columnName").Value))
+                    {
+                        columnInfo += "#" + ColumnInformation.FK;
+                    }
+
+                    try
+                    {
+                        columnInfo += "#" + column.Attribute("type").Value + '-' + column.Attribute("length").Value;
+                    }
+                    catch (System.NullReferenceException)
+                    {
+                        columnInfo += "#" + column.Attribute("type").Value;
+                    }
+                    columnInfo += "|";
+                }
             }
-            return columnInfo.Remove(columnInfo.Length - 1);
+            messageInfo = messageInfo + pkString + columnInfo;
+            return messageInfo.Remove(messageInfo.Length - 1);
         }
     }
 }

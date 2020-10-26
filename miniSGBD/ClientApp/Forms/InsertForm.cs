@@ -98,7 +98,7 @@ namespace miniSGBD.Forms
 
         private void insertBtn_Click(object sender, EventArgs e)
         {
-            var message = "";// Commands. + ";" + databaseName + "#" + text_table_name.Text + "#";
+            var message =  Commands.INSERT_INTO_TABLE + ";" + databaseName + ";" + tablename + ";";
             var noRows = dataGrid.Rows.Count;
             if (dataGrid.Rows.Count > 1)
                 noRows -= 1;
@@ -107,12 +107,12 @@ namespace miniSGBD.Forms
             {
                 for (int col = 0; col < dataGrid.Rows[rows].Cells.Count; col++)
                 {
-                    if (validateCell(col, dataGrid.Rows[rows].Cells[col]))
-                        message += dataGrid.Rows[rows].Cells[col].Value.ToString() + ';';
+                    if (!validateCell(col, dataGrid.Rows[rows].Cells[col]))
+                        message += dataGrid.Rows[rows].Cells[col].Value.ToString() + '*';
                     else
                         return;
                 }
-                message += '|';
+                message += '*';
                 message = message.Remove(message.Length - 2);
             }
 
@@ -159,5 +159,10 @@ namespace miniSGBD.Forms
             }
             return true;
         }
+
+/*        private bool createMessage()
+        {
+
+        }*/
     }
 }

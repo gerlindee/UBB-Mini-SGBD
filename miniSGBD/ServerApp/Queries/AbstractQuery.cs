@@ -36,13 +36,20 @@ namespace ServerApp.Queries
 
         public string Execute()
         {
-            ParseAttributes();
-            var validationResult = ValidateQuery();
-            if (validationResult == Commands.MapCommandToSuccessResponse(QueryCommand))
+            try
             {
-                PerformXMLActions();
+                ParseAttributes();
+                var validationResult = ValidateQuery();
+                if (validationResult == Commands.MapCommandToSuccessResponse(QueryCommand))
+                {
+                    PerformXMLActions();
+                }
+                return validationResult;
+            } catch (Exception ex)
+            {
+                return ex.Message;
             }
-            return validationResult;
+
         }
     }
 }

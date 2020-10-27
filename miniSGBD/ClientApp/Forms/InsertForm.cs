@@ -53,20 +53,38 @@ namespace miniSGBD.Forms
 
             for (int rows = 0; rows < noRows; rows++)
             {
+                var primaryKeyColumnsAdded = false;
                 for (int col = 0; col < dataGrid.Rows[rows].Cells.Count; col++)
                 {
                     if (validateCell(col, dataGrid.Rows[rows].Cells[col]))
-                        message += dataGrid.Rows[rows].Cells[col].Value.ToString() + '*';
+                    {
+                        var columnValue = dataGrid.Rows[rows].Cells[col].Value.ToString();
+                        var columnName = dataGrid.Columns[col].HeaderText.ToString();
+                        var columnObject = columnInfoList.Find(c => c.ColumnName == columnName);
+                        if (!columnObject.PK && !primaryKeyColumnsAdded)
+                        {
+                            // this is the point where all values for the composite primary key are done being concatenated to the message
+                            // => add the separator between the key and value and remove the leftover separator from the key part
+                            message = message.Remove(message.Length - 1);
+                            message += '*'; 
+                            primaryKeyColumnsAdded = true; // make sure that the separator between the key and the value is only added once
+                        }
+                        message += columnValue + '#';
+
+                    }
                     else
+                    {
                         return;
+                    }   
                 }
-                message += '*';
-                message = message.Remove(message.Length - 2);
+                message = message.Remove(message.Length - 1); // remove the separator left from separating the non-pk values
+                message += '|';
             }
 
+            message = message.Remove(message.Length - 1); // remove the separator left from separating the key-value pairs
             tcpClient.Write(message);
             var serverResponse = tcpClient.ReadFromServer();
-            if (serverResponse == Commands.MapCommandToSuccessResponse(Commands.CREATE_TABLE))
+            if (serverResponse == Commands.MapCommandToSuccessResponse(Commands.INSERT_INTO_TABLE))
             {
                 MessageBox.Show(serverResponse, "Query Execution Result", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 Close();
@@ -86,7 +104,6 @@ namespace miniSGBD.Forms
             }
 
             var cell = gridCell.Value.ToString();
-            //get column object 
             var columnName = dataGrid.Columns[columnIndex].HeaderText.ToString();
             var columnObject = columnInfoList.Find(c => c.ColumnName == columnName);
 

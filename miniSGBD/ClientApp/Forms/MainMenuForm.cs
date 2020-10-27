@@ -109,19 +109,21 @@ namespace miniSGBD
                 table_structure_list.Clear();
                 table_contents_list.DataSource = null;
                 table_contents_list.Rows.Clear();
+                table_contents_list.Columns.Clear();
+
                 addTable_btn.Visible = true;
                 selectedDatabase = databasesList.FocusedItem.Text;
                 populateTables();
             }
         }
 
-        private void tablesList_MouseClick(object sender, MouseEventArgs e)
+        private void buildTableInformationDisplays()
         {
-            selectedTable = tablesList.FocusedItem.Text;
-
             table_structure_list.Clear();
             table_contents_list.DataSource = null;
             table_contents_list.Rows.Clear();
+            table_contents_list.Columns.Clear();
+            columnInfoList.Clear();
 
             tcpClient.Write(Commands.GET_TABLE_COLUMNS + ";" + selectedDatabase + ";" + selectedTable);
             var serverResponse = tcpClient.ReadFromServer().Split(';');
@@ -159,6 +161,13 @@ namespace miniSGBD
             {
                 MessageBox.Show(serverResponse[0], "Query Execution Result", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void tablesList_MouseClick(object sender, MouseEventArgs e)
+        {
+            selectedTable = tablesList.FocusedItem.Text;
+
+            buildTableInformationDisplays();
 
             if (e.Button == MouseButtons.Right && tablesList.FocusedItem.Bounds.Contains(e.Location))
             { 
@@ -204,6 +213,8 @@ namespace miniSGBD
         {
             InsertForm insertTableForm = new InsertForm(tcpClient, selectedDatabase, selectedTable);
             insertTableForm.ShowDialog(this);
+            // refresh the records table after the InsertForm is closed
+            buildTableInformationDisplays();
         }
 
         private void contextMenu_insertRecords(object sender, EventArgs e)
@@ -222,7 +233,27 @@ namespace miniSGBD
 
         private void contextMenu_deleteRecord(object sender, EventArgs e)
         {
-            //stergem si
+            string messsage = Commands.DELETE_RECORD + ";" + selectedDatabase + ";" + selectedTable + ";";
+            if (selectedRowToDelete > -1)
+            {
+                var row = table_contents_list.Rows[selectedRowToDelete];
+                for(var index =0; index< row.Cells.Count -1; index ++)
+                {
+                    var columnName = table_contents_list.Columns[index].HeaderText.ToString();
+                    if (columnInfoList.Exists(x => x.ColumnName == columnName && x.PK))
+                    {
+                        var columnValue = row.Cells[index].Value.ToString();
+                        messsage += row.Cells[index].Value.ToString() + '#';
+                    }
+                        
+                }
+            }
+
+            tcpClient.Write(messsage.Remove(messsage.Length - 1));
+
+            var serverResponse = tcpClient.ReadFromServer();
+            MessageBox.Show(serverResponse, "Execution result", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        
             selectedRowToDelete = -1;
         }
         private void dataGridView1_MouseClick(object sender, MouseEventArgs e)

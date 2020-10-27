@@ -35,6 +35,7 @@
             // 
             // dataGrid
             // 
+            this.dataGrid.BackgroundColor = System.Drawing.SystemColors.ButtonHighlight;
             this.dataGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGrid.GridColor = System.Drawing.SystemColors.ButtonHighlight;
             this.dataGrid.Location = new System.Drawing.Point(12, 12);

@@ -36,70 +36,18 @@ namespace miniSGBD.Forms
             var serverResponse = tcpClient.ReadFromServer().Split(';');
             var retreivedInformation = serverResponse[1].Split('|');
 
-            parseColumn(retreivedInformation);
+            foreach (var columnInfo in retreivedInformation)
+                columnInfoList.Add(new ColumnInfo(columnInfo));
 
-            var colNames = new List<string>();
             for (var i = 0; i < columnInfoList.Count; i++)
                 dataGrid.Columns.Add(string.Format("col{0}", i), columnInfoList[i].ColumnName);
-        }
-
-        private void parseColumn(string[] splitColumns)
-        {
-            foreach (var columnInfo in splitColumns) 
-            { 
-                var newCol = new ColumnInfo();
-                var columnStruct = columnInfo.Split('#');
-                newCol.ColumnName = columnStruct[0];
-
-                for(var i=1; i< columnStruct.Length; i++)
-                {
-                    switch (columnStruct[i])
-                    {
-                        case ColumnInformation.PK:
-                            {
-                                newCol.PK = true;
-                            }
-                            break;
-                        case ColumnInformation.FK:
-                            {
-                                newCol.FK = true;
-                            }
-                            break;
-                        case ColumnInformation.UNQ:
-                            {
-                                newCol.unique = true;
-                            }
-                            break;
-                        case ColumnInformation.NULL:
-                            {
-                                newCol.nonNull = true;
-                            }
-                            break;
-                        default:
-                            {
-                                try
-                                {
-                                    var types = columnStruct[i].Split('-');
-                                    newCol.type = types[0];
-                                    int.TryParse(types[1], out int val);
-                                    newCol.lenght = val;
-                                }
-                                catch (Exception)
-                                {
-                                    newCol.type = columnStruct[i];
-                                }
-                            }
-                            break;
-                    }
-                }
-                columnInfoList.Add(newCol);
-            }
         }
 
         private void insertBtn_Click(object sender, EventArgs e)
         {
             var message =  Commands.INSERT_INTO_TABLE + ";" + databaseName + ";" + tablename + ";";
             var noRows = dataGrid.Rows.Count;
+            
             if (dataGrid.Rows.Count > 1)
                 noRows -= 1;
 
@@ -107,7 +55,7 @@ namespace miniSGBD.Forms
             {
                 for (int col = 0; col < dataGrid.Rows[rows].Cells.Count; col++)
                 {
-                    if (!validateCell(col, dataGrid.Rows[rows].Cells[col]))
+                    if (validateCell(col, dataGrid.Rows[rows].Cells[col]))
                         message += dataGrid.Rows[rows].Cells[col].Value.ToString() + '*';
                     else
                         return;
@@ -147,12 +95,12 @@ namespace miniSGBD.Forms
                 MessageBox.Show(Validator.EMPTY_FIELD, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
-            if (!Validator.isTypeCorrect(columnObject.type, cell))
+            if (!Validator.isTypeCorrect(columnObject.Type, cell))
             {
                 MessageBox.Show(Validator.WRONG_TYPE, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
-            if (columnObject.lenght != -1 && Validator.isLenghtExceeded(columnObject.lenght, cell.Length))
+            if (columnObject.Lenght != -1 && Validator.isLenghtExceeded(columnObject.Lenght, cell.Length))
             {
                 MessageBox.Show(Validator.EXCEEDED_LENGHT, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;

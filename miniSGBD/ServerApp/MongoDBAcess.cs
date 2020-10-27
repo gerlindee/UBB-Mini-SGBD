@@ -68,6 +68,7 @@ namespace ServerApp
                 var mongoCollection = MongoDatabase.GetCollection<BsonDocument>(collectionName);
                 var deleteFilter = Builders<BsonDocument>.Filter.Empty;
                 mongoCollection.DeleteMany(deleteFilter);
+                MongoDatabase.DropCollection(collectionName);
             }
             catch (Exception)
             {

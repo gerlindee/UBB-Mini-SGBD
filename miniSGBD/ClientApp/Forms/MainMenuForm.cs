@@ -192,8 +192,11 @@ namespace miniSGBD
         }
 
         private void contextMenu_deleteTB(object sender, EventArgs e)
-        {
+        { 
             var selectedTBName = tablesList.FocusedItem.Text;
+            tcpClient.Write(Commands.DELETE_RECORD + ';' + selectedDatabase + ';' + selectedTable + ';' + "ALL");
+            tcpClient.ReadFromServer();
+
             tcpClient.Write(Commands.DROP_TABLE + ';' + selectedDatabase +";" + selectedTBName);
             var serverResponse = tcpClient.ReadFromServer();
             MessageBox.Show(serverResponse, "Execution result", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -201,6 +204,7 @@ namespace miniSGBD
             table_structure_list.Clear();
             table_contents_list.DataSource = null;
             table_contents_list.Rows.Clear();
+            table_contents_list.Columns.Clear();
         }
 
         private void contextMenu_createIN(object sender, EventArgs e)
@@ -252,8 +256,16 @@ namespace miniSGBD
             tcpClient.Write(messsage.Remove(messsage.Length - 1));
 
             var serverResponse = tcpClient.ReadFromServer();
-            MessageBox.Show(serverResponse, "Execution result", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        
+            if (serverResponse == Commands.MapCommandToSuccessResponse(Commands.DELETE_RECORD))
+            {
+                MessageBox.Show(serverResponse, "Execution result", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                MessageBox.Show(serverResponse, "Execution result", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            table_contents_list.Rows.RemoveAt(selectedRowToDelete);
             selectedRowToDelete = -1;
         }
         private void dataGridView1_MouseClick(object sender, MouseEventArgs e)

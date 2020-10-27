@@ -84,6 +84,11 @@ namespace ServerApp
                         executionResponse = new SelectQuery(commandSplit[1], commandSplit[2]).Execute();
                     }
                     break;
+                case Commands.DELETE_RECORD:
+                    {
+                        executionResponse = new DeleteRowsQuery(commandSplit[1], commandSplit[2], commandSplit[3]).Execute();
+                    }
+                    break;
             }
             return executionResponse;
         }

@@ -47,6 +47,34 @@ namespace ServerApp
             }
         }
 
+        public void RemoveKVFromCollection(string collectionName, string key)
+        {
+            try
+            {
+                var mongoCollection = MongoDatabase.GetCollection<BsonDocument>(collectionName);
+                var deleteFilter = Builders<BsonDocument>.Filter.Eq("_id", key);
+                mongoCollection.DeleteOne(deleteFilter);
+            }
+            catch (Exception)
+            {
+                throw new Exception("Could not delete the entry from MongoDB Collection: " + collectionName + "with Key: " + key);
+            }
+        }
+
+        public void RemoveAllKVFromCollection(string collectionName)
+        {
+            try
+            {
+                var mongoCollection = MongoDatabase.GetCollection<BsonDocument>(collectionName);
+                var deleteFilter = Builders<BsonDocument>.Filter.Empty;
+                mongoCollection.DeleteMany(deleteFilter);
+            }
+            catch (Exception)
+            {
+                throw new Exception("Could not delete all entries from MongoDB Collection: " + collectionName);
+            }
+        }
+
         public List<BsonDocument> GetEntireCollection(string collectionName)
         {
             try

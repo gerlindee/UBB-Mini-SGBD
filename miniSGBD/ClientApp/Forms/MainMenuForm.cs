@@ -106,10 +106,8 @@ namespace miniSGBD
             }
         }
 
-        private void tablesList_MouseClick(object sender, MouseEventArgs e)
+        private void buildTableInformationDisplays()
         {
-            selectedTable = tablesList.FocusedItem.Text;
-
             table_structure_list.Clear();
             table_contents_list.DataSource = null;
             table_contents_list.Rows.Clear();
@@ -119,6 +117,7 @@ namespace miniSGBD
             tcpClient.Write(Commands.GET_TABLE_INFORMATION + ";" + selectedDatabase + ";" + selectedTable);
             var serverResponse = tcpClient.ReadFromServer().Split(';');
             var retreivedInformation = serverResponse[1].Split('|');
+
             foreach (string tableInfo in retreivedInformation)
             {
                 table_structure_list.Items.Add(tableInfo);
@@ -150,6 +149,13 @@ namespace miniSGBD
             {
                 MessageBox.Show(serverResponse[0], "Query Execution Result", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void tablesList_MouseClick(object sender, MouseEventArgs e)
+        {
+            selectedTable = tablesList.FocusedItem.Text;
+
+            buildTableInformationDisplays();
 
             if (e.Button == MouseButtons.Right && tablesList.FocusedItem.Bounds.Contains(e.Location))
             { 
@@ -195,6 +201,8 @@ namespace miniSGBD
         {
             InsertForm insertTableForm = new InsertForm(tcpClient, selectedDatabase, selectedTable);
             insertTableForm.ShowDialog(this);
+            // refresh the records table after the InsertForm is closed
+            buildTableInformationDisplays();
         }
 
         private void contextMenu_insertRecords(object sender, EventArgs e)

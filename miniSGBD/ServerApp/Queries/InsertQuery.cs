@@ -1,6 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Driver;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,18 +15,24 @@ namespace ServerApp.Queries
         private string DatabaseName;
         private string TableName;
         private string RecordsString;
-        private string[] Records;
+        private List<KeyValuePair<String, String>> Records;
 
         public InsertQuery(string _databaseName, string _tableName, string _records) : base(Commands.INSERT_INTO_TABLE)
         {
             DatabaseName = _databaseName;
             TableName = _tableName;
             RecordsString = _records;
+            Records = new List<KeyValuePair<String, String>>();
         }
 
         public override void ParseAttributes()
         {
-            Records = RecordsString.Split('|');
+            var recordsArray = RecordsString.Split('|');
+            foreach (var newRecord in recordsArray)
+            {
+                var keyValuePair = newRecord.Split('*');
+                Records.Add(new KeyValuePair<string, string>(keyValuePair[0], keyValuePair[1]));
+            }
         }
 
         public override void PerformXMLActions()
@@ -33,7 +40,10 @@ namespace ServerApp.Queries
             try
             {
                 var mongoDB = new MongoDBAcess(DatabaseName);
-                mongoDB.InsertKVIntoCollection("5", "test#test#test", TableName);
+                foreach (var keyValuePairs in Records)
+                {
+                    mongoDB.InsertKVIntoCollection(TableName, keyValuePairs.Key, keyValuePairs.Value);
+                }
             }
             catch (Exception ex)
             {

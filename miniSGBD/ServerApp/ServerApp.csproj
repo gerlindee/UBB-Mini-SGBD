@@ -119,6 +119,7 @@
     <Compile Include="Queries\CreateDatabaseQuery.cs" />
     <Compile Include="Queries\CreateIndexQuery.cs" />
     <Compile Include="Queries\CreateTableQuery.cs" />
+    <Compile Include="Queries\DeleteRowsQuery.cs" />
     <Compile Include="Queries\DropDatabaseQuery.cs" />
     <Compile Include="DatabaseManager.cs" />
     <Compile Include="Queries\DropTableQuery.cs" />

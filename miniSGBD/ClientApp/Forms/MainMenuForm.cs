@@ -22,6 +22,7 @@ namespace miniSGBD
         private static string DELETE_TABLE = "Delete Table";
         private static string CREATE_INDEX = "Create Index";
         private static string INSERT_TABLE = "Insert in table";
+        private static string DELETE_RECORD = "Delete record";
 
         private static string selectedDatabase = "";
         private static string selectedTable = "";
@@ -35,12 +36,19 @@ namespace miniSGBD
         MenuItem createTBMenuItem = new MenuItem(CREATE_TABLE);
         ContextMenu cm2 = new ContextMenu();
 
+        MenuItem deleteRecordMenuItem = new MenuItem(DELETE_RECORD);
+        ContextMenu cm1 = new ContextMenu();
+
+        private List<ColumnInfo> columnInfoList = new List<ColumnInfo>();
+        private int selectedRowToDelete = -1;
+
         public MainMenuForm(Client client)
         {
             tcpClient = client;
             tcpClient.Connect();
             InitializeComponent();
 
+            cm1.MenuItems.Add(deleteRecordMenuItem);
             cm3.MenuItems.Add(insertTableMenuItem);
             cm3.MenuItems.Add(deleteTableMenuItem);
             cm3.MenuItems.Add(createIndexMenuItem);
@@ -50,7 +58,8 @@ namespace miniSGBD
             deleteDBMenuItem.Click += new EventHandler(contextMenu_deleteDB);
             deleteTableMenuItem.Click += new EventHandler(contextMenu_deleteTB);
             createIndexMenuItem.Click += new EventHandler(contextMenu_createIN);
-            createTBMenuItem.Click += new EventHandler(addTB_Click);
+            createTBMenuItem.Click += new EventHandler(contextMenu_addTable);
+            deleteRecordMenuItem.Click += new EventHandler(contextMenu_deleteRecord);
             addTable_btn.Visible = false;
 
             populateDatabases();
@@ -100,6 +109,8 @@ namespace miniSGBD
                 table_structure_list.Clear();
                 table_contents_list.DataSource = null;
                 table_contents_list.Rows.Clear();
+                table_contents_list.Columns.Clear();
+
                 addTable_btn.Visible = true;
                 selectedDatabase = databasesList.FocusedItem.Text;
                 populateTables();
@@ -111,18 +122,18 @@ namespace miniSGBD
             table_structure_list.Clear();
             table_contents_list.DataSource = null;
             table_contents_list.Rows.Clear();
-            var recordsDataTable = new DataTable(); // for displaying the DataGridView of the table contents 
+            table_contents_list.Columns.Clear();
+            columnInfoList.Clear();
 
-            // Display the info about the structure of the clicked table
-            tcpClient.Write(Commands.GET_TABLE_INFORMATION + ";" + selectedDatabase + ";" + selectedTable);
+            tcpClient.Write(Commands.GET_TABLE_COLUMNS + ";" + selectedDatabase + ";" + selectedTable);
             var serverResponse = tcpClient.ReadFromServer().Split(';');
             var retreivedInformation = serverResponse[1].Split('|');
 
-            foreach (string tableInfo in retreivedInformation)
-            {
-                table_structure_list.Items.Add(tableInfo);
-                recordsDataTable.Columns.Add(tableInfo.Split(':')[0]);
-            }
+            foreach (var columnInfo in retreivedInformation)
+                columnInfoList.Add(new ColumnInfo(columnInfo)); // we have info about all columns
+
+            for (var i = 0; i < columnInfoList.Count; i++)
+                table_contents_list.Columns.Add(string.Format("col{0}", i), columnInfoList[i].ColumnName);
 
             // Display the records for the clicked table
             tcpClient.Write(Commands.SELECT_RECORDS + ";" + selectedDatabase + ";" + selectedTable);
@@ -135,15 +146,16 @@ namespace miniSGBD
                     if (tableRecord != "")
                     {
                         var tableRecordSplit = tableRecord.Split('#');
-                        var row = recordsDataTable.NewRow();
+
+                        int rowIndex = table_contents_list.Rows.Add();
+                        var row = table_contents_list.Rows[rowIndex];
+
                         for (int idx = 0; idx < tableRecordSplit.Length; idx++)
                         {
-                            row[idx] = tableRecordSplit[idx];
-                        }
-                        recordsDataTable.Rows.Add(row);
+                            row.Cells[idx].Value = tableRecordSplit[idx];
+                        }                        
                     }
                 }
-                table_contents_list.DataSource = recordsDataTable;
             }
             else
             {
@@ -180,8 +192,11 @@ namespace miniSGBD
         }
 
         private void contextMenu_deleteTB(object sender, EventArgs e)
-        {
+        { 
             var selectedTBName = tablesList.FocusedItem.Text;
+            tcpClient.Write(Commands.DELETE_RECORD + ';' + selectedDatabase + ';' + selectedTable + ';' + "ALL");
+            tcpClient.ReadFromServer();
+
             tcpClient.Write(Commands.DROP_TABLE + ';' + selectedDatabase +";" + selectedTBName);
             var serverResponse = tcpClient.ReadFromServer();
             MessageBox.Show(serverResponse, "Execution result", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -189,6 +204,7 @@ namespace miniSGBD
             table_structure_list.Clear();
             table_contents_list.DataSource = null;
             table_contents_list.Rows.Clear();
+            table_contents_list.Columns.Clear();
         }
 
         private void contextMenu_createIN(object sender, EventArgs e)
@@ -212,11 +228,57 @@ namespace miniSGBD
             MessageBox.Show(serverResponse, "Execution result", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        private void addTB_Click(object sender, EventArgs e)
+        private void contextMenu_addTable(object sender, EventArgs e)
         {
             CreateTableForm addTableForm = new CreateTableForm(selectedDatabase, tcpClient);
             addTableForm.ShowDialog(this);
             populateTables();
+        }
+
+        private void contextMenu_deleteRecord(object sender, EventArgs e)
+        {
+            string messsage = Commands.DELETE_RECORD + ";" + selectedDatabase + ";" + selectedTable + ";";
+            if (selectedRowToDelete > -1)
+            {
+                var row = table_contents_list.Rows[selectedRowToDelete];
+                for(var index =0; index< row.Cells.Count -1; index ++)
+                {
+                    var columnName = table_contents_list.Columns[index].HeaderText.ToString();
+                    if (columnInfoList.Exists(x => x.ColumnName == columnName && x.PK))
+                    {
+                        var columnValue = row.Cells[index].Value.ToString();
+                        messsage += row.Cells[index].Value.ToString() + '#';
+                    }
+                        
+                }
+            }
+
+            tcpClient.Write(messsage.Remove(messsage.Length - 1));
+
+            var serverResponse = tcpClient.ReadFromServer();
+            if (serverResponse == Commands.MapCommandToSuccessResponse(Commands.DELETE_RECORD))
+            {
+                MessageBox.Show(serverResponse, "Execution result", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                MessageBox.Show(serverResponse, "Execution result", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            table_contents_list.Rows.RemoveAt(selectedRowToDelete);
+            selectedRowToDelete = -1;
+        }
+        private void dataGridView1_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                selectedRowToDelete = table_contents_list.HitTest(e.X, e.Y).RowIndex;
+                if (selectedRowToDelete >= 0) //oriunde in tabel
+                {
+                    cm1.Show(table_contents_list, new Point(e.X, e.Y));
+
+                }
+            }
         }
     }
 }

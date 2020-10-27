@@ -147,6 +147,7 @@ namespace miniSGBD
 
                         int rowIndex = table_contents_list.Rows.Add();
                         var row = table_contents_list.Rows[rowIndex];
+
                         for (int idx = 0; idx < tableRecordSplit.Length; idx++)
                         {
                             row.Cells[idx].Value = tableRecordSplit[idx];

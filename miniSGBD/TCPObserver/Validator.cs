@@ -15,6 +15,11 @@ namespace Utils
         public static string INVALID_LENGHT_USE = "Date types cannot use lenght!";
         public static string LENGHT_NUMERICAL = "Numerical lenght required";
 
+        //insert
+        public static string EMPTY_FIELD = "Fields cannot be empty!";
+        public static string EXCEEDED_LENGHT = "Lenght exceeded!";
+        public static string WRONG_TYPE = "Type not respected!";
+
         public static bool isStringEmpty(string str)
         {
             return str.Equals("");
@@ -38,7 +43,18 @@ namespace Utils
             int val;
             return int.TryParse(str, out val);
         }
-
-
+        public static bool isLenghtExceeded(int lenght, int obj)
+        {
+            int val;
+            return obj > lenght; 
+        }
+        public static bool isTypeCorrect(string type, string value)
+        {
+            if (type == "INT" || type == "BOOLEAN" || type == "DOUBLE" || type == "FLOAT")
+                return int.TryParse(value, out int val);
+            if (type == "DATE" || type == "TIME" || type == "DATETIME")
+                return (DateTime.TryParse(value, out var result) == true);
+            return true;
+        }
     }
 }

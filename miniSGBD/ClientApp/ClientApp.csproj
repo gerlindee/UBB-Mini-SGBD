@@ -59,6 +59,12 @@
     <Compile Include="Forms\CreateIndexForm.Designer.cs">
       <DependentUpon>CreateIndexForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\InsertForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\InsertForm.Designer.cs">
+      <DependentUpon>InsertForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\MainMenuForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -78,6 +84,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\CreateIndexForm.resx">
       <DependentUpon>CreateIndexForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\InsertForm.resx">
+      <DependentUpon>InsertForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\MainMenuForm.resx">
       <DependentUpon>MainMenuForm.cs</DependentUpon>

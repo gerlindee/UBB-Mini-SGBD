@@ -1,4 +1,5 @@
 ﻿using ClientApp;
+using miniSGBD.Forms;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -20,14 +21,14 @@ namespace miniSGBD
         private static string CREATE_TABLE = "Create Table";
         private static string DELETE_TABLE = "Delete Table";
         private static string CREATE_INDEX = "Create Index";
-        private static string INSERT_RECORDS = "Insert Records";
+        private static string INSERT_TABLE = "Insert in table";
 
         private static string selectedDatabase = "";
         private static string selectedTable = "";
 
         MenuItem deleteTableMenuItem = new MenuItem(DELETE_TABLE);
         MenuItem createIndexMenuItem = new MenuItem(CREATE_INDEX);
-        MenuItem insertRecordsMenuItem = new MenuItem(INSERT_RECORDS);
+        MenuItem insertTableMenuItem = new MenuItem(INSERT_TABLE);
         ContextMenu cm3 = new ContextMenu();
 
         MenuItem deleteDBMenuItem = new MenuItem(DELETE_DATABASE);
@@ -40,15 +41,15 @@ namespace miniSGBD
             tcpClient.Connect();
             InitializeComponent();
 
+            cm3.MenuItems.Add(insertTableMenuItem);
             cm3.MenuItems.Add(deleteTableMenuItem);
             cm3.MenuItems.Add(createIndexMenuItem);
-            cm3.MenuItems.Add(insertRecordsMenuItem);
             cm2.MenuItems.Add(deleteDBMenuItem);
             cm2.MenuItems.Add(createTBMenuItem);
+            insertTableMenuItem.Click += new EventHandler(contextMenu_insertTable);
             deleteDBMenuItem.Click += new EventHandler(contextMenu_deleteDB);
             deleteTableMenuItem.Click += new EventHandler(contextMenu_deleteTB);
             createIndexMenuItem.Click += new EventHandler(contextMenu_createIN);
-            insertRecordsMenuItem.Click += new EventHandler(contextMenu_insertRecords);
             createTBMenuItem.Click += new EventHandler(addTB_Click);
             addTable_btn.Visible = false;
 
@@ -188,6 +189,12 @@ namespace miniSGBD
         {
             CreateIndexForm createDBForm = new CreateIndexForm(tcpClient, selectedDatabase, selectedTable);
             createDBForm.ShowDialog(this);
+        }
+        
+        private void contextMenu_insertTable(object sender, EventArgs e)
+        {
+            InsertForm insertTableForm = new InsertForm(tcpClient, selectedDatabase, selectedTable);
+            insertTableForm.ShowDialog(this);
         }
 
         private void contextMenu_insertRecords(object sender, EventArgs e)

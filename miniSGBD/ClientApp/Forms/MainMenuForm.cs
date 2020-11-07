@@ -21,7 +21,7 @@ namespace miniSGBD
         private static string CREATE_TABLE = "Create Table";
         private static string DELETE_TABLE = "Delete Table";
         private static string CREATE_INDEX = "Create Index";
-        private static string INSERT_TABLE = "Insert in table";
+        private static string INSERT_TABLE = "Insert Records";
         private static string DELETE_RECORD = "Delete record";
 
         private static string selectedDatabase = "";
@@ -125,8 +125,16 @@ namespace miniSGBD
             table_contents_list.Columns.Clear();
             columnInfoList.Clear();
 
-            tcpClient.Write(Commands.GET_TABLE_COLUMNS + ";" + selectedDatabase + ";" + selectedTable);
+            tcpClient.Write(Commands.GET_TABLE_INFORMATION + ";" + selectedDatabase + ";" + selectedTable);
             var serverResponse = tcpClient.ReadFromServer().Split(';');
+            var columnsInfo = serverResponse[1].Split('|');
+            foreach (var column in columnsInfo)
+            {
+                table_structure_list.Items.Add(column);
+            }
+
+            tcpClient.Write(Commands.GET_TABLE_COLUMNS + ";" + selectedDatabase + ";" + selectedTable);
+            serverResponse = tcpClient.ReadFromServer().Split(';');
             var retreivedInformation = serverResponse[1].Split('|');
 
             foreach (var columnInfo in retreivedInformation)

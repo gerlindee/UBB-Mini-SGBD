@@ -37,32 +37,38 @@
             // 
             this.dataGrid.BackgroundColor = System.Drawing.SystemColors.ButtonHighlight;
             this.dataGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGrid.GridColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.dataGrid.Location = new System.Drawing.Point(12, 12);
+            this.dataGrid.GridColor = System.Drawing.SystemColors.ButtonShadow;
+            this.dataGrid.Location = new System.Drawing.Point(11, 10);
+            this.dataGrid.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.dataGrid.Name = "dataGrid";
+            this.dataGrid.RowHeadersVisible = false;
             this.dataGrid.RowHeadersWidth = 62;
             this.dataGrid.RowTemplate.Height = 28;
             this.dataGrid.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGrid.Size = new System.Drawing.Size(614, 331);
+            this.dataGrid.Size = new System.Drawing.Size(697, 423);
             this.dataGrid.TabIndex = 0;
             // 
             // insertBtn
             // 
-            this.insertBtn.Location = new System.Drawing.Point(263, 367);
+            this.insertBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.insertBtn.Location = new System.Drawing.Point(12, 437);
+            this.insertBtn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.insertBtn.Name = "insertBtn";
-            this.insertBtn.Size = new System.Drawing.Size(112, 40);
+            this.insertBtn.Size = new System.Drawing.Size(696, 32);
             this.insertBtn.TabIndex = 1;
-            this.insertBtn.Text = "Insert";
+            this.insertBtn.Text = "Insert Records";
             this.insertBtn.UseVisualStyleBackColor = true;
             this.insertBtn.Click += new System.EventHandler(this.insertBtn_Click);
             // 
             // InsertForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(638, 450);
+            this.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
+            this.ClientSize = new System.Drawing.Size(720, 480);
             this.Controls.Add(this.insertBtn);
             this.Controls.Add(this.dataGrid);
+            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "InsertForm";
             this.Text = "Insert in Table";
             ((System.ComponentModel.ISupportInitialize)(this.dataGrid)).EndInit();

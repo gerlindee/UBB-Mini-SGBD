@@ -55,8 +55,20 @@ namespace ServerApp.Queries
             indexNode.SetAttributeValue("indexType", "BTree");
             indexNode.SetAttributeValue("isUnique", indexType);
             indexNode.SetAttributeValue("indexName", indexName);
+            indexNode.SetAttributeValue("fileName", indexName);
             indexFilesNode.Add(indexNode);
             xmlDocument.Save(Application.StartupPath + "\\SGBDCatalog.xml");
+
+            // Create corresponding MongoDB collection for the Index
+            try
+            {
+                var mongoDB = new MongoDBAcess(DBName);
+                mongoDB.CreateCollection(indexName);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

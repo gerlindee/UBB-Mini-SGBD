@@ -59,7 +59,7 @@ namespace ServerApp
             }
             catch (Exception)
             {
-                throw new Exception("Could not add Key-Value pair to MongoDB Cluster");
+                throw new Exception("Duplicate PK:" + key);
             }
         }
 

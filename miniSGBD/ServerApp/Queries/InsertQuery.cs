@@ -47,7 +47,7 @@ namespace ServerApp.Queries
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                throw new Exception("A record with Primary Key " + ex.Message.Split(':')[1] + " already exists in table " + TableName + "!" );
             }
         }
     }

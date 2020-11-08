@@ -14,11 +14,13 @@ namespace ServerApp.Queries
     {
         private string DBName;
         private string TableName;
+        private MongoDBAcess MongoDB;
 
         public DropTableQuery(string _queryAttributesDB, string _queryAttributesTB) : base(Commands.DROP_TABLE)
         {
             DBName = _queryAttributesDB;
             TableName = _queryAttributesTB;
+            MongoDB = new MongoDBAcess(DBName);
         }
 
         public override void ParseAttributes()
@@ -32,19 +34,50 @@ namespace ServerApp.Queries
         }
 
         public override void PerformXMLActions()
-        {
-            var xmlDocument = XDocument.Load(Application.StartupPath + "\\SGBDCatalog.xml");
-            XElement deletedXMLTag = null;
+        {   
+            try
+            {
+                var xmlDocument = XDocument.Load(Application.StartupPath + "\\SGBDCatalog.xml");
 
-            XElement givenDatabaseNode = null;
-            XElement[] databasesNodes = xmlDocument.Element("Databases").Descendants("Database").ToArray();
-            XElement givenDB = Array.Find(databasesNodes, elem => elem.Attribute("databaseName").Value.Equals(DBName));
+                XElement givenDatabaseNode = null;
+                XElement[] databasesNodes = xmlDocument.Element("Databases").Descendants("Database").ToArray();
+                XElement givenDB = Array.Find(databasesNodes, elem => elem.Attribute("databaseName").Value.Equals(DBName));
 
-            XElement[] databasesTables = givenDB.Descendants("Table").ToArray();
-            deletedXMLTag = Array.Find(databasesTables, elem => elem.Attribute("tableName").Value.Equals(TableName));
+                XElement[] databasesTables = givenDB.Descendants("Table").ToArray();
+                XElement deletedXMLTag = Array.Find(databasesTables, elem => elem.Attribute("tableName").Value.Equals(TableName));
 
-            deletedXMLTag.Remove();
-            xmlDocument.Save(Application.StartupPath + "\\SGBDCatalog.xml");
+                // Delete the records from the table, stored in the MongoDB collection
+                new DeleteRowsQuery(DBName, TableName, "ALL").Execute();
+
+                // Delete unique key collections from MongoDB
+                XElement[] uniqueKeysNodes = deletedXMLTag.Descendants("UniqueKeys").Descendants("UniqueKeyColumn").ToArray(); 
+                foreach (var uniqueKey in uniqueKeysNodes)
+                {
+                    MongoDB.RemoveAllKVFromCollection(uniqueKey.Attribute("fileName").Value);
+                }
+
+                // Delete index file collections from MongoDB
+                XElement[] indexNodes = deletedXMLTag.Descendants("IndexFiles").Descendants("IndexFile").ToArray();
+                foreach (var index in indexNodes)
+                {
+                    MongoDB.RemoveAllKVFromCollection(index.Attribute("fileName").Value);
+                }
+
+                // Delete foreign key file collection from MongoDB 
+                XElement[] foreignKeysNodes = deletedXMLTag.Descendants("ForeignKeys").Descendants("ForeignKey").ToArray();
+                foreach (var foreignKey in foreignKeysNodes)
+                {
+                    MongoDB.RemoveAllKVFromCollection(foreignKey.Attribute("fileName").Value);
+                }
+
+                // Delete the XML content for the table  
+                deletedXMLTag.Remove();
+                xmlDocument.Save(Application.StartupPath + "\\SGBDCatalog.xml");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

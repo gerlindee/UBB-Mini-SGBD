@@ -16,6 +16,7 @@ namespace ServerApp.Queries
         private List<TableColumn> Columns;
         private List<string> ReferencedTables;
         private string QueryAttributes;
+        private MongoDBAcess MongoDB;
 
         public CreateTableQuery(string _queryAttributes) : base(Commands.CREATE_TABLE)
         {
@@ -29,6 +30,8 @@ namespace ServerApp.Queries
             TableName = tableAttributes[1];
             Columns = new List<TableColumn>();
             ReferencedTables = new List<string>();
+
+            // Columns definition
             for (int idx = 2; idx < tableAttributes.Length - 1; idx++)
             {
                 var columnAttributes = tableAttributes[idx].Split('|');
@@ -41,6 +44,7 @@ namespace ServerApp.Queries
                 Columns.Add(new TableColumn(columnName, columnPK, columnType, columnLength, columnUnique, columnAllowNull));
             }
 
+            // FK references definition 
             if (tableAttributes[tableAttributes.Length - 1] != "")
             {
                 var refTables = tableAttributes[tableAttributes.Length - 1].Split('|');
@@ -52,6 +56,8 @@ namespace ServerApp.Queries
                     }
                 }
             }
+
+            MongoDB = new MongoDBAcess(DatabaseName);
         }
 
         public override string ValidateQuery()
@@ -144,7 +150,12 @@ namespace ServerApp.Queries
                 if (tableColumn.IsUnique)
                 {
                     XElement uniqueColumnNode = new XElement("UniqueKeyColumn", tableColumn.Name);
+                    var uniqueKeyFilename = "UK_" + TableName + '_' + tableColumn.Name;
+                    uniqueColumnNode.Add(new XAttribute("fileName", uniqueKeyFilename));
                     uniqueKeysNode.Add(uniqueColumnNode);
+
+                    // Create MongoDB collection for unique key 
+                    MongoDB.CreateCollection(uniqueKeyFilename);
                 }
             }
 
@@ -153,8 +164,13 @@ namespace ServerApp.Queries
             {
                 foreach (string reference in ReferencedTables)
                 {
+                    // Create MongoDB Collection for the FK Index file 
+                    MongoDB.CreateCollection("FK_" + TableName + "_" + reference);
+
+                    // Create the XML nodes for the Reference 
                     XElement foreignKeyNode = new XElement("ForeignKey");
                     foreignKeysNode.Add(foreignKeyNode);
+                    foreignKeyNode.Add(new XAttribute("fileName", "FK_" + TableName + "_" + reference));
 
                     foreignKeyNode.Add(new XElement("ReferencedTable", reference));
 
@@ -174,10 +190,21 @@ namespace ServerApp.Queries
             }
 
             newTableNode.SetAttributeValue("rowLength", rowLength);
-            newTableNode.SetAttributeValue("fileName", DatabaseName + "." + TableName);
+            newTableNode.SetAttributeValue("fileName", TableName);
             newTableNode.SetAttributeValue("tableName", TableName);
             givenDatabaseNode.Add(newTableNode);
             xmlDocument.Save(Application.StartupPath + "\\SGBDCatalog.xml");
+            
+            // Create the correponding MongoDB Collection for the table 
+            try
+            {
+                var mongoDB = new MongoDBAcess(DatabaseName);
+                mongoDB.CreateCollection(TableName);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
         private bool AreThereUniqueKeys()

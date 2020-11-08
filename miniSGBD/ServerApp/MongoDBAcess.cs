@@ -20,6 +20,9 @@ namespace ServerApp
             CreateDBConnection();
         }
 
+        // Note: There is no MongoDB method to create a database; instead, it is implicitly created when a collection is added to it 
+        // => we don't need an explicit method to create a database in MongoDB when one is created in the XML file, as it will be
+        // created when a table is added to the database in the XML 
         private void CreateDBConnection()
         {
             try
@@ -33,6 +36,19 @@ namespace ServerApp
             }
         }
 
+        public void CreateCollection(string collectionName)
+        {
+            try
+            {
+                MongoDatabase.CreateCollection(collectionName);
+            }
+            catch
+            {
+                // Should never happen, since duplicate table validation is already done baed on the XML file 
+                throw new Exception("Could not create MongoDB Collection: " + collectionName);
+            }
+        }
+
         public void InsertKVIntoCollection(string collectionName, string key, string value)
         {
             try
@@ -43,7 +59,7 @@ namespace ServerApp
             }
             catch (Exception)
             {
-                throw new Exception("Could not add Key-Value pair to MongoDB Cluster");
+                throw new Exception("Duplicate PK:" + key);
             }
         }
 
@@ -73,6 +89,18 @@ namespace ServerApp
             catch (Exception)
             {
                 throw new Exception("Could not delete all entries from MongoDB Collection: " + collectionName);
+            }
+        }
+
+        public void RemoveCollection(string collectioName)
+        {
+            try
+            {
+                MongoDatabase.DropCollection(collectioName);
+            }
+            catch (Exception)
+            {
+                throw new Exception("Could not remove MongoDB Collection: " + collectioName);
             }
         }
 

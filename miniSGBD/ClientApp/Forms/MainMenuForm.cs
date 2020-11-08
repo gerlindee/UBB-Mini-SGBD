@@ -202,9 +202,6 @@ namespace miniSGBD
         private void contextMenu_deleteTB(object sender, EventArgs e)
         { 
             var selectedTBName = tablesList.FocusedItem.Text;
-            tcpClient.Write(Commands.DELETE_RECORD + ';' + selectedDatabase + ';' + selectedTable + ';' + "ALL");
-            tcpClient.ReadFromServer();
-
             tcpClient.Write(Commands.DROP_TABLE + ';' + selectedDatabase +";" + selectedTBName);
             var serverResponse = tcpClient.ReadFromServer();
             MessageBox.Show(serverResponse, "Execution result", MessageBoxButtons.OK, MessageBoxIcon.Information);

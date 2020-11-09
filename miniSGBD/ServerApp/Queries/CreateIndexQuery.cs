@@ -39,36 +39,56 @@ namespace ServerApp.Queries
 
         public override void PerformXMLActions()
         {
-            var xmlDocument = XDocument.Load(Application.StartupPath + "\\SGBDCatalog.xml");
-            XElement[] databasesNodes = xmlDocument.Element("Databases").Descendants("Database").ToArray();
-            XElement givenDB = Array.Find(databasesNodes, elem => elem.Attribute("databaseName").Value.Equals(DBName));
-            XElement[] databasesTables = givenDB.Descendants("Table").ToArray();
-            XElement givenTable = Array.Find(databasesTables, elem => elem.Attribute("tableName").Value.Equals(TableName));
-            XElement indexFilesNode = givenTable.Descendants("IndexFiles").ToArray()[0];
-            XElement indexNode = new XElement("IndexFile");
-
-            foreach (var col in columns)
-            {
-                indexNode.Add(new XElement("IndexAttribute", col));
-            }
-
-            indexNode.SetAttributeValue("indexType", "BTree");
-            indexNode.SetAttributeValue("isUnique", indexType);
-            indexNode.SetAttributeValue("indexName", indexName);
-            indexNode.SetAttributeValue("fileName", indexName);
-            indexFilesNode.Add(indexNode);
-            xmlDocument.Save(Application.StartupPath + "\\SGBDCatalog.xml");
-
-            // Create corresponding MongoDB collection for the Index
             try
             {
+                // Create corresponding MongoDB collection for the index 
                 var mongoDB = new MongoDBAcess(DBName);
-                mongoDB.CreateCollection(indexName);
+
+                // If the table already has records => organize the contents in the new index file 
+                if (mongoDB.CollectionHasDocuments(TableName))
+                {
+                    if (indexType == true)
+                    {
+                        IndexRecordsUnique();
+                    }
+                    else
+                    {
+                        IndexRecordsNonUnique();
+                    }
+                }
+                else
+                {
+                    mongoDB.CreateCollection(indexName);
+                }
+
+                // Add the Index to the XML structure 
+                var xmlDocument = XDocument.Load(Application.StartupPath + "\\SGBDCatalog.xml");
+                XElement[] databasesNodes = xmlDocument.Element("Databases").Descendants("Database").ToArray();
+                XElement givenDB = Array.Find(databasesNodes, elem => elem.Attribute("databaseName").Value.Equals(DBName));
+                XElement[] databasesTables = givenDB.Descendants("Table").ToArray();
+                XElement givenTable = Array.Find(databasesTables, elem => elem.Attribute("tableName").Value.Equals(TableName));
+                XElement indexFilesNode = givenTable.Descendants("IndexFiles").ToArray()[0];
+                XElement indexNode = new XElement("IndexFile");
+
+                foreach (var col in columns)
+                {
+                    indexNode.Add(new XElement("IndexAttribute", col));
+                }
             }
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
+        }
+
+        private void IndexRecordsUnique()
+        {
+
+        }
+
+        private void IndexRecordsNonUnique()
+        {
+
         }
     }
 }

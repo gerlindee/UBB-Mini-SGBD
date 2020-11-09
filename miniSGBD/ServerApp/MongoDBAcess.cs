@@ -59,7 +59,7 @@ namespace ServerApp
             }
             catch (Exception)
             {
-                throw new Exception("Duplicate PK:" + key);
+                throw new Exception("Duplicate Key:" + key);
             }
         }
 
@@ -127,6 +127,18 @@ namespace ServerApp
             catch (Exception)
             {
                 throw new Exception("Could not retrieve the contents of MongoDB Collection: " + collectionName);
+            }
+        }
+
+        public bool CollectionHasDocuments(string collectionName)
+        {
+            try
+            {
+                return GetEntireCollection(collectionName).Count > 0;
+            }
+            catch (Exception)
+            {
+                throw new Exception("Could not retrieve the number of records from MongoDB Collection: " + collectionName);
             }
         }
     }

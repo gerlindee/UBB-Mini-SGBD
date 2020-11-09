@@ -138,10 +138,14 @@ namespace miniSGBD
             var retreivedInformation = serverResponse[1].Split('|');
 
             foreach (var columnInfo in retreivedInformation)
+            {
                 columnInfoList.Add(new ColumnInfo(columnInfo)); // we have info about all columns
+            }
 
             for (var i = 0; i < columnInfoList.Count; i++)
+            {
                 table_contents_list.Columns.Add(string.Format("col{0}", i), columnInfoList[i].ColumnName);
+            }
 
             // Display the records for the clicked table
             tcpClient.Write(Commands.SELECT_RECORDS + ";" + selectedDatabase + ";" + selectedTable);
@@ -158,10 +162,18 @@ namespace miniSGBD
                         int rowIndex = table_contents_list.Rows.Add();
                         var row = table_contents_list.Rows[rowIndex];
 
-                        for (int idx = 0; idx < tableRecordSplit.Length; idx++)
+                        // Special handling for tables with one column 
+                        if (columnInfoList.Count == 1)
                         {
-                            row.Cells[idx].Value = tableRecordSplit[idx];
-                        }                        
+                            row.Cells[0].Value = tableRecordSplit[0];
+                        }
+                        else
+                        {
+                            for (int idx = 0; idx < tableRecordSplit.Length; idx++)
+                            {
+                                row.Cells[idx].Value = tableRecordSplit[idx];
+                            }
+                        }                     
                     }
                 }
             }
@@ -195,8 +207,25 @@ namespace miniSGBD
             var selectedDBName = databasesList.FocusedItem.Text;
             tcpClient.Write(Commands.DROP_DATABASE + ";" + selectedDBName);
             var serverResponse = tcpClient.ReadFromServer();
-            MessageBox.Show(serverResponse, "Query Execution Result", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            populateDatabases();
+            if (serverResponse == Commands.MapCommandToSuccessResponse(Commands.DROP_DATABASE))
+            {
+                MessageBox.Show(serverResponse, "Query Execution Result", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                // Clear the table information area just in case a table is selected when we delete a DB 
+                tablesList.Clear();
+                table_structure_list.Clear();
+                table_contents_list.DataSource = null;
+                table_contents_list.Rows.Clear();
+                table_contents_list.Columns.Clear();
+                columnInfoList.Clear();
+
+                // Repopulate databases list 
+                populateDatabases();
+            }
+            else
+            {
+                MessageBox.Show(serverResponse, "Query Execution Result", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void contextMenu_deleteTB(object sender, EventArgs e)

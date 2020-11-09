@@ -31,7 +31,16 @@ namespace ServerApp.Queries
             foreach (var newRecord in recordsArray)
             {
                 var keyValuePair = newRecord.Split('*');
-                Records.Add(new KeyValuePair<string, string>(keyValuePair[0], keyValuePair[1]));
+
+                // Special handling for tables with one column, where key = value bc I said so 
+                if (keyValuePair.Length == 1)
+                {
+                    Records.Add(new KeyValuePair<string, string>(keyValuePair[0], keyValuePair[0]));
+                } 
+                else
+                {
+                    Records.Add(new KeyValuePair<string, string>(keyValuePair[0], keyValuePair[1]));
+                }
             }
         }
 

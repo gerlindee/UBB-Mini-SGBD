@@ -92,6 +92,19 @@ namespace ServerApp
             }
         }
 
+        public static void RemoveDatabase(string databaseName)
+        {
+            try
+            {
+                var mongoClient = new MongoClient("mongodb+srv://mongo_user:parolaMongo@cluster0.qsvie.mongodb.net/" + databaseName + "?retryWrites=true&w=majority");
+                mongoClient.DropDatabase(databaseName);
+            }
+            catch (Exception)
+            {
+                throw new Exception("Could not delete MongoDB Database: " + databaseName);
+            }
+        }
+
         public void RemoveCollection(string collectioName)
         {
             try

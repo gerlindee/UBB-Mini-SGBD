@@ -39,19 +39,28 @@ namespace ServerApp.Queries
 
         public override void PerformXMLActions()
         {
-            var xmlDocument = XDocument.Load(Application.StartupPath + "\\SGBDCatalog.xml");
-            XElement deletedXMLTag = null;
-            var databasesTags = xmlDocument.Element("Databases").Descendants("Database").ToArray();
-            foreach (XElement tag in databasesTags)
+            try
             {
-                if (tag.Attribute("databaseName").Value.Equals(DatabaseName))
+                MongoDBAcess.RemoveDatabase(DatabaseName);
+
+                var xmlDocument = XDocument.Load(Application.StartupPath + "\\SGBDCatalog.xml");
+                XElement deletedXMLTag = null;
+                var databasesTags = xmlDocument.Element("Databases").Descendants("Database").ToArray();
+                foreach (XElement tag in databasesTags)
                 {
-                    deletedXMLTag = tag;
-                    break;
+                    if (tag.Attribute("databaseName").Value.Equals(DatabaseName))
+                    {
+                        deletedXMLTag = tag;
+                        break;
+                    }
                 }
+                deletedXMLTag.Remove();
+                xmlDocument.Save(Application.StartupPath + "\\SGBDCatalog.xml");
             }
-            deletedXMLTag.Remove();
-            xmlDocument.Save(Application.StartupPath + "\\SGBDCatalog.xml");
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
     }

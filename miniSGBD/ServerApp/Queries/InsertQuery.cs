@@ -24,14 +24,18 @@ namespace ServerApp.Queries
         // Attributes used for Foreign Key constraints check
         private List<KeyValuePair<string, int>> ForeignKeyPositions; // stores the name of the FK + the position of the column within a record
         private List<ForeignKeyData> ForeignKeyData; // stores the data about FK relations 
+        private List<ForeignKeyInsertData> NewForeignKeyEntries;
+
+        private List<KeyValuePair<string, int>> PrimaryKeyPositions; 
 
         public InsertQuery(string _databaseName, string _tableName, string _records) : base(Commands.INSERT_INTO_TABLE)
         {
             DatabaseName = _databaseName;
             TableName = _tableName;
             RecordsString = _records;
-            Records = new List<KeyValuePair<String, String>>();
+            Records = new List<KeyValuePair<string, string>>();
             ColumnsInfo = new List<ColumnInfo>();
+            PrimaryKeyPositions = new List<KeyValuePair<string, int>>();
             ForeignKeyPositions = new List<KeyValuePair<string, int>>();
             ForeignKeyData = new List<ForeignKeyData>();
         }
@@ -63,6 +67,15 @@ namespace ServerApp.Queries
                 ColumnsInfo.Add(new ColumnInfo(columnInfo));
             }
 
+            // Get a list of Primary Key names + the positions within the table structure of the PK column
+            for (int idx = 0; idx < ColumnsInfo.Count; idx++)
+            {
+                if (ColumnsInfo[idx].PK)
+                {
+                    PrimaryKeyPositions.Add(new KeyValuePair<string, int>(ColumnsInfo[idx].ColumnName, idx));
+                }
+            }
+
             // Get a list of Foreign Key names + the position within the table struture of the FK column 
             for (int idx = 0; idx < ColumnsInfo.Count; idx++)
             {
@@ -81,9 +94,11 @@ namespace ServerApp.Queries
         public override void PerformXMLActions()
         {
             try
-            {
+            { 
                 foreach (var keyValuePairs in Records)
                 {
+                    NewForeignKeyEntries = new List<ForeignKeyInsertData>();
+
                     if (CheckDuplicatePK(keyValuePairs.Key))
                     {
                         throw new Exception("Table " + TableName + " already contains a record with Primary Key " + keyValuePairs.Key + "!");
@@ -93,7 +108,6 @@ namespace ServerApp.Queries
 
                     // All checks have passed => Insert new record 
                     InsertRecord(keyValuePairs.Key, keyValuePairs.Value);
-
                 }
             }
             catch (Exception ex)
@@ -115,10 +129,10 @@ namespace ServerApp.Queries
             }
         }
 
-        private bool CheckFKConstraints(string record)
+        private void CheckFKConstraints(string record)
         {
             var columnValues = record.Split('#');
-            
+
             // Check each FK constraint one by one
             foreach (var referenceData in ForeignKeyData)
             {
@@ -144,9 +158,17 @@ namespace ServerApp.Queries
                 {
                     throw new Exception("Invalid reference! No record with Primary Key " + fkValue + " could be found in referenced table " + referenceData.ReferencedTable + "!");
                 }
-            }
 
-            return true; // if no exception has been thrown so far => all FK constraints are respected for the current row 
+                var pkValue = "";
+                foreach (var primaryKey in PrimaryKeyPositions)
+                {
+                    pkValue += columnValues.ElementAt(primaryKey.Value) + '#';
+                }
+                pkValue = pkValue.Remove(pkValue.Length - 1);
+
+                // current FK correct => add it to the Index File to-insert list
+                NewForeignKeyEntries.Add(new ForeignKeyInsertData(referenceData.ForeignKeyFile, fkValue, pkValue));
+            }
         }
 
         private void InsertRecord(string key, string value)
@@ -155,6 +177,26 @@ namespace ServerApp.Queries
             {
                 // Insert into main table data file 
                 MongoDB.InsertKVIntoCollection(TableName, key, value);
+
+                // Insert into FK index file 
+                foreach (var newFKRecords in NewForeignKeyEntries)
+                {
+                    // Check if the Foreign Key from the referenced table has any other assigned records from the current table 
+                    if (MongoDB.CollectionContainsKey(newFKRecords.MongoDBFilename, newFKRecords.ForeignKeyRecord.Key))
+                    {
+                        var existingReferences = MongoDB.GetRecordValueWithKey(newFKRecords.MongoDBFilename, newFKRecords.ForeignKeyRecord.Key);
+                        existingReferences += "#" + newFKRecords.ForeignKeyRecord.Value;
+
+                        // who needs update when you can just delete and add back 
+                        MongoDB.RemoveKVFromCollection(newFKRecords.MongoDBFilename, newFKRecords.ForeignKeyRecord.Key);
+                        MongoDB.InsertKVIntoCollection(newFKRecords.MongoDBFilename, newFKRecords.ForeignKeyRecord.Key, existingReferences);
+                    }
+                    // Otherwise just add a new Key-Value entry
+                    else
+                    {
+                        MongoDB.InsertKVIntoCollection(newFKRecords.MongoDBFilename, newFKRecords.ForeignKeyRecord.Key, newFKRecords.ForeignKeyRecord.Value);
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -203,6 +245,18 @@ namespace ServerApp.Queries
             ReferencedColumns = _column;
             ReferencedTable = _table;
             ForeignKeyFile = _file;
+        }
+    }
+
+    class ForeignKeyInsertData
+    {
+        public string MongoDBFilename;
+        public KeyValuePair<string, string> ForeignKeyRecord; 
+
+        public ForeignKeyInsertData(string _file, string _key, string _value)
+        {
+            MongoDBFilename = _file;
+            ForeignKeyRecord = new KeyValuePair<string, string>(_key, _value);
         }
     }
 }

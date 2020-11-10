@@ -50,7 +50,6 @@ namespace miniSGBD.Forms
             
             if (dataGrid.Rows.Count > 1)
                 noRows -= 1;
-
             for (int rows = 0; rows < noRows; rows++)
             {
                 var primaryKeyColumnsAdded = false;
@@ -58,19 +57,26 @@ namespace miniSGBD.Forms
                 {
                     if (validateCell(col, dataGrid.Rows[rows].Cells[col]))
                     {
-                        var columnValue = dataGrid.Rows[rows].Cells[col].Value.ToString();
-                        var columnName = dataGrid.Columns[col].HeaderText.ToString();
-                        var columnObject = columnInfoList.Find(c => c.ColumnName == columnName);
-                        if (!columnObject.PK && !primaryKeyColumnsAdded)
+                        if (validateUniqueAttibutesBeforeInsert(col, dataGrid.Rows[rows].Cells[col]))
                         {
-                            // this is the point where all values for the composite primary key are done being concatenated to the message
-                            // => add the separator between the key and value and remove the leftover separator from the key part
-                            message = message.Remove(message.Length - 1);
-                            message += '*'; 
-                            primaryKeyColumnsAdded = true; // make sure that the separator between the key and the value is only added once
+                            var columnValue = dataGrid.Rows[rows].Cells[col].Value.ToString();
+                            var columnName = dataGrid.Columns[col].HeaderText.ToString();
+                            var columnObject = columnInfoList.Find(c => c.ColumnName == columnName);
+                            if (!columnObject.PK && !primaryKeyColumnsAdded)
+                            {
+                                // this is the point where all values for the composite primary key are done being concatenated to the message
+                                // => add the separator between the key and value and remove the leftover separator from the key part
+                                message = message.Remove(message.Length - 1);
+                                message += '*';
+                                primaryKeyColumnsAdded = true; // make sure that the separator between the key and the value is only added once
+                            }
+                            message += columnValue + '#';
                         }
-                        message += columnValue + '#';
-
+                        else
+                        {
+                            MessageBox.Show("Unique key constraint violation!", "Query Execution Result", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            return;
+                        }
                     }
                     else
                     {
@@ -121,6 +127,42 @@ namespace miniSGBD.Forms
             {
                 MessageBox.Show(Validator.EXCEEDED_LENGHT, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
+            }
+            return true;
+        }
+
+        private bool validateUniqueAttibutesBeforeInsert(int columnIndex, DataGridViewCell gridCell)
+        {
+            List<string[]> records = new List<string[]>();
+            tcpClient.Write(Commands.SELECT_RECORDS + ";" + databaseName + ";" + tablename);
+            var serverResponse = tcpClient.ReadFromServer().Split(';');
+            if (serverResponse[0] == Commands.MapCommandToSuccessResponse(Commands.SELECT_RECORDS))
+            {
+                var retrievedRecords = serverResponse[1].Split('|');
+                foreach (string tableRecord in retrievedRecords)
+                {
+                    if (tableRecord != "")
+                    {
+                        var tableRecordSplit = tableRecord.Split('#');
+                        records.Add(tableRecordSplit);
+                    }
+                }
+            }
+
+            //find unique attribute and it's index
+            var uniqueAttributes = columnInfoList.FindAll(c => c.Unique == true);
+            var columnName = dataGrid.Columns[columnIndex].HeaderText.ToString();
+
+            if(uniqueAttributes.Exists(c => c.ColumnName == columnName)) //the content of this cell should be unique
+            {
+                var cellContent = gridCell.Value.ToString();
+                foreach(var record in records)
+                {
+                    if(record[columnIndex].ToString() == cellContent)
+                    {
+                        return false;
+                    }
+                }
             }
             return true;
         }

@@ -92,6 +92,7 @@ namespace miniSGBD.Forms
             else
             {
                 MessageBox.Show(serverResponse, "Query Execution Result", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Close();
             }
         }
 

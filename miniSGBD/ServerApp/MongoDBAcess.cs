@@ -130,6 +130,20 @@ namespace ServerApp
             }
         }
 
+        public bool CollectionContainsKey(string collectionName, string key)
+        {
+            try
+            {
+                var mongoCollection = MongoDatabase.GetCollection<BsonDocument>(collectionName);
+                var filter = Builders<BsonDocument>.Filter.Eq("_id", key);
+                return mongoCollection.Find(filter).Any();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
         public bool CollectionHasDocuments(string collectionName)
         {
             try

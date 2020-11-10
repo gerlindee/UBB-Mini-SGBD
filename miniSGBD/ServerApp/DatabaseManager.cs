@@ -177,10 +177,13 @@ namespace ServerApp
             foreach (var foreignKey in foreignKeysNodes)
             {
                 var fkTableName = foreignKey.Descendants("ReferencedTable").ToArray()[0].Value;
-                fkTableNames.Add(fkTableName);
 
-                var fkColumnName = foreignKey.Descendants("ReferencedColumn").ToArray()[0].Value;
-                fkColumnNames.Add(fkColumnName);
+                var fkColumnNodes = foreignKey.Descendants("ReferencedColumn").ToArray();
+                foreach (var fkColumn in fkColumnNodes)
+                {
+                    fkColumnNames.Add(fkColumn.Value);
+                    fkTableNames.Add(fkTableName);
+                }
             }
 
             // Get column structure information
@@ -245,7 +248,7 @@ namespace ServerApp
             return columnInfo.Remove(columnInfo.Length - 1);
         }
 
-        private static string FetchTableColumns(string databaseName, string tableName)
+        public static string FetchTableColumns(string databaseName, string tableName)
         {
             string pkString = "";
             string columnInfo = "";
@@ -281,10 +284,13 @@ namespace ServerApp
             foreach (var foreignKey in foreignKeysNodes)
             {
                 var fkTableName = foreignKey.Descendants("ReferencedTable").ToArray()[0].Value;
-                fkTableNames.Add(fkTableName);
 
-                var fkColumnName = foreignKey.Descendants("ReferencedColumn").ToArray()[0].Value;
-                fkColumnNames.Add(fkColumnName);
+                var fkColumnNodes = foreignKey.Descendants("ReferencedColumn").ToArray();
+                foreach (var fkColumn in fkColumnNodes)
+                {
+                    fkColumnNames.Add(fkColumn.Value);
+                    fkTableNames.Add(fkTableName);
+                }
             }
 
             // Get column structure information

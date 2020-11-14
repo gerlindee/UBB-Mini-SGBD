@@ -68,12 +68,15 @@ namespace ServerApp.Queries
                 XElement[] databasesTables = givenDB.Descendants("Table").ToArray();
                 XElement givenTable = Array.Find(databasesTables, elem => elem.Attribute("tableName").Value.Equals(TableName));
                 XElement indexFilesNode = givenTable.Descendants("IndexFiles").ToArray()[0];
-                XElement indexNode = new XElement("IndexFile");
+                XElement indexNode = new XElement("IndexFile", new XAttribute("isUnique", indexType), new XAttribute("indexName", indexName));
 
                 foreach (var col in columns)
                 {
                     indexNode.Add(new XElement("IndexAttribute", col));
                 }
+
+                indexFilesNode.Add(indexNode);
+                xmlDocument.Save(Application.StartupPath + "\\SGBDCatalog.xml");
             }
             catch (Exception ex)
             {

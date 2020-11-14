@@ -58,9 +58,16 @@ namespace miniSGBD.Forms
                 {
                     if (validateCell(col, dataGrid.Rows[rows].Cells[col]))
                     {
-                        var columnValue = dataGrid.Rows[rows].Cells[col].Value.ToString();
                         var columnName = dataGrid.Columns[col].HeaderText.ToString();
                         var columnObject = columnInfoList.Find(c => c.ColumnName == columnName);
+
+                        if (columnObject.NonNull == true && dataGrid.Rows[rows].Cells[col].Value == null)
+                        {
+                            message += "NULL" + '#';
+                            continue;
+                        }
+
+                        var columnValue = dataGrid.Rows[rows].Cells[col].Value.ToString();
                         if (!columnObject.PK && !primaryKeyColumnsAdded)
                         {
                             // this is the point where all values for the composite primary key are done being concatenated to the message
@@ -98,6 +105,14 @@ namespace miniSGBD.Forms
 
         private bool validateCell(int columnIndex, DataGridViewCell gridCell)
         {
+            var columnName = dataGrid.Columns[columnIndex].HeaderText.ToString();
+            var columnObject = columnInfoList.Find(c => c.ColumnName == columnName);
+
+            if (gridCell.Value == null && columnObject.NonNull == true)
+            {
+                return true; 
+            }
+
             if (gridCell.Value == null)
             {
                 MessageBox.Show(Validator.EMPTY_FIELD, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -105,24 +120,25 @@ namespace miniSGBD.Forms
             }
 
             var cell = gridCell.Value.ToString();
-            var columnName = dataGrid.Columns[columnIndex].HeaderText.ToString();
-            var columnObject = columnInfoList.Find(c => c.ColumnName == columnName);
 
-            if (Validator.isStringEmpty(cell))
+            if (Validator.isStringEmpty(cell) && columnObject.NonNull == false)
             {
                 MessageBox.Show(Validator.EMPTY_FIELD, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
+
             if (!Validator.isTypeCorrect(columnObject.Type, cell))
             {
                 MessageBox.Show(Validator.WRONG_TYPE, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
+
             if (columnObject.Lenght != -1 && Validator.isLenghtExceeded(columnObject.Lenght, cell.Length))
             {
                 MessageBox.Show(Validator.EXCEEDED_LENGHT, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
+
             return true;
         }
     }

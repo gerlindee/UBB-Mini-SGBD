@@ -130,6 +130,20 @@ namespace ServerApp
             }
         }
 
+        public string GetRecordValueWithKey(string collectionName, string key)
+        {
+            try
+            {
+                var mongoCollection = MongoDatabase.GetCollection<BsonDocument>(collectionName);
+                var filter = Builders<BsonDocument>.Filter.Eq("_id", key);
+                return mongoCollection.Find(filter).First().GetElement("value").Value.ToString();
+            }
+            catch (Exception)
+            {
+                throw new Exception("Could not retrieve the record with key " + key + " from MongoDB Collection: " + collectionName);
+            }
+        }
+
         public bool CollectionContainsKey(string collectionName, string key)
         {
             try

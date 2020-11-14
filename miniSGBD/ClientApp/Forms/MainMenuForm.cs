@@ -233,12 +233,20 @@ namespace miniSGBD
             var selectedTBName = tablesList.FocusedItem.Text;
             tcpClient.Write(Commands.DROP_TABLE + ';' + selectedDatabase +";" + selectedTBName);
             var serverResponse = tcpClient.ReadFromServer();
-            MessageBox.Show(serverResponse, "Execution result", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            populateTables();
-            table_structure_list.Clear();
-            table_contents_list.DataSource = null;
-            table_contents_list.Rows.Clear();
-            table_contents_list.Columns.Clear();
+
+            if (Commands.MapCommandToSuccessResponse(Commands.DROP_TABLE) == serverResponse)
+            {
+                MessageBox.Show(serverResponse, "Execution result", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                populateTables();
+                table_structure_list.Clear();
+                table_contents_list.DataSource = null;
+                table_contents_list.Rows.Clear();
+                table_contents_list.Columns.Clear();
+            }
+            else
+            {
+                MessageBox.Show(serverResponse, "Execution result", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void contextMenu_createIN(object sender, EventArgs e)

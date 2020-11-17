@@ -301,14 +301,13 @@ namespace miniSGBD
             if (serverResponse == Commands.MapCommandToSuccessResponse(Commands.DELETE_RECORD))
             {
                 MessageBox.Show(serverResponse, "Execution result", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                table_contents_list.Rows.RemoveAt(selectedRowToDelete);
+                selectedRowToDelete = -1;
             }
             else
             {
                 MessageBox.Show(serverResponse, "Execution result", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
-            table_contents_list.Rows.RemoveAt(selectedRowToDelete);
-            selectedRowToDelete = -1;
         }
         private void dataGridView1_MouseClick(object sender, MouseEventArgs e)
         {

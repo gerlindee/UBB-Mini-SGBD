@@ -31,14 +31,7 @@ namespace ServerApp.Queries
         public override string ValidateQuery()
         {
             // Check if the table is used as a reference in any other table 
-            var xmlDocument = XDocument.Load(Application.StartupPath + "\\SGBDCatalog.xml");
-
-            XElement givenDatabaseNode = null;
-            XElement[] databasesNodes = xmlDocument.Element("Databases").Descendants("Database").ToArray();
-            XElement givenDB = Array.Find(databasesNodes, elem => elem.Attribute("databaseName").Value.Equals(DBName));
-
-            var referencedTables = Array.FindAll(givenDB.Descendants("ReferencedTable").ToArray(), elem => elem.Value == TableName);
-            if (referencedTables.Count() != 0)
+            if (TableUtils.IsTableReferenced(DBName, TableName))
             {
                 // Table references exist => error message 
                 return Responses.DROP_TABLE_REFERENCED;

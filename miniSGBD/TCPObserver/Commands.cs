@@ -77,6 +77,7 @@ namespace Utils
         public const string INSERT_INTO_TABLE_SUCCESS = "New records added successfully!";
         public const string SELECT_RECORDS_SUCCESS = "Selection of records ended successfully!";
         public const string DELETE_RECORD_SUCCESS = "Deletion of records ended successfully!";
+        public const string DELETE_RECORD_USED_AS_FK = "Could not delete record because it is used as a FOREIGN KEY in table "; 
 
         //Index Responses
         public const string CREATE_INDEX_SUCCESS = "Index created successfully!";

@@ -95,9 +95,20 @@ namespace ServerApp
                         }
                     }
                     newRecordValue = newRecordValue.Remove(newRecordValue.Length - 1);
-                    var filter = Builders<BsonDocument>.Filter.Eq("_id", record.GetElement("_id").Value);
-                    var update = Builders<BsonDocument>.Update.Set("value", newRecordValue);
-                    mongoCollection.UpdateOne(filter, update);
+
+                    if (newRecordValue != record.GetElement("value").Value.ToString())
+                    {
+                        if (newRecordValue == "")
+                        {
+                            RemoveKVFromCollection(collectionName, record.GetElement("_id").Value.ToString());
+                        }
+                        else
+                        {
+                            var filter = Builders<BsonDocument>.Filter.Eq("_id", record.GetElement("_id").Value);
+                            var update = Builders<BsonDocument>.Update.Set("value", newRecordValue);
+                            mongoCollection.UpdateOne(filter, update);
+                        }
+                    }
                 }
             }
             catch (Exception)
@@ -210,6 +221,21 @@ namespace ServerApp
             catch (Exception)
             {
                 throw new Exception("Could not retrieve the number of records from MongoDB Collection: " + collectionName);
+            }
+        }
+
+        public bool CollectionExists(string collectionName)
+        {
+            try
+            {
+                var filter = new BsonDocument("name", collectionName);
+                var options = new ListCollectionNamesOptions { Filter = filter };
+
+                return MongoDatabase.ListCollectionNames(options).Any();
+            }
+            catch (Exception)
+            {
+                throw new Exception("Could not check that MongoDB Collection: " + collectionName + " exists");
             }
         }
     }

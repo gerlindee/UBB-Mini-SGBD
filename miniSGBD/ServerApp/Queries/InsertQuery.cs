@@ -106,7 +106,7 @@ namespace ServerApp.Queries
 
                     CheckFKConstraints(keyValuePairs.Key + "#" + keyValuePairs.Value);
 
-                    // All checks have passed => Insert new record 
+                    // All checks have passed => Insert new record into all relevant files
                     InsertRecord(keyValuePairs.Key, keyValuePairs.Value);
                 }
             }
@@ -197,6 +197,40 @@ namespace ServerApp.Queries
                         MongoDB.InsertKVIntoCollection(newFKRecords.MongoDBFilename, newFKRecords.ForeignKeyRecord.Key, newFKRecords.ForeignKeyRecord.Value);
                     }
                 }
+
+                // Insert into any index files 
+                foreach (var indexFile in TableUtils.GetIndexFiles(DatabaseName, TableName))
+                {
+                    var indexKey = "";
+                    var recordColumns = (key + '#' + value).Split('#'); 
+
+                    // Build the key from the specified Index KV file 
+                    foreach (var indexColumn in indexFile.IndexColumns)
+                    {
+                        indexKey += recordColumns[ColumnsInfo.FindIndex(elem => elem.ColumnName == indexColumn)] + '#';
+                    }
+                    indexKey = indexKey.Remove(indexKey.Length - 1);
+                    
+                    if (indexFile.IsUnique)
+                    {
+                        // If the index is unique and the file already contains a key with the specified value => error message 
+                    }
+                    else
+                    {
+                        if (MongoDB.CollectionContainsKey(indexFile.IndexFileName, indexKey))
+                        {
+                            // Append the new record PK to the value of the index key 
+                            var indexValue = MongoDB.GetRecordValueWithKey(indexFile.IndexFileName, indexKey) + '#' + key;
+                            MongoDB.RemoveKVFromCollection(indexFile.IndexFileName, indexKey);
+                            MongoDB.InsertKVIntoCollection(indexFile.IndexFileName, indexKey, indexValue);
+                        }
+                        else
+                        {
+                            MongoDB.InsertKVIntoCollection(indexFile.IndexFileName, indexKey, key);
+                        }
+                    }
+                }
+  
             }
             catch (Exception ex)
             {

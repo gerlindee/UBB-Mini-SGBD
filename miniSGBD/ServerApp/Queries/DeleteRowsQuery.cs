@@ -60,7 +60,8 @@ namespace ServerApp.Queries
                 }
                 else
                 {
-                    // Remove record PK from Unique Index File
+                    // Remove record PK from any Index File 
+                    RemoveFromIndexFiles(mongoDB);
 
                     // Remove record PK from FK value 
                     RemoveFromFKIndexFiles(mongoDB);
@@ -84,6 +85,24 @@ namespace ServerApp.Queries
             foreach (var foreignKey in ForeignKeyFiles)
             {
                 mongoDB.RemoveValueFromCollection(foreignKey, RemovedKey);
+            }
+        }
+
+        private void RemoveFromIndexFiles(MongoDBAcess mongoDB)
+        {
+            var indexFiles = TableUtils.GetIndexFiles(DatabaseName, TableName);
+
+            foreach (var index in indexFiles)
+            {
+                if (index.IsUnique)
+                {
+                    // Entire KV pair needs to be removed from the file 
+                }
+                else
+                {
+                    // Only the current key needs to be removed from the Key-Value
+                    mongoDB.RemoveValueFromCollection(index.IndexFileName, RemovedKey);
+                }    
             }
         }
     }

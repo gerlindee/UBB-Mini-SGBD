@@ -233,12 +233,20 @@ namespace miniSGBD
             var selectedTBName = tablesList.FocusedItem.Text;
             tcpClient.Write(Commands.DROP_TABLE + ';' + selectedDatabase +";" + selectedTBName);
             var serverResponse = tcpClient.ReadFromServer();
-            MessageBox.Show(serverResponse, "Execution result", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            populateTables();
-            table_structure_list.Clear();
-            table_contents_list.DataSource = null;
-            table_contents_list.Rows.Clear();
-            table_contents_list.Columns.Clear();
+
+            if (Commands.MapCommandToSuccessResponse(Commands.DROP_TABLE) == serverResponse)
+            {
+                MessageBox.Show(serverResponse, "Execution result", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                populateTables();
+                table_structure_list.Clear();
+                table_contents_list.DataSource = null;
+                table_contents_list.Rows.Clear();
+                table_contents_list.Columns.Clear();
+            }
+            else
+            {
+                MessageBox.Show(serverResponse, "Execution result", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void contextMenu_createIN(object sender, EventArgs e)
@@ -293,14 +301,13 @@ namespace miniSGBD
             if (serverResponse == Commands.MapCommandToSuccessResponse(Commands.DELETE_RECORD))
             {
                 MessageBox.Show(serverResponse, "Execution result", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                table_contents_list.Rows.RemoveAt(selectedRowToDelete);
+                selectedRowToDelete = -1;
             }
             else
             {
                 MessageBox.Show(serverResponse, "Execution result", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
-            table_contents_list.Rows.RemoveAt(selectedRowToDelete);
-            selectedRowToDelete = -1;
         }
         private void dataGridView1_MouseClick(object sender, MouseEventArgs e)
         {

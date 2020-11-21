@@ -106,7 +106,7 @@ namespace ServerApp.Queries
 
                     CheckFKConstraints(keyValuePairs.Key + "#" + keyValuePairs.Value);
 
-                    // All checks have passed => Insert new record 
+                    // All checks have passed => Insert new record into all relevant files
                     InsertRecord(keyValuePairs.Key, keyValuePairs.Value);
                 }
             }
@@ -197,6 +197,40 @@ namespace ServerApp.Queries
                         MongoDB.InsertKVIntoCollection(newFKRecords.MongoDBFilename, newFKRecords.ForeignKeyRecord.Key, newFKRecords.ForeignKeyRecord.Value);
                     }
                 }
+
+                // Insert into any index files 
+                foreach (var indexFile in TableUtils.GetIndexFiles(DatabaseName, TableName))
+                {
+                    var indexKey = "";
+                    var recordColumns = (key + '#' + value).Split('#'); 
+
+                    // Build the key from the specified Index KV file 
+                    foreach (var indexColumn in indexFile.IndexColumns)
+                    {
+                        indexKey += recordColumns[ColumnsInfo.FindIndex(elem => elem.ColumnName == indexColumn)] + '#';
+                    }
+                    indexKey = indexKey.Remove(indexKey.Length - 1);
+                    
+                    if (indexFile.IsUnique)
+                    {
+                        // If the index is unique and the file already contains a key with the specified value => error message 
+                    }
+                    else
+                    {
+                        if (MongoDB.CollectionContainsKey(indexFile.IndexFileName, indexKey))
+                        {
+                            // Append the new record PK to the value of the index key 
+                            var indexValue = MongoDB.GetRecordValueWithKey(indexFile.IndexFileName, indexKey) + '#' + key;
+                            MongoDB.RemoveKVFromCollection(indexFile.IndexFileName, indexKey);
+                            MongoDB.InsertKVIntoCollection(indexFile.IndexFileName, indexKey, indexValue);
+                        }
+                        else
+                        {
+                            MongoDB.InsertKVIntoCollection(indexFile.IndexFileName, indexKey, key);
+                        }
+                    }
+                }
+  
             }
             catch (Exception ex)
             {
@@ -231,32 +265,6 @@ namespace ServerApp.Queries
             }
 
             return fkData;
-        }
-    }
-
-    class ForeignKeyData
-    {
-        public List<string> ReferencedColumns;
-        public string ReferencedTable;
-        public string ForeignKeyFile;
-
-        public ForeignKeyData(List<string> _column, string _table, string _file)
-        {
-            ReferencedColumns = _column;
-            ReferencedTable = _table;
-            ForeignKeyFile = _file;
-        }
-    }
-
-    class ForeignKeyInsertData
-    {
-        public string MongoDBFilename;
-        public KeyValuePair<string, string> ForeignKeyRecord; 
-
-        public ForeignKeyInsertData(string _file, string _key, string _value)
-        {
-            MongoDBFilename = _file;
-            ForeignKeyRecord = new KeyValuePair<string, string>(_key, _value);
         }
     }
 }

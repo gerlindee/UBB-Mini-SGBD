@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace ServerApp
+namespace Utils
 {
-    class TableColumn
+    public class TableColumn
     {
-        public string Name { get; } 
+        public string Name { get; }
         public bool IsPrimaryKey { get; }
         public string Type { get; }
         public int Length { get; }
@@ -24,6 +22,6 @@ namespace ServerApp
             IsUnique = _isUnique;
             AllowsNulls = _allowsNulls;
         }
-        
+
     }
 }

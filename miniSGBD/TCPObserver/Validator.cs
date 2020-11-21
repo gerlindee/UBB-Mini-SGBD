@@ -16,8 +16,8 @@ namespace Utils
         public static string LENGHT_NUMERICAL = "Numerical lenght required";
 
         //insert
-        public static string EMPTY_FIELD = "Fields cannot be empty!";
-        public static string EXCEEDED_LENGHT = "Lenght exceeded!";
+        public static string EMPTY_FIELD = "Field value cannot be empty!";
+        public static string EXCEEDED_LENGHT = "Length exceeded!";
         public static string WRONG_TYPE = "Type not respected!";
 
         public static bool isStringEmpty(string str)

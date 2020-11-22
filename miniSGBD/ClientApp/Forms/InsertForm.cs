@@ -43,11 +43,12 @@ namespace miniSGBD.Forms
                 dataGrid.Columns.Add(string.Format("col{0}", i), columnInfoList[i].ColumnName);
         }
 
+
         private void insertBtn_Click(object sender, EventArgs e)
         {
-            var message =  Commands.INSERT_INTO_TABLE + ";" + databaseName + ";" + tablename + ";";
+            var message = Commands.INSERT_INTO_TABLE + ";" + databaseName + ";" + tablename + ";";
             var noRows = dataGrid.Rows.Count;
-            
+
             if (dataGrid.Rows.Count > 1)
                 noRows -= 1;
 
@@ -73,7 +74,7 @@ namespace miniSGBD.Forms
                             // this is the point where all values for the composite primary key are done being concatenated to the message
                             // => add the separator between the key and value and remove the leftover separator from the key part
                             message = message.Remove(message.Length - 1);
-                            message += '*'; 
+                            message += '*';
                             primaryKeyColumnsAdded = true; // make sure that the separator between the key and the value is only added once
                         }
                         message += columnValue + '#';
@@ -82,7 +83,7 @@ namespace miniSGBD.Forms
                     else
                     {
                         return;
-                    }   
+                    }
                 }
                 message = message.Remove(message.Length - 1); // remove the separator left from separating the non-pk values
                 message += '|';
@@ -100,9 +101,9 @@ namespace miniSGBD.Forms
             {
                 MessageBox.Show(serverResponse, "Query Execution Result", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Close();
+
             }
         }
-
         private bool validateCell(int columnIndex, DataGridViewCell gridCell)
         {
             var columnName = dataGrid.Columns[columnIndex].HeaderText.ToString();
@@ -139,6 +140,42 @@ namespace miniSGBD.Forms
                 return false;
             }
 
+            return true;
+        }
+
+        private bool validateUniqueAttibutesBeforeInsert(int columnIndex, DataGridViewCell gridCell)
+        {
+            List<string[]> records = new List<string[]>();
+            tcpClient.Write(Commands.SELECT_RECORDS + ";" + databaseName + ";" + tablename);
+            var serverResponse = tcpClient.ReadFromServer().Split(';');
+            if (serverResponse[0] == Commands.MapCommandToSuccessResponse(Commands.SELECT_RECORDS))
+            {
+                var retrievedRecords = serverResponse[1].Split('|');
+                foreach (string tableRecord in retrievedRecords)
+                {
+                    if (tableRecord != "")
+                    {
+                        var tableRecordSplit = tableRecord.Split('#');
+                        records.Add(tableRecordSplit);
+                    }
+                }
+            }
+
+            //find unique attribute and it's index
+            var uniqueAttributes = columnInfoList.FindAll(c => c.Unique == true);
+            var columnName = dataGrid.Columns[columnIndex].HeaderText.ToString();
+
+            if(uniqueAttributes.Exists(c => c.ColumnName == columnName)) //the content of this cell should be unique
+            {
+                var cellContent = gridCell.Value.ToString();
+                foreach(var record in records)
+                {
+                    if(record[columnIndex].ToString() == cellContent)
+                    {
+                        return false;
+                    }
+                }
+            }
             return true;
         }
     }

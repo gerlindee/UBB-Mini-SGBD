@@ -26,14 +26,18 @@ namespace ServerApp.Queries
         private List<KeyValuePair<string, int>> UniqueKeyPositions; // stores the name of the UqK + the position of the column within a record
         private List<ForeignKeyData> ForeignKeyData; // stores the data about FK relations 
         private List<Tuple<string, string>> UniqueKeyData;
+        private List<ForeignKeyInsertData> NewForeignKeyEntries;
+        private List<KeyValuePair<string, int>> PrimaryKeyPositions; 
+
 
         public InsertQuery(string _databaseName, string _tableName, string _records) : base(Commands.INSERT_INTO_TABLE)
         {
             DatabaseName = _databaseName;
             TableName = _tableName;
             RecordsString = _records;
-            Records = new List<KeyValuePair<String, String>>();
+            Records = new List<KeyValuePair<string, string>>();
             ColumnsInfo = new List<ColumnInfo>();
+            PrimaryKeyPositions = new List<KeyValuePair<string, int>>();
             ForeignKeyPositions = new List<KeyValuePair<string, int>>();
             UniqueKeyPositions = new List<KeyValuePair<string, int>>();
             ForeignKeyData = new List<ForeignKeyData>();
@@ -67,6 +71,15 @@ namespace ServerApp.Queries
                 ColumnsInfo.Add(new ColumnInfo(columnInfo));
             }
 
+            // Get a list of Primary Key names + the positions within the table structure of the PK column
+            for (int idx = 0; idx < ColumnsInfo.Count; idx++)
+            {
+                if (ColumnsInfo[idx].PK)
+                {
+                    PrimaryKeyPositions.Add(new KeyValuePair<string, int>(ColumnsInfo[idx].ColumnName, idx));
+                }
+            }
+
             // Get a list of Foreign Key names + the position within the table struture of the FK column 
             for (int idx = 0; idx < ColumnsInfo.Count; idx++)
             {
@@ -95,20 +108,21 @@ namespace ServerApp.Queries
         public override void PerformXMLActions()
         {
             try
-            {
+            { 
                 foreach (var keyValuePairs in Records)
                 {
+                    NewForeignKeyEntries = new List<ForeignKeyInsertData>();
+
                     if (CheckDuplicatePK(keyValuePairs.Key))
                     {
                         throw new Exception("Table " + TableName + " already contains a record with Primary Key " + keyValuePairs.Key + "!");
                     }
 
                     CheckFKConstraints(keyValuePairs.Key + "#" + keyValuePairs.Value);
-
                     CheckUniqueKeyConstraint(keyValuePairs.Key + "#" + keyValuePairs.Value);
-                    // All checks have passed => Insert new record 
-                    InsertRecord(keyValuePairs.Key, keyValuePairs.Value);
+                    // All checks have passed => Insert new record into all relevant files
 
+                    InsertRecord(keyValuePairs.Key, keyValuePairs.Value);
                 }
             }
             catch (Exception ex)
@@ -130,10 +144,10 @@ namespace ServerApp.Queries
             }
         }
 
-        private bool CheckFKConstraints(string record)
+        private void CheckFKConstraints(string record)
         {
             var columnValues = record.Split('#');
-            
+
             // Check each FK constraint one by one
             foreach (var referenceData in ForeignKeyData)
             {
@@ -159,14 +173,23 @@ namespace ServerApp.Queries
                 {
                     throw new Exception("Invalid reference! No record with Primary Key " + fkValue + " could be found in referenced table " + referenceData.ReferencedTable + "!");
                 }
-            }
 
-            return true; // if no exception has been thrown so far => all FK constraints are respected for the current row 
+                var pkValue = "";
+                foreach (var primaryKey in PrimaryKeyPositions)
+                {
+                    pkValue += columnValues.ElementAt(primaryKey.Value) + '#';
+                }
+                pkValue = pkValue.Remove(pkValue.Length - 1);
+
+                // current FK correct => add it to the Index File to-insert list
+                NewForeignKeyEntries.Add(new ForeignKeyInsertData(referenceData.ForeignKeyFile, fkValue, pkValue));
+            }
         }
 
         private bool CheckUniqueKeyConstraint(string record)
         {
             var columnValues = record.Split('#');
+           
             foreach (var referenceData in UniqueKeyData)
             {
                 var uqValue = columnValues.ElementAt(UniqueKeyPositions.Find(elem => elem.Key == referenceData.Item1.ToString()).Value);
@@ -179,12 +202,99 @@ namespace ServerApp.Queries
             return true;
 
         }
+
+        private void CheckUniqueIndexConstraint(string record)
+        {
+            var columnValues = record.Split('#');
+            var mongoDB = new MongoDBAcess(DatabaseName);
+            var indexFiles = TableUtils.GetIndexFiles(DatabaseName, TableName);
+            
+            foreach(var file in indexFiles)
+            {
+                if (file.IsUnique)
+                {
+                    var createKeyOfUqIndex = "";
+                    var pk = "";
+                    for (int idx = 0; idx < ColumnsInfo.Count; idx++)
+                    {
+                        if(file.IndexColumns.Exists(elem => elem == ColumnsInfo[idx].ColumnName))
+                        {
+                            createKeyOfUqIndex += columnValues[idx] + '#';
+                        }
+
+                        if (ColumnsInfo[idx].PK)
+                            pk = columnValues[idx] + "#";
+                    }
+                    
+                    createKeyOfUqIndex = createKeyOfUqIndex.Remove(createKeyOfUqIndex.Length - 1);
+                    pk = pk.Remove(pk.Length - 1);
+
+                    MongoDB.InsertKVIntoCollection(file.IndexFileName, createKeyOfUqIndex, pk);
+                }
+            }
+        }
+
         private void InsertRecord(string key, string value)
         {
             try
             {
                 // Insert into main table data file 
                 MongoDB.InsertKVIntoCollection(TableName, key, value);
+
+                // Insert into FK index file 
+                foreach (var newFKRecords in NewForeignKeyEntries)
+                {
+                    // Check if the Foreign Key from the referenced table has any other assigned records from the current table 
+                    if (MongoDB.CollectionContainsKey(newFKRecords.MongoDBFilename, newFKRecords.ForeignKeyRecord.Key))
+                    {
+                        var existingReferences = MongoDB.GetRecordValueWithKey(newFKRecords.MongoDBFilename, newFKRecords.ForeignKeyRecord.Key);
+                        existingReferences += "#" + newFKRecords.ForeignKeyRecord.Value;
+
+                        // who needs update when you can just delete and add back 
+                        MongoDB.RemoveKVFromCollection(newFKRecords.MongoDBFilename, newFKRecords.ForeignKeyRecord.Key);
+                        MongoDB.InsertKVIntoCollection(newFKRecords.MongoDBFilename, newFKRecords.ForeignKeyRecord.Key, existingReferences);
+                    }
+                    // Otherwise just add a new Key-Value entry
+                    else
+                    {
+                        MongoDB.InsertKVIntoCollection(newFKRecords.MongoDBFilename, newFKRecords.ForeignKeyRecord.Key, newFKRecords.ForeignKeyRecord.Value);
+                    }
+                }
+
+                // Insert into any index files 
+                foreach (var indexFile in TableUtils.GetIndexFiles(DatabaseName, TableName))
+                {
+                    var indexKey = "";
+                    var recordColumns = (key + '#' + value).Split('#'); 
+
+                    // Build the key from the specified Index KV file 
+                    foreach (var indexColumn in indexFile.IndexColumns)
+                    {
+                        indexKey += recordColumns[ColumnsInfo.FindIndex(elem => elem.ColumnName == indexColumn)] + '#';
+                    }
+                    indexKey = indexKey.Remove(indexKey.Length - 1);
+                    
+                    if (indexFile.IsUnique)
+                    {
+                        CheckUniqueIndexConstraint(key + '#' + value);
+                        // If the index is unique and the file already contains a key with the specified value => error message 
+                    }
+                    else
+                    {
+                        if (MongoDB.CollectionContainsKey(indexFile.IndexFileName, indexKey))
+                        {
+                            // Append the new record PK to the value of the index key 
+                            var indexValue = MongoDB.GetRecordValueWithKey(indexFile.IndexFileName, indexKey) + '#' + key;
+                            MongoDB.RemoveKVFromCollection(indexFile.IndexFileName, indexKey);
+                            MongoDB.InsertKVIntoCollection(indexFile.IndexFileName, indexKey, indexValue);
+                        }
+                        else
+                        {
+                            MongoDB.InsertKVIntoCollection(indexFile.IndexFileName, indexKey, key);
+                        }
+                    }
+                }
+  
             }
             catch (Exception ex)
             {
@@ -242,20 +352,6 @@ namespace ServerApp.Queries
             }
 
             return uqData;
-        }
-    }
-
-    class ForeignKeyData
-    {
-        public List<string> ReferencedColumns;
-        public string ReferencedTable;
-        public string ForeignKeyFile;
-
-        public ForeignKeyData(List<string> _column, string _table, string _file)
-        {
-            ReferencedColumns = _column;
-            ReferencedTable = _table;
-            ForeignKeyFile = _file;
         }
     }
 }

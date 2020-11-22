@@ -82,7 +82,16 @@ namespace miniSGBD
             }
             
             var serverResponse = tcpClient.ReadFromServer();
-            MessageBox.Show(serverResponse, "Query Execution Result", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            if (serverResponse == Commands.MapCommandToSuccessResponse(Commands.CREATE_NONUNIQUE_INDEX) || 
+                serverResponse == Commands.MapCommandToSuccessResponse(Commands.CREATE_UNIQUE_INDEX))
+            {
+                MessageBox.Show(serverResponse, "Query Execution Result", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                MessageBox.Show(serverResponse, "Query Execution Result", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            
             this.Close();
         }
 

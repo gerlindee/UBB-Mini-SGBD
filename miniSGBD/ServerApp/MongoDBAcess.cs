@@ -63,6 +63,81 @@ namespace ServerApp
             }
         }
 
+        public List<BsonDocument> GetAllEntriesFromCollection(string collectionName)
+        {
+            try
+            {
+                var mongoCollection = MongoDatabase.GetCollection<BsonDocument>(collectionName);
+                var emptyFilter = Builders<BsonDocument>.Filter.Empty;
+                return mongoCollection.Find(emptyFilter).ToList(); 
+            }
+            catch (Exception)
+            {
+                throw new Exception("Could not retrieve all entries from MongoDB Collection: " + collectionName);
+            }
+        }
+
+        public void RemoveValueFromCollection(string collectionName, string value)
+        {
+            try
+            {
+                var mongoCollection = MongoDatabase.GetCollection<BsonDocument>(collectionName);
+                var allRecords = GetAllEntriesFromCollection(collectionName);
+                foreach (var record in allRecords)
+                {
+                    var recordValues = record.GetElement("value").Value.ToString().Split('#');
+                    var newRecordValue = "";
+                    foreach (var recordValue in recordValues)
+                    {
+                        if (recordValue != value)
+                        {
+                            newRecordValue += recordValue + '#';
+                        }
+                    }
+                    newRecordValue = newRecordValue.Remove(newRecordValue.Length - 1);
+
+                    if (newRecordValue != record.GetElement("value").Value.ToString())
+                    {
+                        if (newRecordValue == "")
+                        {
+                            RemoveKVFromCollection(collectionName, record.GetElement("_id").Value.ToString());
+                        }
+                        else
+                        {
+                            var filter = Builders<BsonDocument>.Filter.Eq("_id", record.GetElement("_id").Value);
+                            var update = Builders<BsonDocument>.Update.Set("value", newRecordValue);
+                            mongoCollection.UpdateOne(filter, update);
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw new Exception("Could not remove Value: " + value + " from MongoDB Collection: " + collectionName);
+            }
+        }
+
+        public void RemoveByValueFromCollection(string collectionName, string value)
+        {
+            try
+            {
+                var mongoCollection = MongoDatabase.GetCollection<BsonDocument>(collectionName);
+                var allRecords = GetAllEntriesFromCollection(collectionName);
+                foreach (var record in allRecords)
+                {
+                    var recordValue = record.GetElement("value").Value.ToString();
+                    if (recordValue == value)
+                    { 
+                        RemoveKVFromCollection(collectionName, record.GetElement("_id").Value.ToString());
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw new Exception("Could not remove Value: " + value + " from MongoDB Collection: " + collectionName);
+            }
+        }
+
         public void RemoveKVFromCollection(string collectionName, string key)
         {
             try
@@ -130,6 +205,20 @@ namespace ServerApp
             }
         }
 
+        public string GetRecordValueWithKey(string collectionName, string key)
+        {
+            try
+            {
+                var mongoCollection = MongoDatabase.GetCollection<BsonDocument>(collectionName);
+                var filter = Builders<BsonDocument>.Filter.Eq("_id", key);
+                return mongoCollection.Find(filter).First().GetElement("value").Value.ToString();
+            }
+            catch (Exception)
+            {
+                throw new Exception("Could not retrieve the record with key " + key + " from MongoDB Collection: " + collectionName);
+            }
+        }
+
         public bool CollectionContainsKey(string collectionName, string key)
         {
             try
@@ -153,6 +242,21 @@ namespace ServerApp
             catch (Exception)
             {
                 throw new Exception("Could not retrieve the number of records from MongoDB Collection: " + collectionName);
+            }
+        }
+
+        public bool CollectionExists(string collectionName)
+        {
+            try
+            {
+                var filter = new BsonDocument("name", collectionName);
+                var options = new ListCollectionNamesOptions { Filter = filter };
+
+                return MongoDatabase.ListCollectionNames(options).Any();
+            }
+            catch (Exception)
+            {
+                throw new Exception("Could not check that MongoDB Collection: " + collectionName + " exists");
             }
         }
     }

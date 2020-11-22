@@ -30,6 +30,13 @@ namespace ServerApp.Queries
 
         public override string ValidateQuery()
         {
+            // Check if the table is used as a reference in any other table 
+            if (TableUtils.IsTableReferenced(DBName, TableName))
+            {
+                // Table references exist => error message 
+                return Responses.DROP_TABLE_REFERENCED;
+            }
+
             return Commands.MapCommandToSuccessResponse(QueryCommand);
         }
 

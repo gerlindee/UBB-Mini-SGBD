@@ -43,13 +43,15 @@ namespace miniSGBD.Forms
                 dataGrid.Columns.Add(string.Format("col{0}", i), columnInfoList[i].ColumnName);
         }
 
+
         private void insertBtn_Click(object sender, EventArgs e)
         {
-            var message =  Commands.INSERT_INTO_TABLE + ";" + databaseName + ";" + tablename + ";";
+            var message = Commands.INSERT_INTO_TABLE + ";" + databaseName + ";" + tablename + ";";
             var noRows = dataGrid.Rows.Count;
-            
+
             if (dataGrid.Rows.Count > 1)
                 noRows -= 1;
+
             for (int rows = 0; rows < noRows; rows++)
             {
                 var primaryKeyColumnsAdded = false;
@@ -57,31 +59,31 @@ namespace miniSGBD.Forms
                 {
                     if (validateCell(col, dataGrid.Rows[rows].Cells[col]))
                     {
-                       /* if (validateUniqueAttibutesBeforeInsert(col, dataGrid.Rows[rows].Cells[col]))
-                        {*/
-                            var columnValue = dataGrid.Rows[rows].Cells[col].Value.ToString();
-                            var columnName = dataGrid.Columns[col].HeaderText.ToString();
-                            var columnObject = columnInfoList.Find(c => c.ColumnName == columnName);
-                            if (!columnObject.PK && !primaryKeyColumnsAdded)
-                            {
-                                // this is the point where all values for the composite primary key are done being concatenated to the message
-                                // => add the separator between the key and value and remove the leftover separator from the key part
-                                message = message.Remove(message.Length - 1);
-                                message += '*';
-                                primaryKeyColumnsAdded = true; // make sure that the separator between the key and the value is only added once
-                            }
-                            message += columnValue + '#';
-                       /* }
-                        else
+                        var columnName = dataGrid.Columns[col].HeaderText.ToString();
+                        var columnObject = columnInfoList.Find(c => c.ColumnName == columnName);
+
+                        if (columnObject.NonNull == true && dataGrid.Rows[rows].Cells[col].Value == null)
                         {
-                            MessageBox.Show("Unique key constraint violation!", "Query Execution Result", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            return;
-                        }*/
+                            message += "NULL" + '#';
+                            continue;
+                        }
+
+                        var columnValue = dataGrid.Rows[rows].Cells[col].Value.ToString();
+                        if (!columnObject.PK && !primaryKeyColumnsAdded)
+                        {
+                            // this is the point where all values for the composite primary key are done being concatenated to the message
+                            // => add the separator between the key and value and remove the leftover separator from the key part
+                            message = message.Remove(message.Length - 1);
+                            message += '*';
+                            primaryKeyColumnsAdded = true; // make sure that the separator between the key and the value is only added once
+                        }
+                        message += columnValue + '#';
+
                     }
                     else
                     {
                         return;
-                    }   
+                    }
                 }
                 message = message.Remove(message.Length - 1); // remove the separator left from separating the non-pk values
                 message += '|';
@@ -99,11 +101,19 @@ namespace miniSGBD.Forms
             {
                 MessageBox.Show(serverResponse, "Query Execution Result", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Close();
+
             }
         }
-
         private bool validateCell(int columnIndex, DataGridViewCell gridCell)
         {
+            var columnName = dataGrid.Columns[columnIndex].HeaderText.ToString();
+            var columnObject = columnInfoList.Find(c => c.ColumnName == columnName);
+
+            if (gridCell.Value == null && columnObject.NonNull == true)
+            {
+                return true; 
+            }
+
             if (gridCell.Value == null)
             {
                 MessageBox.Show(Validator.EMPTY_FIELD, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -111,24 +121,25 @@ namespace miniSGBD.Forms
             }
 
             var cell = gridCell.Value.ToString();
-            var columnName = dataGrid.Columns[columnIndex].HeaderText.ToString();
-            var columnObject = columnInfoList.Find(c => c.ColumnName == columnName);
 
-            if (Validator.isStringEmpty(cell))
+            if (Validator.isStringEmpty(cell) && columnObject.NonNull == false)
             {
                 MessageBox.Show(Validator.EMPTY_FIELD, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
+
             if (!Validator.isTypeCorrect(columnObject.Type, cell))
             {
                 MessageBox.Show(Validator.WRONG_TYPE, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
+
             if (columnObject.Lenght != -1 && Validator.isLenghtExceeded(columnObject.Lenght, cell.Length))
             {
                 MessageBox.Show(Validator.EXCEEDED_LENGHT, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
+
             return true;
         }
 

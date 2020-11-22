@@ -117,6 +117,27 @@ namespace ServerApp
             }
         }
 
+        public void RemoveByValueFromCollection(string collectionName, string value)
+        {
+            try
+            {
+                var mongoCollection = MongoDatabase.GetCollection<BsonDocument>(collectionName);
+                var allRecords = GetAllEntriesFromCollection(collectionName);
+                foreach (var record in allRecords)
+                {
+                    var recordValue = record.GetElement("value").Value.ToString();
+                    if (recordValue == value)
+                    { 
+                        RemoveKVFromCollection(collectionName, record.GetElement("_id").Value.ToString());
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw new Exception("Could not remove Value: " + value + " from MongoDB Collection: " + collectionName);
+            }
+        }
+
         public void RemoveKVFromCollection(string collectionName, string key)
         {
             try

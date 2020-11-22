@@ -55,15 +55,13 @@ namespace ServerApp.Queries
                     throw new Exception("An index for column combination: " + columnsString + " already exists!");
                 }
 
-                mongoDB.CreateCollection(indexName);
-
                 // If the table already has records => organize the contents in the new index file 
                 if (mongoDB.CollectionHasDocuments(TableName))
                 {
                     DetermineColumnsPositions(mongoDB);
                     if (indexType == true)
                     {
-                        IndexRecordsUnique();
+                        IndexRecordsUnique(mongoDB);
                     }
                     else
                     {
@@ -94,15 +92,61 @@ namespace ServerApp.Queries
             }
         }
 
-        private void IndexRecordsUnique()
+        private void IndexRecordsUnique(MongoDBAcess mongoDB)
         {
+            List<KeyValuePair<string, string>> indexedContent = new List<KeyValuePair<string, string>>();
+            List<string> indexKeys = new List<string>();
+
+            for (int idx = 0; idx < RecordsSplit.Count(); idx++)
+            {
+                var indexKey = "";
+                foreach (var indexColumn in columns)
+                {
+                    var columnValue = RecordsSplit[idx][ColumnsPositions.Find(elem => elem.Key == indexColumn).Value];
+                    indexKey += columnValue + '#';
+                }
+                indexKey = indexKey.Remove(indexKey.Length - 1);
+
+                var recordPK = "";
+                foreach (var column in ColumnsInfo)
+                {
+                    if (column.PK)
+                    {
+                        recordPK += RecordsSplit[idx][ColumnsPositions.Find(elem => elem.Key == column.ColumnName).Value] + '#';
+                    }
+                }
+                recordPK = recordPK.Remove(recordPK.Length - 1);
+
+
+                if (indexKeys.Exists(elem => elem == indexKey))
+                {
+                    throw new Exception("Could not index content for table: " + TableName);
+                }
+                else
+                {
+                    indexKeys.Add(indexKey);
+                    indexedContent.Add(new KeyValuePair<string, string>(indexKey, recordPK));
+                }
+            }
+
+            try
+            {
+                foreach (var indexKeyValue in indexedContent)
+                {
+                    mongoDB.InsertKVIntoCollection(indexName, indexKeyValue.Key, indexKeyValue.Value);
+                }
+            }
+            catch (Exception)
+            {
+                throw new Exception("Could not index content for table: " + TableName);
+            }
 
         }
 
         private void IndexRecordsNonUnique(MongoDBAcess mongoDB)
         {
             List<KeyValuePair<string, string>> indexedContent = new List<KeyValuePair<string, string>>();
-
+            
             for (int idx = 0; idx < RecordsSplit.Count(); idx++)
             {
                 var indexKey = "";

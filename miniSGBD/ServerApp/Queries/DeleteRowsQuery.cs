@@ -97,6 +97,7 @@ namespace ServerApp.Queries
                 if (index.IsUnique)
                 {
                     // Entire KV pair needs to be removed from the file 
+                    mongoDB.RemoveByValueFromCollection(index.IndexFileName, RemovedKey);
                 }
                 else
                 {

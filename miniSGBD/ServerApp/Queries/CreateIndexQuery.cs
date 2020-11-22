@@ -45,7 +45,7 @@ namespace ServerApp.Queries
                 var mongoDB = new MongoDBAcess(DBName);
 
                 // If the table already has records => organize the contents in the new index file 
-                if (mongoDB.CollectionHasDocuments(TableName))
+                /*if (mongoDB.CollectionHasDocuments(TableName))
                 {
                     if (indexType == true)
                     {
@@ -57,9 +57,9 @@ namespace ServerApp.Queries
                     }
                 }
                 else
-                {
+                {*/
                     mongoDB.CreateCollection(indexName);
-                }
+                //}
 
                 // Add the Index to the XML structure 
                 var xmlDocument = XDocument.Load(Application.StartupPath + "\\SGBDCatalog.xml");
@@ -68,12 +68,14 @@ namespace ServerApp.Queries
                 XElement[] databasesTables = givenDB.Descendants("Table").ToArray();
                 XElement givenTable = Array.Find(databasesTables, elem => elem.Attribute("tableName").Value.Equals(TableName));
                 XElement indexFilesNode = givenTable.Descendants("IndexFiles").ToArray()[0];
-                XElement indexNode = new XElement("IndexFile");
+                XElement indexNode = new XElement("IndexFile", new XAttribute("indexName", indexName), new XAttribute("isUnique", indexType));
 
                 foreach (var col in columns)
                 {
                     indexNode.Add(new XElement("IndexAttribute", col));
                 }
+                indexFilesNode.Add(indexNode);
+                xmlDocument.Save(Application.StartupPath + "\\SGBDCatalog.xml");
             }
             catch (Exception ex)
             {

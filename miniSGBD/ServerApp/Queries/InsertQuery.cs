@@ -23,7 +23,9 @@ namespace ServerApp.Queries
 
         // Attributes used for Foreign Key constraints check
         private List<KeyValuePair<string, int>> ForeignKeyPositions; // stores the name of the FK + the position of the column within a record
+        private List<KeyValuePair<string, int>> UniqueKeyPositions; // stores the name of the UqK + the position of the column within a record
         private List<ForeignKeyData> ForeignKeyData; // stores the data about FK relations 
+        private List<Tuple<string, string>> UniqueKeyData;
 
         public InsertQuery(string _databaseName, string _tableName, string _records) : base(Commands.INSERT_INTO_TABLE)
         {
@@ -33,7 +35,9 @@ namespace ServerApp.Queries
             Records = new List<KeyValuePair<String, String>>();
             ColumnsInfo = new List<ColumnInfo>();
             ForeignKeyPositions = new List<KeyValuePair<string, int>>();
+            UniqueKeyPositions = new List<KeyValuePair<string, int>>();
             ForeignKeyData = new List<ForeignKeyData>();
+            UniqueKeyData = new List<Tuple<string, string>>();
         }
 
         public override void ParseAttributes()
@@ -71,8 +75,18 @@ namespace ServerApp.Queries
                     ForeignKeyPositions.Add(new KeyValuePair<string, int>(ColumnsInfo[idx].ColumnName, idx));
                 }
             }
+            
+            for (int idx = 0; idx < ColumnsInfo.Count; idx++)
+            {
+                if (ColumnsInfo[idx].Unique)
+                {
+                    UniqueKeyPositions.Add(new KeyValuePair<string, int>(ColumnsInfo[idx].ColumnName, idx));
+                }
+            }
 
             ForeignKeyData = GetReferencesInformation();
+
+            UniqueKeyData = GetUniqueKeyInformation();
 
             // Initialize MongoDB Access class
             MongoDB = new MongoDBAcess(DatabaseName);
@@ -91,6 +105,7 @@ namespace ServerApp.Queries
 
                     CheckFKConstraints(keyValuePairs.Key + "#" + keyValuePairs.Value);
 
+                    CheckUniqueKeyConstraint(keyValuePairs.Key + "#" + keyValuePairs.Value);
                     // All checks have passed => Insert new record 
                     InsertRecord(keyValuePairs.Key, keyValuePairs.Value);
 
@@ -149,6 +164,21 @@ namespace ServerApp.Queries
             return true; // if no exception has been thrown so far => all FK constraints are respected for the current row 
         }
 
+        private bool CheckUniqueKeyConstraint(string record)
+        {
+            var columnValues = record.Split('#');
+            foreach (var referenceData in UniqueKeyData)
+            {
+                var uqValue = columnValues.ElementAt(UniqueKeyPositions.Find(elem => elem.Key == referenceData.Item1.ToString()).Value);
+
+                if (MongoDB.CollectionContainsKey(referenceData.Item2, uqValue))
+                {
+                    throw new Exception("A record with Unique Key " + uqValue + " is already in referenced table " + referenceData.Item2 + "!");
+                }
+            }
+            return true;
+
+        }
         private void InsertRecord(string key, string value)
         {
             try
@@ -189,6 +219,29 @@ namespace ServerApp.Queries
             }
 
             return fkData;
+        }
+
+        private List<Tuple<string, string>> GetUniqueKeyInformation()
+        {
+            // Return a list with all the data about all foreign keys on the table (list of FKs, Referenced table, mongoDB filename)
+            var uqData = new List<Tuple<string,string>>();
+
+            var xmlDocument = XDocument.Load(Application.StartupPath + "\\SGBDCatalog.xml");
+            XElement databaseNode = Array.Find(xmlDocument.Element("Databases").Descendants("Database").ToArray(),
+                                                                elem => elem.Attribute("databaseName").Value.Equals(DatabaseName));
+            XElement tableNode = Array.Find(databaseNode.Descendants("Table").ToArray(),
+                                                                elem => elem.Attribute("tableName").Value.Equals(TableName));
+            XElement[] uqNodes = tableNode.Descendants("UniqueKeys").Descendants("UniqueKeyColumn").ToArray();
+
+            foreach (var uniqueKeyNode in uqNodes)
+            {
+                var mongoDBFilename = uniqueKeyNode.Attribute("fileName").Value;
+                var keyName = uniqueKeyNode.Value;
+
+                uqData.Add(new Tuple<string, string>(keyName, mongoDBFilename));
+            }
+
+            return uqData;
         }
     }
 

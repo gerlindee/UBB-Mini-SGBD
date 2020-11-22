@@ -57,8 +57,8 @@ namespace miniSGBD.Forms
                 {
                     if (validateCell(col, dataGrid.Rows[rows].Cells[col]))
                     {
-                        if (validateUniqueAttibutesBeforeInsert(col, dataGrid.Rows[rows].Cells[col]))
-                        {
+                       /* if (validateUniqueAttibutesBeforeInsert(col, dataGrid.Rows[rows].Cells[col]))
+                        {*/
                             var columnValue = dataGrid.Rows[rows].Cells[col].Value.ToString();
                             var columnName = dataGrid.Columns[col].HeaderText.ToString();
                             var columnObject = columnInfoList.Find(c => c.ColumnName == columnName);
@@ -71,12 +71,12 @@ namespace miniSGBD.Forms
                                 primaryKeyColumnsAdded = true; // make sure that the separator between the key and the value is only added once
                             }
                             message += columnValue + '#';
-                        }
+                       /* }
                         else
                         {
                             MessageBox.Show("Unique key constraint violation!", "Query Execution Result", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             return;
-                        }
+                        }*/
                     }
                     else
                     {

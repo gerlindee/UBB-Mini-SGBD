@@ -23,6 +23,7 @@ namespace miniSGBD
         private static string CREATE_INDEX = "Create Index";
         private static string INSERT_TABLE = "Insert Records";
         private static string DELETE_RECORD = "Delete record";
+        private static string CREATE_STATEMENT = "Create statement";
 
         private static string selectedDatabase = "";
         private static string selectedTable = "";
@@ -34,6 +35,7 @@ namespace miniSGBD
 
         MenuItem deleteDBMenuItem = new MenuItem(DELETE_DATABASE);
         MenuItem createTBMenuItem = new MenuItem(CREATE_TABLE);
+        MenuItem createStatementMenuItem = new MenuItem(CREATE_STATEMENT);
         ContextMenu cm2 = new ContextMenu();
 
         MenuItem deleteRecordMenuItem = new MenuItem(DELETE_RECORD);
@@ -52,6 +54,7 @@ namespace miniSGBD
             cm3.MenuItems.Add(insertTableMenuItem);
             cm3.MenuItems.Add(deleteTableMenuItem);
             cm3.MenuItems.Add(createIndexMenuItem);
+            cm2.MenuItems.Add(createStatementMenuItem);
             cm2.MenuItems.Add(deleteDBMenuItem);
             cm2.MenuItems.Add(createTBMenuItem);
             insertTableMenuItem.Click += new EventHandler(contextMenu_insertTable);
@@ -60,6 +63,8 @@ namespace miniSGBD
             createIndexMenuItem.Click += new EventHandler(contextMenu_createIN);
             createTBMenuItem.Click += new EventHandler(contextMenu_addTable);
             deleteRecordMenuItem.Click += new EventHandler(contextMenu_deleteRecord);
+            createStatementMenuItem.Click += new EventHandler(contextMenu_createStatement);
+
             addTable_btn.Visible = false;
 
             populateDatabases();
@@ -275,6 +280,12 @@ namespace miniSGBD
             CreateTableForm addTableForm = new CreateTableForm(selectedDatabase, tcpClient);
             addTableForm.ShowDialog(this);
             populateTables();
+        }
+
+        private void contextMenu_createStatement(object sender, EventArgs e)
+        {
+            StatementsForm createStmForm = new StatementsForm(selectedDatabase, tcpClient);
+            createStmForm.ShowDialog(this);
         }
 
         private void contextMenu_deleteRecord(object sender, EventArgs e)

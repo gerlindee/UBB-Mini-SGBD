@@ -61,8 +61,35 @@ namespace miniSGBD.Forms
 
         private void changeLayoutAfterTreatySelection()
         {
+            panel_join_config.Controls.Clear();
+            list_column_config.Rows.Clear();
             setupTablesComboBox();
             getValuesForColumnsComboBox();
+            setUpJoinTables();
+        }
+
+        private void setUpJoinTables()
+        {
+            foreach (var table in selectedTables)
+            {
+                var panelForTable = new FlowLayoutPanel();
+                panelForTable.AutoSize = true;
+                panelForTable.FlowDirection = FlowDirection.TopDown;
+
+                var tableName = new Label();
+                tableName.Text = table;
+                
+                var columnsCheckBoxed = new CheckedListBox();
+                foreach (var column in tableColumns.Find(elem => elem.Key == table).Value)
+                {
+                    columnsCheckBoxed.Items.Add(column);
+                }
+
+                panelForTable.Controls.Add(tableName);
+                panelForTable.Controls.Add(columnsCheckBoxed);
+                panel_join_config.Controls.Add(panelForTable);
+            }
+
         }
 
         private void setupTablesComboBox()

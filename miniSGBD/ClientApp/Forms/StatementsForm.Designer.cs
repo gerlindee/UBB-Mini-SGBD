@@ -30,7 +30,6 @@
         {
             this.components = new System.ComponentModel.Container();
             this.label_table_config = new System.Windows.Forms.Label();
-            this.listView1 = new System.Windows.Forms.ListView();
             this.button_table_config = new System.Windows.Forms.Button();
             this.label_column_config = new System.Windows.Forms.Label();
             this.button_column_config = new System.Windows.Forms.Button();
@@ -44,6 +43,7 @@
             this.filter = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.group_by = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.having = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.panel_join_config = new System.Windows.Forms.FlowLayoutPanel();
             ((System.ComponentModel.ISupportInitialize)(this.list_column_config)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.binding_source_table_name)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.binding_source_column_name)).BeginInit();
@@ -58,15 +58,6 @@
             this.label_table_config.Size = new System.Drawing.Size(124, 20);
             this.label_table_config.TabIndex = 0;
             this.label_table_config.Text = "Table Selection";
-            // 
-            // listView1
-            // 
-            this.listView1.HideSelection = false;
-            this.listView1.Location = new System.Drawing.Point(19, 42);
-            this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(1080, 272);
-            this.listView1.TabIndex = 1;
-            this.listView1.UseCompatibleStateImageBehavior = false;
             // 
             // button_table_config
             // 
@@ -83,7 +74,7 @@
             // 
             this.label_column_config.AutoSize = true;
             this.label_column_config.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label_column_config.Location = new System.Drawing.Point(15, 341);
+            this.label_column_config.Location = new System.Drawing.Point(15, 397);
             this.label_column_config.Name = "label_column_config";
             this.label_column_config.Size = new System.Drawing.Size(138, 20);
             this.label_column_config.TabIndex = 3;
@@ -92,7 +83,7 @@
             // button_column_config
             // 
             this.button_column_config.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button_column_config.Location = new System.Drawing.Point(971, 658);
+            this.button_column_config.Location = new System.Drawing.Point(971, 714);
             this.button_column_config.Name = "button_column_config";
             this.button_column_config.Size = new System.Drawing.Size(133, 30);
             this.button_column_config.TabIndex = 5;
@@ -111,7 +102,7 @@
             this.filter,
             this.group_by,
             this.having});
-            this.list_column_config.Location = new System.Drawing.Point(19, 364);
+            this.list_column_config.Location = new System.Drawing.Point(19, 420);
             this.list_column_config.Name = "list_column_config";
             this.list_column_config.RowHeadersWidth = 25;
             this.list_column_config.RowTemplate.Height = 24;
@@ -170,17 +161,27 @@
             this.having.Name = "having";
             this.having.Width = 125;
             // 
+            // panel_join_config
+            // 
+            this.panel_join_config.AutoSize = true;
+            this.panel_join_config.BackColor = System.Drawing.SystemColors.Window;
+            this.panel_join_config.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel_join_config.Location = new System.Drawing.Point(19, 42);
+            this.panel_join_config.Name = "panel_join_config";
+            this.panel_join_config.Size = new System.Drawing.Size(1080, 337);
+            this.panel_join_config.TabIndex = 7;
+            // 
             // StatementsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            this.ClientSize = new System.Drawing.Size(1167, 716);
+            this.ClientSize = new System.Drawing.Size(1167, 756);
+            this.Controls.Add(this.panel_join_config);
             this.Controls.Add(this.list_column_config);
             this.Controls.Add(this.button_column_config);
             this.Controls.Add(this.label_column_config);
             this.Controls.Add(this.button_table_config);
-            this.Controls.Add(this.listView1);
             this.Controls.Add(this.label_table_config);
             this.Name = "StatementsForm";
             this.Text = "Data Selection";
@@ -195,7 +196,6 @@
         #endregion
 
         private System.Windows.Forms.Label label_table_config;
-        private System.Windows.Forms.ListView listView1;
         private System.Windows.Forms.Button button_table_config;
         private System.Windows.Forms.Label label_column_config;
         private System.Windows.Forms.Button button_column_config;
@@ -209,5 +209,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn filter;
         private System.Windows.Forms.DataGridViewCheckBoxColumn group_by;
         private System.Windows.Forms.DataGridViewTextBoxColumn having;
+        private System.Windows.Forms.FlowLayoutPanel panel_join_config;
     }
 }

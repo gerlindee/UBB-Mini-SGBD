@@ -54,8 +54,8 @@ namespace miniSGBD.Forms
                         selectedTables.Remove(tableName);
                     }
                 }
-                
             }
+            Close();
         }
 
         private void populateTablesList()

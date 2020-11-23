@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.label_table_config = new System.Windows.Forms.Label();
             this.listView1 = new System.Windows.Forms.ListView();
             this.button_table_config = new System.Windows.Forms.Button();
@@ -35,13 +36,17 @@
             this.button_column_config = new System.Windows.Forms.Button();
             this.list_column_config = new System.Windows.Forms.DataGridView();
             this.table_name = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.binding_source_table_name = new System.Windows.Forms.BindingSource(this.components);
             this.col_name = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.binding_source_column_name = new System.Windows.Forms.BindingSource(this.components);
             this.alias = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.output = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.filter = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.group_by = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.having = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.list_column_config)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.binding_source_table_name)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.binding_source_column_name)).BeginInit();
             this.SuspendLayout();
             // 
             // label_table_config
@@ -59,14 +64,14 @@
             this.listView1.HideSelection = false;
             this.listView1.Location = new System.Drawing.Point(19, 42);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(1040, 272);
+            this.listView1.Size = new System.Drawing.Size(1080, 272);
             this.listView1.TabIndex = 1;
             this.listView1.UseCompatibleStateImageBehavior = false;
             // 
             // button_table_config
             // 
             this.button_table_config.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button_table_config.Location = new System.Drawing.Point(1065, 42);
+            this.button_table_config.Location = new System.Drawing.Point(1105, 42);
             this.button_table_config.Name = "button_table_config";
             this.button_table_config.Size = new System.Drawing.Size(50, 50);
             this.button_table_config.TabIndex = 2;
@@ -87,7 +92,7 @@
             // button_column_config
             // 
             this.button_column_config.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button_column_config.Location = new System.Drawing.Point(926, 658);
+            this.button_column_config.Location = new System.Drawing.Point(971, 658);
             this.button_column_config.Name = "button_column_config";
             this.button_column_config.Size = new System.Drawing.Size(133, 30);
             this.button_column_config.TabIndex = 5;
@@ -108,14 +113,15 @@
             this.having});
             this.list_column_config.Location = new System.Drawing.Point(19, 364);
             this.list_column_config.Name = "list_column_config";
-            this.list_column_config.RowHeadersVisible = false;
-            this.list_column_config.RowHeadersWidth = 51;
+            this.list_column_config.RowHeadersWidth = 25;
             this.list_column_config.RowTemplate.Height = 24;
-            this.list_column_config.Size = new System.Drawing.Size(1040, 288);
+            this.list_column_config.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.list_column_config.Size = new System.Drawing.Size(1085, 288);
             this.list_column_config.TabIndex = 6;
             // 
             // table_name
             // 
+            this.table_name.DataSource = this.binding_source_table_name;
             this.table_name.HeaderText = "Table Name";
             this.table_name.MinimumWidth = 6;
             this.table_name.Name = "table_name";
@@ -123,6 +129,7 @@
             // 
             // col_name
             // 
+            this.col_name.DataSource = this.binding_source_column_name;
             this.col_name.HeaderText = "Column Name";
             this.col_name.MinimumWidth = 6;
             this.col_name.Name = "col_name";
@@ -168,7 +175,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            this.ClientSize = new System.Drawing.Size(1137, 716);
+            this.ClientSize = new System.Drawing.Size(1167, 716);
             this.Controls.Add(this.list_column_config);
             this.Controls.Add(this.button_column_config);
             this.Controls.Add(this.label_column_config);
@@ -178,6 +185,8 @@
             this.Name = "StatementsForm";
             this.Text = "Data Selection";
             ((System.ComponentModel.ISupportInitialize)(this.list_column_config)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.binding_source_table_name)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.binding_source_column_name)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -191,6 +200,8 @@
         private System.Windows.Forms.Label label_column_config;
         private System.Windows.Forms.Button button_column_config;
         private System.Windows.Forms.DataGridView list_column_config;
+        private System.Windows.Forms.BindingSource binding_source_table_name;
+        private System.Windows.Forms.BindingSource binding_source_column_name;
         private System.Windows.Forms.DataGridViewComboBoxColumn table_name;
         private System.Windows.Forms.DataGridViewComboBoxColumn col_name;
         private System.Windows.Forms.DataGridViewTextBoxColumn alias;

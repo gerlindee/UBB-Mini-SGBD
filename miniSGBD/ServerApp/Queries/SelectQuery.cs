@@ -7,41 +7,40 @@ using Utils;
 
 namespace ServerApp.Queries
 {
-    class SelectQuery
+    class SelectQuery 
     {
-        private string DatabaseName;
-        private string TableName;
-        private MongoDBAcess MongoDB;
+            private string DatabaseName;
+            private string TableName;
+            private MongoDBAcess MongoDB;
 
-        public SelectQuery(string _databaseName, string _tableName)
-        {
-            DatabaseName = _databaseName;
-            TableName = _tableName;
-            MongoDB = new MongoDBAcess(DatabaseName);
-        }
-
-        public string Execute()
-        {
-            return SelectEntireTable();
-        }
-
-        private string SelectEntireTable()
-        {
-            try
+            public SelectQuery(string _databaseName, string _tableName)
             {
-                var records = "";
-                var keyValuePairs = MongoDB.GetEntireCollection(TableName);
-                foreach (var keyValue in keyValuePairs)
+                DatabaseName = _databaseName;
+                TableName = _tableName;
+                MongoDB = new MongoDBAcess(DatabaseName);
+            }
+
+            public string Execute()
+            {
+                return SelectEntireTable();
+            }
+
+            private string SelectEntireTable()
+            {
+                try
                 {
-                    records += keyValue.GetElement("_id").Value + "#" + keyValue.GetElement("value").Value + "|";
+                    var records = "";
+                    var keyValuePairs = MongoDB.GetEntireCollection(TableName);
+                    foreach (var keyValue in keyValuePairs)
+                    {
+                        records += keyValue.GetElement("_id").Value + "#" + keyValue.GetElement("value").Value + "|";
+                    }
+                    return Commands.MapCommandToSuccessResponse(Commands.SELECT_RECORDS) + ";" + records;
                 }
-                return Commands.MapCommandToSuccessResponse(Commands.SELECT_RECORDS) + ";" + records;
+                catch (Exception ex)
+                {
+                    return ex.Message + ";";
+                }
             }
-            catch (Exception ex)
-            {
-                return ex.Message + ";";
-            }
-        }
-
     }
 }

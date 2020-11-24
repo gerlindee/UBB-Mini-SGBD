@@ -22,6 +22,7 @@ namespace Utils
         public const string GET_TABLE_COLUMNS = "GET_TABLE_COLUMNS";
         public const string INSERT_INTO_TABLE = "INSERT_INTO_TABLE";
         public const string SELECT_RECORDS = "SELECT_RECORDS";
+        public const string SELECT_RECORDS_BY_PK = "SELECT_RECORDS_BY_PK";
         public const string DELETE_RECORD = "DELETE_RECORD";
 
         public const string SELECT_DATA = "SELECT_DATA"; 
@@ -30,6 +31,8 @@ namespace Utils
         public const string CREATE_INDEX = "CREATE_INDEX";
         public const string CREATE_NONUNIQUE_INDEX = "CREATE_NONUNIQUE_INDEX";
         public const string CREATE_UNIQUE_INDEX = "CREATE_UNIQUE_INDEX";
+
+        public const string SELECT_QUERY = "SELECT_QUERY";
 
         public static string MapCommandToSuccessResponse(string command)
         {
@@ -86,7 +89,6 @@ namespace Utils
 
         //Index Responses
         public const string CREATE_INDEX_SUCCESS = "Index created successfully!";
-
     }
 
     public static class ColumnInformation
@@ -95,5 +97,11 @@ namespace Utils
         public const string FK = "FK";
         public const string UNQ = "UNQ";
         public const string NULL = "NULL";
+    }
+
+    public static class SelectColumnInformation
+    {
+        public const string Output = "Output";
+        public const string GroupBy = "GroupBy";
     }
 }

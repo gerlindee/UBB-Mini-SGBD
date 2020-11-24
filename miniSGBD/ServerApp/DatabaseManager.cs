@@ -89,6 +89,16 @@ namespace ServerApp
                         executionResponse = new DeleteRowsQuery(commandSplit[1], commandSplit[2], commandSplit[3]).Execute();
                     }
                     break;
+                case Commands.SELECT_QUERY:
+                    {
+                        executionResponse = new SelectStatementQuery(commandSplit[1], commandSplit[2], commandSplit[3]).Execute();
+                    }
+                    break;
+                case Commands.SELECT_RECORDS_BY_PK:
+                    {
+                        executionResponse = new SelectStatementQuery(commandSplit[1], commandSplit[2], commandSplit[3]).Execute();
+                    }
+                    break;
             }
             return executionResponse;
         }

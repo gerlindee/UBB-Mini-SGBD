@@ -23,7 +23,7 @@ namespace miniSGBD
         private static string CREATE_INDEX = "Create Index";
         private static string INSERT_TABLE = "Insert Records";
         private static string DELETE_RECORD = "Delete record";
-        private static string CREATE_STATEMENT = "Create statement";
+        private static string CREATE_STATEMENT = "Create Selection Query";
 
         private static string selectedDatabase = "";
         private static string selectedTable = "";

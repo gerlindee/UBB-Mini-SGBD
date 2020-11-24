@@ -34,19 +34,22 @@
             this.label_column_config = new System.Windows.Forms.Label();
             this.button_column_config = new System.Windows.Forms.Button();
             this.list_column_config = new System.Windows.Forms.DataGridView();
-            this.table_name = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.binding_source_table_name = new System.Windows.Forms.BindingSource(this.components);
-            this.col_name = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.binding_source_column_name = new System.Windows.Forms.BindingSource(this.components);
+            this.panel_join_config = new System.Windows.Forms.FlowLayoutPanel();
+            this.binding_source_sorting = new System.Windows.Forms.BindingSource(this.components);
+            this.table_name = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.col_name = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.alias = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.output = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.filter = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.sorting = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.group_by = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.having = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.panel_join_config = new System.Windows.Forms.FlowLayoutPanel();
             ((System.ComponentModel.ISupportInitialize)(this.list_column_config)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.binding_source_table_name)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.binding_source_column_name)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.binding_source_sorting)).BeginInit();
             this.SuspendLayout();
             // 
             // label_table_config
@@ -62,7 +65,7 @@
             // button_table_config
             // 
             this.button_table_config.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button_table_config.Location = new System.Drawing.Point(1105, 42);
+            this.button_table_config.Location = new System.Drawing.Point(1263, 42);
             this.button_table_config.Name = "button_table_config";
             this.button_table_config.Size = new System.Drawing.Size(50, 50);
             this.button_table_config.TabIndex = 2;
@@ -83,12 +86,13 @@
             // button_column_config
             // 
             this.button_column_config.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button_column_config.Location = new System.Drawing.Point(971, 714);
+            this.button_column_config.Location = new System.Drawing.Point(1127, 714);
             this.button_column_config.Name = "button_column_config";
             this.button_column_config.Size = new System.Drawing.Size(133, 30);
             this.button_column_config.TabIndex = 5;
             this.button_column_config.Text = "Select";
             this.button_column_config.UseVisualStyleBackColor = true;
+            this.button_column_config.Click += new System.EventHandler(this.button_column_config_Click);
             // 
             // list_column_config
             // 
@@ -100,15 +104,27 @@
             this.alias,
             this.output,
             this.filter,
+            this.sorting,
             this.group_by,
             this.having});
+            this.list_column_config.GridColor = System.Drawing.SystemColors.GrayText;
             this.list_column_config.Location = new System.Drawing.Point(19, 420);
             this.list_column_config.Name = "list_column_config";
             this.list_column_config.RowHeadersWidth = 25;
             this.list_column_config.RowTemplate.Height = 24;
             this.list_column_config.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.list_column_config.Size = new System.Drawing.Size(1085, 288);
+            this.list_column_config.Size = new System.Drawing.Size(1241, 288);
             this.list_column_config.TabIndex = 6;
+            // 
+            // panel_join_config
+            // 
+            this.panel_join_config.AutoSize = true;
+            this.panel_join_config.BackColor = System.Drawing.SystemColors.Window;
+            this.panel_join_config.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel_join_config.Location = new System.Drawing.Point(19, 42);
+            this.panel_join_config.Name = "panel_join_config";
+            this.panel_join_config.Size = new System.Drawing.Size(1238, 337);
+            this.panel_join_config.TabIndex = 7;
             // 
             // table_name
             // 
@@ -147,6 +163,14 @@
             this.filter.Name = "filter";
             this.filter.Width = 125;
             // 
+            // sorting
+            // 
+            this.sorting.DataSource = this.binding_source_sorting;
+            this.sorting.HeaderText = "Sorting";
+            this.sorting.MinimumWidth = 6;
+            this.sorting.Name = "sorting";
+            this.sorting.Width = 125;
+            // 
             // group_by
             // 
             this.group_by.HeaderText = "Group By";
@@ -161,22 +185,12 @@
             this.having.Name = "having";
             this.having.Width = 125;
             // 
-            // panel_join_config
-            // 
-            this.panel_join_config.AutoSize = true;
-            this.panel_join_config.BackColor = System.Drawing.SystemColors.Window;
-            this.panel_join_config.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel_join_config.Location = new System.Drawing.Point(19, 42);
-            this.panel_join_config.Name = "panel_join_config";
-            this.panel_join_config.Size = new System.Drawing.Size(1080, 337);
-            this.panel_join_config.TabIndex = 7;
-            // 
             // StatementsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            this.ClientSize = new System.Drawing.Size(1167, 756);
+            this.ClientSize = new System.Drawing.Size(1325, 756);
             this.Controls.Add(this.panel_join_config);
             this.Controls.Add(this.list_column_config);
             this.Controls.Add(this.button_column_config);
@@ -188,6 +202,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.list_column_config)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.binding_source_table_name)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.binding_source_column_name)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.binding_source_sorting)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -202,13 +217,15 @@
         private System.Windows.Forms.DataGridView list_column_config;
         private System.Windows.Forms.BindingSource binding_source_table_name;
         private System.Windows.Forms.BindingSource binding_source_column_name;
+        private System.Windows.Forms.FlowLayoutPanel panel_join_config;
+        private System.Windows.Forms.BindingSource binding_source_sorting;
         private System.Windows.Forms.DataGridViewComboBoxColumn table_name;
         private System.Windows.Forms.DataGridViewComboBoxColumn col_name;
         private System.Windows.Forms.DataGridViewTextBoxColumn alias;
         private System.Windows.Forms.DataGridViewCheckBoxColumn output;
         private System.Windows.Forms.DataGridViewTextBoxColumn filter;
+        private System.Windows.Forms.DataGridViewComboBoxColumn sorting;
         private System.Windows.Forms.DataGridViewCheckBoxColumn group_by;
         private System.Windows.Forms.DataGridViewTextBoxColumn having;
-        private System.Windows.Forms.FlowLayoutPanel panel_join_config;
     }
 }

@@ -66,6 +66,7 @@ namespace miniSGBD.Forms
             setupTablesComboBox();
             getValuesForColumnsComboBox();
             setUpJoinTables();
+            setupSortingComboBox();
         }
 
         private void setUpJoinTables()
@@ -102,6 +103,15 @@ namespace miniSGBD.Forms
             binding_source_column_name.DataSource = tableColumns.Find(elem => elem.Key == tableName).Value;
         }
 
+        private void setupSortingComboBox()
+        {
+            var sortingTypes = new List<string>();
+            sortingTypes.Add("None");
+            sortingTypes.Add("Ascending");
+            sortingTypes.Add("Descending");
+            binding_source_sorting.DataSource = sortingTypes;
+        }
+
         private void getValuesForColumnsComboBox()
         { 
             foreach (var table in selectedTables)
@@ -116,6 +126,18 @@ namespace miniSGBD.Forms
                     columnsInTable.Add(column);
                 }
                 tableColumns.Add(new KeyValuePair<string, List<string>>(table, columnsInTable));
+            }
+        }
+
+        private void button_column_config_Click(object sender, EventArgs e)
+        {
+            if (panel_join_config.Controls.Count == 0)
+            {
+                MessageBox.Show("At least one table needs to be selected!", "Invalid Configuration", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else
+            {
+
             }
         }
     }

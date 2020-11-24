@@ -29,6 +29,7 @@ namespace Utils
         public const string CREATE_NONUNIQUE_INDEX = "CREATE_NONUNIQUE_INDEX";
         public const string CREATE_UNIQUE_INDEX = "CREATE_UNIQUE_INDEX";
 
+
         public static string MapCommandToSuccessResponse(string command)
         {
             switch (command)
@@ -81,7 +82,6 @@ namespace Utils
 
         //Index Responses
         public const string CREATE_INDEX_SUCCESS = "Index created successfully!";
-
     }
 
     public static class ColumnInformation
@@ -90,5 +90,11 @@ namespace Utils
         public const string FK = "FK";
         public const string UNQ = "UNQ";
         public const string NULL = "NULL";
+    }
+
+    public static class SelectColumnInformation
+    {
+        public const string Output = "Output";
+        public const string GroupBy = "GroupBy";
     }
 }

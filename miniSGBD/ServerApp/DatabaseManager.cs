@@ -81,7 +81,7 @@ namespace ServerApp
                     break;
                 case Commands.SELECT_RECORDS:
                     {
-                        executionResponse = new SelectQuery(commandSplit[1], commandSplit[2]).Execute();
+                        executionResponse = new SelectQuery(commandSplit[1], commandSplit[2], commandSplit[3]).Execute();
                     }
                     break;
                 case Commands.DELETE_RECORD:

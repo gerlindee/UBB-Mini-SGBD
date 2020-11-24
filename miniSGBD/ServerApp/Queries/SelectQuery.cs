@@ -34,8 +34,7 @@ namespace ServerApp.Queries
 
             foreach(var attribute in splitAttributes)
             {
-                var selectRowInfo = new SelectRowInfo(attribute);
-                SelectRows.Add(selectRowInfo);
+                SelectRows.Add(new SelectRowInfo(attribute));
             }
         }
 
@@ -43,13 +42,12 @@ namespace ServerApp.Queries
         {
             foreach(var row in SelectRows)
             {
-                if (row.Alias != "-")
+                if (row.Output)
                     OutputParamsAndAlias.Add(new Tuple<string, string>(row.ColumnName, row.Alias));
                 if (row.Filter != "-")
                     FilterParamsAndCondition.Add(new Tuple<string, string>(row.ColumnName, row.Filter));
                 if (row.GroupBy)
                     GroupByList.Add(row.ColumnName);
-
             }
         }
         private string SelectEntireTable()
@@ -70,5 +68,16 @@ namespace ServerApp.Queries
             }
         }
 
+        public override void PerformXMLActions()
+        {
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

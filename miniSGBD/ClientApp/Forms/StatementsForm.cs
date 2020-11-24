@@ -131,13 +131,93 @@ namespace miniSGBD.Forms
 
         private void button_column_config_Click(object sender, EventArgs e)
         {
-            if (panel_join_config.Controls.Count == 0)
+            if (selectedTables.Count == 0)
             {
                 MessageBox.Show("At least one table needs to be selected!", "Invalid Configuration", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             else
             {
+                var columnConditions = list_column_config.Rows.Count;
+                if (columnConditions == 1 && selectedTables.Count == 1)
+                {
+                    var resultTableContents = new List<string>();
+                    // Select the entire contents of the table, unfiltered => SELECT * FROM <table>
+                    tcpClient.Write(Commands.SELECT_RECORDS + ";" + databaseName + ";" + selectedTables[0]);
+                    var serverResponse = tcpClient.ReadFromServer().Split(';');
 
+                    if (serverResponse[0] == Commands.MapCommandToSuccessResponse(Commands.SELECT_RECORDS))
+                    {
+                        foreach (string tableRecord in serverResponse[1].Split('|'))
+                        {
+                            if (tableRecord != "")
+                            {
+                                resultTableContents.Add(tableRecord);
+                            }
+                        }
+
+                        var resultTableHeader = tableColumns.Find(elem => elem.Key == selectedTables[0]).Value;
+                        StatementsResultForm statementsResultForm = new StatementsResultForm(resultTableHeader, resultTableContents);
+                        statementsResultForm.Show();
+                    }
+                    else
+                    {
+                        MessageBox.Show(serverResponse[0], "Query Execution Result", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+                else 
+                {
+                    if (selectedTables.Count == 1)
+                    {
+                        // Select on one table, without Join => separate because no validations on join configuration is needed 
+                    }
+                    else
+                    {
+                        // Build the list of checked columns for join, for each displayed table
+                        var selectedJoinColumns = new List<KeyValuePair<string, List<string>>>();
+                        foreach (FlowLayoutPanel tableControl in panel_join_config.Controls)
+                        {
+                            var tableName = tableControl.Controls[0].Text;
+                            var checkedColumns = (tableControl.Controls[1] as CheckedListBox).CheckedItems;
+                            if (checkedColumns.Count != 0)
+                            {
+                                var joinColumns = new List<string>();
+                                foreach (var column in checkedColumns)
+                                {
+                                    joinColumns.Add(column.ToString());
+                                }
+                                selectedJoinColumns.Add(new KeyValuePair<string, List<string>>(tableName, joinColumns));
+                            }
+                        }
+
+                        // If there is a selected table for the join but no columns selected for the join => error 
+                        if (selectedJoinColumns.Count != selectedTables.Count)
+                        {
+                            MessageBox.Show("Configure the columns for the join opereation for all selected tables!", "Invalid Configuration", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                        else
+                        {
+                            // If the number of columns selected for join differs between tables => error 
+                            var errorColumnsFlag = false;
+                            for (int idx = 0; idx < selectedJoinColumns.Count - 1; idx++)
+                            {
+                                if (selectedJoinColumns[idx].Value.Count != selectedJoinColumns[idx + 1].Value.Count)
+                                {
+                                    errorColumnsFlag = true;
+                                    break;
+                                }
+                            }
+
+                            if (errorColumnsFlag)
+                            {
+                                MessageBox.Show("The same number of columns need to be selected for all join tables!", "Invalid Configuration", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            }
+                            else
+                            {
+                                // Aici o sa fie chemat Select Query-ul cu Join-uri 
+                            }
+                        }
+                    }
+                }
             }
         }
     }

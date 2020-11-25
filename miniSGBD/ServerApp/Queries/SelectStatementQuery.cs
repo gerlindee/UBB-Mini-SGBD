@@ -30,12 +30,14 @@ namespace ServerApp.Queries
 
         public override void ParseAttributes()
         {
-            var rows = new List<SelectRowInfo>();
             var splitAttributes = Attributes.Split('|');
 
             foreach (var attribute in splitAttributes)
             {
-                SelectRows.Add(new SelectRowInfo(attribute));
+                if (attribute != "")
+                {
+                    SelectRows.Add(new SelectRowInfo(attribute));
+                }
             }
             parseRows();
         }

@@ -190,11 +190,63 @@ namespace miniSGBD.Forms
                                 }
                                 else
                                 {
+                                    message += columnName.ToString() + '#';
 
+                                    var aliasName = (columnConfig[2] as DataGridViewTextBoxCell).Value;
+                                    if (aliasName == null)
+                                    {
+                                        message += "-#";
+                                    }
+                                    else
+                                    {
+                                        message += aliasName.ToString() + '#';
+                                    }
+
+                                    var outputCheck = (columnConfig[3] as DataGridViewCheckBoxCell).Value;
+                                    if (outputCheck == null)
+                                    {
+                                        message += "-#";
+                                    }
+                                    else
+                                    {
+                                        message += outputCheck.ToString() + '#';
+                                    }
+
+                                    var filterValue = (columnConfig[4] as DataGridViewTextBoxCell).Value;
+                                    if (filterValue == null)
+                                    {
+                                        message += "-#";
+                                    }
+                                    else
+                                    {
+                                        message += filterValue.ToString() + '#';
+                                    }
+
+                                    var groupByCheck = (columnConfig[5] as DataGridViewCheckBoxCell).Value;
+                                    if (groupByCheck == null)
+                                    {
+                                        message += "-#";
+                                    }
+                                    else
+                                    {
+                                        message += groupByCheck.ToString() + '#';
+                                    }
+
+                                    var havingValue = (columnConfig[6] as DataGridViewTextBoxCell).Value;
+                                    if (havingValue == null)
+                                    {
+                                        message += "-|";
+                                    }
+                                    else
+                                    {
+                                        message += havingValue.ToString() + '|';
+                                    }
                                 }
                             }
-
                         }
+
+                        tcpClient.Write(message);
+                        var serverResponse = tcpClient.ReadFromServer();
                     }
                     else
                     {

@@ -66,6 +66,9 @@ namespace ServerApp.Queries
                     // Remove record PK from FK value 
                     RemoveFromFKIndexFiles(mongoDB);
 
+                    // Remove record from UQ file 
+                    RemoveFromUQIndexFiles(mongoDB);
+
                     // Remove record from main table collection
                     mongoDB.RemoveKVFromCollection(TableName, RemovedKey);
 
@@ -105,6 +108,39 @@ namespace ServerApp.Queries
                     mongoDB.RemoveValueFromCollection(index.IndexFileName, RemovedKey);
                 }    
             }
+        }
+
+        private void RemoveFromUQIndexFiles(MongoDBAcess mongoDB)
+        {
+            var uniqueKeyFiles = GetUniqueKeyInformation();
+
+            foreach (var uniqueKey in uniqueKeyFiles)
+            {
+                mongoDB.RemoveValueFromCollection(uniqueKey.Item2, RemovedKey);
+            }
+        }
+
+        private List<Tuple<string, string>> GetUniqueKeyInformation()
+        {
+            // Return a list with all the data about all unique keys on the table 
+            var uqData = new List<Tuple<string, string>>();
+
+            var xmlDocument = XDocument.Load(Application.StartupPath + "\\SGBDCatalog.xml");
+            XElement databaseNode = Array.Find(xmlDocument.Element("Databases").Descendants("Database").ToArray(),
+                                                                elem => elem.Attribute("databaseName").Value.Equals(DatabaseName));
+            XElement tableNode = Array.Find(databaseNode.Descendants("Table").ToArray(),
+                                                                elem => elem.Attribute("tableName").Value.Equals(TableName));
+            XElement[] uqNodes = tableNode.Descendants("UniqueKeys").Descendants("UniqueKeyColumn").ToArray();
+
+            foreach (var uniqueKeyNode in uqNodes)
+            {
+                var mongoDBFilename = uniqueKeyNode.Attribute("fileName").Value;
+                var keyName = uniqueKeyNode.Value;
+
+                uqData.Add(new Tuple<string, string>(keyName, mongoDBFilename));
+            }
+
+            return uqData;
         }
     }
 }

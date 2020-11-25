@@ -7,7 +7,7 @@ using Utils;
 
 namespace ServerApp.Queries
 {
-    class SelectStatementQuery :AbstractQuery
+    class SelectStatementQuery : AbstractQuery
     {
         private string DatabaseName;
         private string TableName;
@@ -20,7 +20,7 @@ namespace ServerApp.Queries
         private List<Tuple<string, string>> HavingParamsAndCondition = new List<Tuple<string, string>>();
         private List<string> GroupByList = new List<string>();
 
-        public SelectStatementQuery(string _databaseName, string _tableName, string _attributes) : base(Commands.SELECT_RECORDS)
+        public SelectStatementQuery(string _databaseName, string _tableName, string _attributes) : base(Commands.SELECT_QUERY)
         {
             DatabaseName = _databaseName;
             TableName = _tableName;
@@ -30,12 +30,14 @@ namespace ServerApp.Queries
 
         public override void ParseAttributes()
         {
-            var rows = new List<SelectRowInfo>();
             var splitAttributes = Attributes.Split('|');
 
             foreach (var attribute in splitAttributes)
             {
-                SelectRows.Add(new SelectRowInfo(attribute));
+                if (attribute != "")
+                {
+                    SelectRows.Add(new SelectRowInfo(attribute));
+                }
             }
             parseRows();
         }

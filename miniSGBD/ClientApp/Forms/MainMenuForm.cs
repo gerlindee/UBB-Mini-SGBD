@@ -23,7 +23,7 @@ namespace miniSGBD
         private static string CREATE_INDEX = "Create Index";
         private static string INSERT_TABLE = "Insert Records";
         private static string DELETE_RECORD = "Delete record";
-        private static string CREATE_STATEMENT = "Create statement";
+        private static string CREATE_STATEMENT = "Create Selection Query";
 
         private static string selectedDatabase = "";
         private static string selectedTable = "";
@@ -105,6 +105,7 @@ namespace miniSGBD
 
         private void databasesList_MouseClick(object sender, MouseEventArgs e)
         {
+            selectedDatabase = databasesList.FocusedItem.Text;
             if (e.Button == MouseButtons.Right && databasesList.FocusedItem.Bounds.Contains(e.Location))
             {
                cm2.Show(databasesList, e.Location);
@@ -117,7 +118,6 @@ namespace miniSGBD
                 table_contents_list.Columns.Clear();
 
                 addTable_btn.Visible = true;
-                selectedDatabase = databasesList.FocusedItem.Text;
                 populateTables();
             }
         }

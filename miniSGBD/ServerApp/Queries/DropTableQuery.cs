@@ -46,7 +46,6 @@ namespace ServerApp.Queries
             {
                 var xmlDocument = XDocument.Load(Application.StartupPath + "\\SGBDCatalog.xml");
 
-                XElement givenDatabaseNode = null;
                 XElement[] databasesNodes = xmlDocument.Element("Databases").Descendants("Database").ToArray();
                 XElement givenDB = Array.Find(databasesNodes, elem => elem.Attribute("databaseName").Value.Equals(DBName));
 

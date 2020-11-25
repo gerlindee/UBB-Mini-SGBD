@@ -94,7 +94,11 @@ namespace ServerApp
                             newRecordValue += recordValue + '#';
                         }
                     }
-                    newRecordValue = newRecordValue.Remove(newRecordValue.Length - 1);
+
+                    if (newRecordValue != "")
+                    {
+                        newRecordValue = newRecordValue.Remove(newRecordValue.Length - 1);
+                    }
 
                     if (newRecordValue != record.GetElement("value").Value.ToString())
                     {

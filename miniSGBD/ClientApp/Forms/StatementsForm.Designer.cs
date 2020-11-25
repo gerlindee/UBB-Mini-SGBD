@@ -36,8 +36,8 @@
             this.list_column_config = new System.Windows.Forms.DataGridView();
             this.binding_source_table_name = new System.Windows.Forms.BindingSource(this.components);
             this.binding_source_column_name = new System.Windows.Forms.BindingSource(this.components);
-            this.panel_join_config = new System.Windows.Forms.FlowLayoutPanel();
             this.binding_source_sorting = new System.Windows.Forms.BindingSource(this.components);
+            this.panel_join_config = new System.Windows.Forms.FlowLayoutPanel();
             this.table_name = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.col_name = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.alias = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -165,6 +165,7 @@
             // 
             // sorting
             // 
+            this.sorting.DataPropertyName = "None";
             this.sorting.DataSource = this.binding_source_sorting;
             this.sorting.HeaderText = "Sorting";
             this.sorting.MinimumWidth = 6;

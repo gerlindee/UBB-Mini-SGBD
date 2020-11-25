@@ -16,9 +16,14 @@ namespace Utils
             Having = columnStruct[5];
 
             if(columnStruct[2] == SelectColumnInformation.Output)
+            {
                 Output = true;
-            if(columnStruct[4] == SelectColumnInformation.GroupBy)
+            }
+
+            if (columnStruct[4] == SelectColumnInformation.GroupBy)
+            {
                 GroupBy = true;
+            }
         }
 
         public string ColumnName { get; set; }

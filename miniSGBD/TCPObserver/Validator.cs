@@ -45,7 +45,6 @@ namespace Utils
         }
         public static bool isLenghtExceeded(int lenght, int obj)
         {
-            int val;
             return obj > lenght; 
         }
         public static bool isTypeCorrect(string type, string value)

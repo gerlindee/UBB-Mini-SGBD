@@ -22,17 +22,14 @@ namespace Utils
         public const string GET_TABLE_COLUMNS = "GET_TABLE_COLUMNS";
         public const string INSERT_INTO_TABLE = "INSERT_INTO_TABLE";
         public const string SELECT_RECORDS = "SELECT_RECORDS";
+        public const string SELECT_QUERY = "SELECT_QUERY";
         public const string SELECT_RECORDS_BY_PK = "SELECT_RECORDS_BY_PK";
-        public const string DELETE_RECORD = "DELETE_RECORD";
-
-        public const string SELECT_DATA = "SELECT_DATA"; 
+        public const string DELETE_RECORD = "DELETE_RECORD"; 
 
         //Index Commands
         public const string CREATE_INDEX = "CREATE_INDEX";
         public const string CREATE_NONUNIQUE_INDEX = "CREATE_NONUNIQUE_INDEX";
         public const string CREATE_UNIQUE_INDEX = "CREATE_UNIQUE_INDEX";
-
-        public const string SELECT_QUERY = "SELECT_QUERY";
 
         public static string MapCommandToSuccessResponse(string command)
         {
@@ -56,8 +53,8 @@ namespace Utils
                     return Responses.SELECT_RECORDS_SUCCESS;
                 case DELETE_RECORD:
                     return Responses.DELETE_RECORD_SUCCESS;
-                case SELECT_DATA:
-                    return Responses.SELECT_DATA_SUCCESS;
+                case SELECT_QUERY:
+                    return Responses.SELECT_QUERY_SUCCESS;
             }
             return "";
         }
@@ -85,7 +82,7 @@ namespace Utils
         public const string SELECT_RECORDS_SUCCESS = "Selection of records ended successfully!";
         public const string DELETE_RECORD_SUCCESS = "Deletion of records ended successfully!";
         public const string DELETE_RECORD_USED_AS_FK = "Could not delete record because it is used as a FOREIGN KEY in table ";
-        public const string SELECT_DATA_SUCCESS = "Data selection was successful";
+        public const string SELECT_QUERY_SUCCESS = "Data selection was successful";
 
         //Index Responses
         public const string CREATE_INDEX_SUCCESS = "Index created successfully!";

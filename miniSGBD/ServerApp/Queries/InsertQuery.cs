@@ -120,6 +120,7 @@ namespace ServerApp.Queries
 
                     CheckFKConstraints(keyValuePairs.Key + "#" + keyValuePairs.Value);
                     CheckUniqueKeyConstraint(keyValuePairs.Key + "#" + keyValuePairs.Value);
+                    CheckUniqueIndexConstraint(keyValuePairs.Key + '#' + keyValuePairs.Value);
                     // All checks have passed => Insert new record into all relevant files
 
                     InsertRecord(keyValuePairs.Key, keyValuePairs.Value);
@@ -261,6 +262,14 @@ namespace ServerApp.Queries
                     }
                 }
 
+                // Insert into Unique Key files
+                var columnValues = (key + '#' + value).Split('#');
+                foreach (var uniqueKey in UniqueKeyData)
+                {
+                    var uqValue = columnValues.ElementAt(UniqueKeyPositions.Find(elem => elem.Key == uniqueKey.Item1.ToString()).Value);
+                    MongoDB.InsertKVIntoCollection(uniqueKey.Item2, uqValue, key);
+                }
+
                 // Insert into any index files 
                 foreach (var indexFile in TableUtils.GetIndexFiles(DatabaseName, TableName))
                 {
@@ -276,8 +285,7 @@ namespace ServerApp.Queries
                     
                     if (indexFile.IsUnique)
                     {
-                        CheckUniqueIndexConstraint(key + '#' + value);
-                        // If the index is unique and the file already contains a key with the specified value => error message 
+                        MongoDB.InsertKVIntoCollection(indexFile.IndexFileName, indexKey, key);
                     }
                     else
                     {
@@ -333,7 +341,7 @@ namespace ServerApp.Queries
 
         private List<Tuple<string, string>> GetUniqueKeyInformation()
         {
-            // Return a list with all the data about all foreign keys on the table (list of FKs, Referenced table, mongoDB filename)
+            // Return a list with all the data about all unique keys on the table 
             var uqData = new List<Tuple<string,string>>();
 
             var xmlDocument = XDocument.Load(Application.StartupPath + "\\SGBDCatalog.xml");

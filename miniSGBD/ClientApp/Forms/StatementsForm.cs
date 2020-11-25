@@ -169,6 +169,32 @@ namespace miniSGBD.Forms
                     if (selectedTables.Count == 1)
                     {
                         // Select on one table, without Join => separate because no validations on join configuration is needed 
+                        var message = Commands.SELECT_QUERY + ';' + databaseName + ';' + selectedTables[0] + ';';
+                        var noRows = list_column_config.Rows.Count - 1;
+
+                        for (int idx = 0; idx < noRows; idx++)
+                        {
+                            var columnConfig = list_column_config.Rows[idx].Cells;
+                            var tableName = (columnConfig[0] as DataGridViewComboBoxCell).Value;
+
+                            if (tableName == null)
+                            {
+                                MessageBox.Show("Table name needs to be selected in row " + idx.ToString(), "Invalid Configuration", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            }
+                            else
+                            {
+                                var columnName = (columnConfig[1] as DataGridViewComboBoxCell).Value;
+                                if (columnName == null)
+                                {
+                                    MessageBox.Show("Column name needs to be selected in row " + idx.ToString(), "Invalid Configuration", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                }
+                                else
+                                {
+
+                                }
+                            }
+
+                        }
                     }
                     else
                     {

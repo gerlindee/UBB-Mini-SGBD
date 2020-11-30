@@ -1,6 +1,6 @@
 ﻿namespace miniSGBD.Forms
 {
-    partial class StatementsForm
+    partial class SelectForm
     {
         /// <summary>
         /// Required designer variable.

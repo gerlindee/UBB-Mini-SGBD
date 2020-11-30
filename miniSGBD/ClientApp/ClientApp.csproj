@@ -71,23 +71,23 @@
     <Compile Include="Forms\MainMenuForm.Designer.cs">
       <DependentUpon>MainMenuForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\StatementsForm.cs">
+    <Compile Include="Forms\SelectForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\StatementsForm.Designer.cs">
-      <DependentUpon>StatementsForm.cs</DependentUpon>
+    <Compile Include="Forms\SelectForm.Designer.cs">
+      <DependentUpon>SelectForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\StatementsFormTables.cs">
+    <Compile Include="Forms\SelectFormTables.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\StatementsFormTables.Designer.cs">
-      <DependentUpon>StatementsFormTables.cs</DependentUpon>
+    <Compile Include="Forms\SelectFormTables.Designer.cs">
+      <DependentUpon>SelectFormTables.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\StatementsResultForm.cs">
+    <Compile Include="Forms\SelectResultForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\StatementsResultForm.Designer.cs">
-      <DependentUpon>StatementsResultForm.cs</DependentUpon>
+    <Compile Include="Forms\SelectResultForm.Designer.cs">
+      <DependentUpon>SelectResultForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -109,14 +109,14 @@
     <EmbeddedResource Include="Forms\MainMenuForm.resx">
       <DependentUpon>MainMenuForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\StatementsForm.resx">
-      <DependentUpon>StatementsForm.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\SelectForm.resx">
+      <DependentUpon>SelectForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\StatementsFormTables.resx">
-      <DependentUpon>StatementsFormTables.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\SelectFormTables.resx">
+      <DependentUpon>SelectFormTables.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\StatementsResultForm.resx">
-      <DependentUpon>StatementsResultForm.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\SelectResultForm.resx">
+      <DependentUpon>SelectResultForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

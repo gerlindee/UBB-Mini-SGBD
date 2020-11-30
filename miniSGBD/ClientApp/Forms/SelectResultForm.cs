@@ -10,12 +10,12 @@ using System.Windows.Forms;
 
 namespace miniSGBD.Forms
 {
-    public partial class StatementsResultForm : Form
+    public partial class SelectResultForm : Form
     {
         private List<string> tableHeader;
         private List<string> tableContent; 
 
-        public StatementsResultForm(List<string> _header, List<string> _content)
+        public SelectResultForm(List<string> _header, List<string> _content)
         {
             tableHeader = _header;
             tableContent = _content; 

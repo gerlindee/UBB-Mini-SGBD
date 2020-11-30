@@ -12,14 +12,14 @@ using Utils;
 
 namespace miniSGBD.Forms
 {
-    public partial class StatementsForm : Form
+    public partial class SelectForm : Form
     {
         private string databaseName;
         private Client tcpClient;
         private List<string> selectedTables;
         private List<KeyValuePair<string, List<string>>> tableColumns;  
 
-        public StatementsForm(string _databaseName, Client _tcpClient)
+        public SelectForm(string _databaseName, Client _tcpClient)
         {
             databaseName = _databaseName;
             tcpClient = _tcpClient;
@@ -53,7 +53,7 @@ namespace miniSGBD.Forms
 
         private void button_table_config_Click(object sender, EventArgs e)
         {
-            StatementsFormTables statementsFormTables = new StatementsFormTables(tcpClient, databaseName, selectedTables);
+            SelectFormTables statementsFormTables = new SelectFormTables(tcpClient, databaseName, selectedTables);
             statementsFormTables.ShowDialog();
             selectedTables = statementsFormTables.getSelectedTables();
             changeLayoutAfterTreatySelection();
@@ -156,7 +156,7 @@ namespace miniSGBD.Forms
                         }
 
                         var resultTableHeader = tableColumns.Find(elem => elem.Key == selectedTables[0]).Value;
-                        StatementsResultForm statementsResultForm = new StatementsResultForm(resultTableHeader, resultTableContents);
+                        SelectResultForm statementsResultForm = new SelectResultForm(resultTableHeader, resultTableContents);
                         statementsResultForm.Show();
                     }
                     else

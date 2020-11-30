@@ -284,7 +284,7 @@ namespace miniSGBD
 
         private void contextMenu_createStatement(object sender, EventArgs e)
         {
-            StatementsForm createStmForm = new StatementsForm(selectedDatabase, tcpClient);
+            SelectForm createStmForm = new SelectForm(selectedDatabase, tcpClient);
             createStmForm.ShowDialog(this);
         }
 

@@ -153,7 +153,7 @@ namespace miniSGBD
             }
 
             // Display the records for the clicked table
-            tcpClient.Write(Commands.SELECT_RECORDS + ";" + selectedDatabase + ";" + selectedTable);
+            tcpClient.Write(Commands.SELECT_RECORDS + ";" + selectedDatabase + ";" + "SELECT_ALL#" + selectedTable);
             serverResponse = tcpClient.ReadFromServer().Split(';');
             if (serverResponse[0] == Commands.MapCommandToSuccessResponse(Commands.SELECT_RECORDS))
             {

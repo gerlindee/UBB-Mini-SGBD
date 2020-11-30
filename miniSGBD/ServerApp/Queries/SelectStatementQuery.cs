@@ -20,7 +20,7 @@ namespace ServerApp.Queries
         private List<Tuple<string, string>> HavingParamsAndCondition = new List<Tuple<string, string>>();
         private List<string> GroupByList = new List<string>();
 
-        public SelectStatementQuery(string _databaseName, string _tableName, string _attributes) : base(Commands.SELECT_QUERY)
+        public SelectStatementQuery(string _databaseName, string _tableName, string _attributes) : base(Commands.SELECT_RECORDS)
         {
             DatabaseName = _databaseName;
             TableName = _tableName;

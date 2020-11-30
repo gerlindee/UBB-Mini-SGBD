@@ -8,24 +8,28 @@ namespace Utils
     {
         public SelectRowInfo(string command)
         {
-            //colName#alias#output#filter#group#having
+            // Select Information formatting: TableName#ColumnName#Alias#Output#Filter#Group#Having
             var columnStruct = command.Split('#');
-            ColumnName = columnStruct[0];
-            Alias = columnStruct[1];
-            Filter = columnStruct[3];
-            Having = columnStruct[5];
+            TableName = columnStruct[0];
+            ColumnName = columnStruct[1];
+            Alias = columnStruct[2];
 
-            if(columnStruct[2] == SelectColumnInformation.Output)
+            if(columnStruct[3] == SelectColumnInformation.Output)
             {
                 Output = true;
             }
 
-            if (columnStruct[4] == SelectColumnInformation.GroupBy)
+            Filter = columnStruct[4];
+
+            if (columnStruct[5] == SelectColumnInformation.GroupBy)
             {
                 GroupBy = true;
             }
+
+            Having = columnStruct[6];
         }
 
+        public string TableName { get; set; }
         public string ColumnName { get; set; }
         public string Alias { get; set; }
         public bool Output { get; set; } = false;

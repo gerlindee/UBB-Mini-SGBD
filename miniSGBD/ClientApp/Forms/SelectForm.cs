@@ -142,7 +142,7 @@ namespace miniSGBD.Forms
                 {
                     var resultTableContents = new List<string>();
                     // Select the entire contents of the table, unfiltered => SELECT * FROM <table>
-                    tcpClient.Write(Commands.SELECT_RECORDS + ";" + databaseName + ";" + selectedTables[0]);
+                    tcpClient.Write(Commands.SELECT_RECORDS + ";" + databaseName + ";" + "SELECT_ALL#" + selectedTables[0]);
                     var serverResponse = tcpClient.ReadFromServer().Split(';');
 
                     if (serverResponse[0] == Commands.MapCommandToSuccessResponse(Commands.SELECT_RECORDS))
@@ -169,7 +169,7 @@ namespace miniSGBD.Forms
                     if (selectedTables.Count == 1)
                     {
                         // Select on one table, without Join => separate because no validations on join configuration is needed 
-                        var message = Commands.SELECT_QUERY + ';' + databaseName + ';' + selectedTables[0] + ';';
+                        var message = Commands.SELECT_RECORDS + ';' + databaseName + ';' + selectedTables[0] + ';';
                         var noRows = list_column_config.Rows.Count - 1;
 
                         for (int idx = 0; idx < noRows; idx++)

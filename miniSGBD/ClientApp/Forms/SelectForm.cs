@@ -169,7 +169,7 @@ namespace miniSGBD.Forms
                     if (selectedTables.Count == 1)
                     {
                         // Select on one table, without Join => separate because no validations on join configuration is needed 
-                        var message = Commands.SELECT_RECORDS + ';' + databaseName + ';' + selectedTables[0] + ';';
+                        var message = Commands.SELECT_RECORDS + ';' + databaseName + ';';
                         var noRows = list_column_config.Rows.Count - 1;
 
                         for (int idx = 0; idx < noRows; idx++)
@@ -183,6 +183,8 @@ namespace miniSGBD.Forms
                             }
                             else
                             {
+                                message += tableName.ToString() + '#';
+
                                 var columnName = (columnConfig[1] as DataGridViewComboBoxCell).Value;
                                 if (columnName == null)
                                 {
@@ -209,7 +211,7 @@ namespace miniSGBD.Forms
                                     }
                                     else
                                     {
-                                        message += outputCheck.ToString() + '#';
+                                        message += SelectColumnInformation.Output + '#';
                                     }
 
                                     var filterValue = (columnConfig[4] as DataGridViewTextBoxCell).Value;
@@ -229,7 +231,7 @@ namespace miniSGBD.Forms
                                     }
                                     else
                                     {
-                                        message += groupByCheck.ToString() + '#';
+                                        message += SelectColumnInformation.GroupBy + '#';
                                     }
 
                                     var havingValue = (columnConfig[6] as DataGridViewTextBoxCell).Value;

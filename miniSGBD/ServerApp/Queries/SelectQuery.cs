@@ -10,10 +10,13 @@ namespace ServerApp.Queries
     class SelectQuery : AbstractQuery
     {
         private string DatabaseName;
-        private string Attributes; 
+        private string Attributes;
         private MongoDBAcess MongoDB;
 
+        // only used for SELECT * from <table> 
         private string SelectAllTableName;
+
+        private List<string> TablesUsed = new List<string>();
         private List<SelectRowInfo> SelectConfigList = new List<SelectRowInfo>();
         private List<Tuple<Tuple<string, string>, string>> OutputParamsAliasList = new List<Tuple<Tuple<string, string>, string>>();
         private List<Tuple<Tuple<string, string>, string>> WhereConditionsList = new List<Tuple<Tuple<string, string>, string>>();
@@ -41,7 +44,13 @@ namespace ServerApp.Queries
                 {
                     if (attribute != "")
                     {
-                        SelectConfigList.Add(new SelectRowInfo(attribute));
+                        var newColumnConfig = new SelectRowInfo(attribute);
+                        SelectConfigList.Add(newColumnConfig);
+
+                        if (!TablesUsed.Contains(newColumnConfig.TableName))
+                        {
+                            TablesUsed.Add(newColumnConfig.TableName);
+                        }
                     }
                 }
 
@@ -52,10 +61,17 @@ namespace ServerApp.Queries
         private void ParseSelectConfig()
         {
             foreach (var column in SelectConfigList)
-            { 
+            {
                 if (column.Output)
                 {
-                    OutputParamsAliasList.Add(new Tuple<Tuple<string, string>, string>(new Tuple<string, string>(column.TableName, column.ColumnName), column.Alias));
+                    if (column.Alias == "-")
+                    {
+                        OutputParamsAliasList.Add(new Tuple<Tuple<string, string>, string>(new Tuple<string, string>(column.TableName, column.ColumnName), column.ColumnName));
+                    }
+                    else
+                    {
+                        OutputParamsAliasList.Add(new Tuple<Tuple<string, string>, string>(new Tuple<string, string>(column.TableName, column.ColumnName), column.Alias));
+                    }
                 }
 
                 if (column.Filter != "-")
@@ -68,7 +84,7 @@ namespace ServerApp.Queries
                     GroupByList.Add(new Tuple<string, string>(column.TableName, column.ColumnName));
                 }
 
-                if (column.Having != "")
+                if (column.Having != "-")
                 {
                     HavingParamsList.Add(new Tuple<Tuple<string, string>, string>(new Tuple<string, string>(column.TableName, column.ColumnName), column.Having));
                 }
@@ -85,7 +101,35 @@ namespace ServerApp.Queries
             }
             else
             {
-                return "TODO";
+                var whereConditionPrimaryKey = CheckForPrimaryKey(WhereConditionsList);
+                var projectionConditionPrimaryKey = CheckForPrimaryKey(OutputParamsAliasList);
+
+                if (whereConditionPrimaryKey.Count != 0)
+                {
+                    return "Primary key subset used in where condition";
+                }
+
+                if (projectionConditionPrimaryKey.Count != 0)
+                {
+                    return "Primary key subsent used in projection";
+                }
+
+                var whereConditionIndex = CheckForIndex(WhereConditionsList);
+                var projectionConditionIndex = CheckForIndex(OutputParamsAliasList);
+
+                if (whereConditionIndex == "" && projectionConditionIndex == "")
+                {
+                    return "Does not use Index";
+                }
+
+                if (whereConditionIndex != "")
+                {
+                    return "Where Index has priority";
+                }
+                else
+                {
+                    return "Projection Index";
+                }
             }
         }
 
@@ -108,37 +152,55 @@ namespace ServerApp.Queries
             }
         }
 
-        /*
-        private void checkWhereInIndexFiles()
+        private List<string> CheckForPrimaryKey(List<Tuple<Tuple<string, string>, string>> conditionList)
         {
-            var mongoDB = new MongoDBAcess(DatabaseName);
+            var primaryKeyColumnsUsed = new List<string>();
 
-            string whereAttributes = "";//Where has priority
-            foreach (var whereCondition in FilterParamsAndCondition)
+            if (TablesUsed.Count == 1)
             {
-                whereAttributes += whereCondition.Item1 + '#';
-            }
-            whereAttributes = whereAttributes.Remove(whereAttributes.Length - 1);
+                var primaryKeyColumns = TableUtils.GetPrimaryKey(DatabaseName, TablesUsed[0]);
 
-            var pkOfWhere = MongoDB.GetRecordValueWithKey(TableName, whereAttributes);
-
-            if (pkOfWhere.Length != 0)
-            {
-                try
+                foreach (var column in conditionList)
                 {
-                    var listOfPk = pkOfWhere.Split('#');
-                    foreach (var pk in listOfPk)
+                    if (primaryKeyColumns.Contains(column.Item1.Item2))
                     {
-                        var valueFromMainList = MongoDB.GetRecordValueWithKey(TableName, pk);
+                        primaryKeyColumnsUsed.Add(column.Item1.Item2);
                     }
                 }
-                catch (Exception e)
-                {
-
-                }
 
             }
+            return primaryKeyColumnsUsed;
         }
-        */
+
+        private string CheckForIndex(List<Tuple<Tuple<string, string>, string>> conditionList)
+        {
+            if (TablesUsed.Count == 1)
+            {
+                // build the index name containing the attributes from the condition 
+                var searchedIndexName = "";
+                foreach (var column in conditionList)
+                {
+                    searchedIndexName += column.Item1.Item2 + "_";
+                }
+                searchedIndexName = searchedIndexName.Remove(searchedIndexName.Length - 1);
+
+                var indexFiles = TableUtils.GetIndexFiles(DatabaseName, TablesUsed[0]);
+
+                foreach (var index in indexFiles)
+                {
+                    if (index.IndexFileName.Contains(searchedIndexName))
+                    {
+                        // an index is used in the selection condition if the attributes are a prefix of the attributes in an existing index 
+                        return index.IndexFileName;
+                    }
+                }
+            }
+            else
+            {
+                // TODO: when implementing JOIN 
+            }
+
+            return "";
+        }
     }
 }

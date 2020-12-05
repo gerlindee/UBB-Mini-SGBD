@@ -101,35 +101,44 @@ namespace ServerApp.Queries
             }
             else
             {
-                var whereConditionPrimaryKey = CheckForPrimaryKey(WhereConditionsList);
-                var projectionConditionPrimaryKey = CheckForPrimaryKey(OutputParamsAliasList);
-
-                if (whereConditionPrimaryKey.Count != 0)
+                if (TablesUsed.Count == 1)
                 {
-                    return "Primary key subset used in where condition";
-                }
+                    var whereConditionPrimaryKey = CheckForPrimaryKey(WhereConditionsList);
+                    var projectionConditionPrimaryKey = CheckForPrimaryKey(OutputParamsAliasList);
 
-                if (projectionConditionPrimaryKey.Count != 0)
-                {
-                    return "Primary key subsent used in projection";
-                }
+                    if (whereConditionPrimaryKey.Count != 0)
+                    {
+                        return "Primary key subset used in where condition";
+                    }
 
-                var whereConditionIndex = CheckForIndex(WhereConditionsList);
-                var projectionConditionIndex = CheckForIndex(OutputParamsAliasList);
+                    if (projectionConditionPrimaryKey.Count != 0)
+                    {
+                        return "Primary key subsent used in projection";
+                    }
 
-                if (whereConditionIndex == "" && projectionConditionIndex == "")
-                {
-                    return "Does not use Index";
-                }
+                    var whereConditionIndex = CheckForIndex(WhereConditionsList);
+                    var projectionConditionIndex = CheckForIndex(OutputParamsAliasList);
 
-                if (whereConditionIndex != "")
-                {
-                    return "Where Index has priority";
+                    if (whereConditionIndex == "" && projectionConditionIndex == "")
+                    {
+                        return "Does not use Index";
+                    }
+
+                    if (whereConditionIndex != "")
+                    {
+                        return "Where Index has priority";
+                    }
+                    else
+                    {
+                        return "Projection Index";
+                    }
                 }
                 else
                 {
-                    return "Projection Index";
+                    // TODO: when JOIN algorithms are implemented 
+                    //              => methods that check if the JOIN tables can be restricted using index files 
                 }
+
             }
         }
 
@@ -155,49 +164,38 @@ namespace ServerApp.Queries
         private List<string> CheckForPrimaryKey(List<Tuple<Tuple<string, string>, string>> conditionList)
         {
             var primaryKeyColumnsUsed = new List<string>();
+            var primaryKeyColumns = TableUtils.GetPrimaryKey(DatabaseName, TablesUsed[0]);
 
-            if (TablesUsed.Count == 1)
+            foreach (var column in conditionList)
             {
-                var primaryKeyColumns = TableUtils.GetPrimaryKey(DatabaseName, TablesUsed[0]);
-
-                foreach (var column in conditionList)
+                if (primaryKeyColumns.Contains(column.Item1.Item2))
                 {
-                    if (primaryKeyColumns.Contains(column.Item1.Item2))
-                    {
-                        primaryKeyColumnsUsed.Add(column.Item1.Item2);
-                    }
+                    primaryKeyColumnsUsed.Add(column.Item1.Item2);
                 }
-
             }
+
             return primaryKeyColumnsUsed;
         }
 
         private string CheckForIndex(List<Tuple<Tuple<string, string>, string>> conditionList)
         {
-            if (TablesUsed.Count == 1)
+            // build the index name containing the attributes from the condition 
+            var searchedIndexName = "";
+            foreach (var column in conditionList)
             {
-                // build the index name containing the attributes from the condition 
-                var searchedIndexName = "";
-                foreach (var column in conditionList)
-                {
-                    searchedIndexName += column.Item1.Item2 + "_";
-                }
-                searchedIndexName = searchedIndexName.Remove(searchedIndexName.Length - 1);
-
-                var indexFiles = TableUtils.GetIndexFiles(DatabaseName, TablesUsed[0]);
-
-                foreach (var index in indexFiles)
-                {
-                    if (index.IndexFileName.Contains(searchedIndexName))
-                    {
-                        // an index is used in the selection condition if the attributes are a prefix of the attributes in an existing index 
-                        return index.IndexFileName;
-                    }
-                }
+                searchedIndexName += column.Item1.Item2 + "_";
             }
-            else
+            searchedIndexName = searchedIndexName.Remove(searchedIndexName.Length - 1);
+
+            var indexFiles = TableUtils.GetIndexFiles(DatabaseName, TablesUsed[0]);
+
+            foreach (var index in indexFiles)
             {
-                // TODO: when implementing JOIN 
+                if (index.IndexFileName.Contains(searchedIndexName))
+                {
+                    // an index is used in the selection condition if the attributes are a prefix of the attributes in an existing index 
+                    return index.IndexFileName;
+                }
             }
 
             return "";

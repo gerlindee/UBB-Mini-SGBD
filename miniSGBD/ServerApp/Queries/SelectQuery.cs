@@ -93,52 +93,62 @@ namespace ServerApp.Queries
 
         public new string Execute()
         {
-            ParseAttributes();
+            try
+            {
+                ParseAttributes();
 
-            if (SelectAllTableName != null)
-            {
-                return SelectEntireTable();
-            }
-            else
-            {
-                if (TablesUsed.Count == 1)
+                var selectionResult = "";
+
+                if (SelectAllTableName != null)
                 {
-                    var whereConditionPrimaryKey = CheckForPrimaryKey(WhereConditionsList);
-                    var projectionConditionPrimaryKey = CheckForPrimaryKey(OutputParamsAliasList);
-
-                    if (whereConditionPrimaryKey.Count != 0)
-                    {
-                        return "Primary key subset used in where condition";
-                    }
-
-                    if (projectionConditionPrimaryKey.Count != 0)
-                    {
-                        return "Primary key subsent used in projection";
-                    }
-
-                    var whereConditionIndex = CheckForIndex(WhereConditionsList);
-                    var projectionConditionIndex = CheckForIndex(OutputParamsAliasList);
-
-                    if (whereConditionIndex == "" && projectionConditionIndex == "")
-                    {
-                        return "Does not use Index";
-                    }
-
-                    if (whereConditionIndex != "")
-                    {
-                        return "Where Index has priority";
-                    }
-                    else
-                    {
-                        return "Projection Index";
-                    }
+                    selectionResult = SelectEntireTable();
                 }
                 else
                 {
-                    // TODO: when JOIN algorithms are implemented 
-                    //              => methods that check if the JOIN tables can be restricted using index files 
+                    if (TablesUsed.Count == 1)
+                    {
+                        var whereConditionPrimaryKey = CheckForPrimaryKey(WhereConditionsList);
+                        var projectionConditionPrimaryKey = CheckForPrimaryKey(OutputParamsAliasList);
+
+                        if (whereConditionPrimaryKey.Count != 0)
+                        {
+                            return "Primary key subset used in where condition";
+                        }
+
+                        if (projectionConditionPrimaryKey.Count != 0)
+                        {
+                            return "Primary key subsent used in projection";
+                        }
+
+                        var whereConditionIndex = CheckForIndex(WhereConditionsList);
+                        var projectionConditionIndex = CheckForIndex(OutputParamsAliasList);
+
+                        if (whereConditionIndex == "" && projectionConditionIndex == "")
+                        {
+                            return "Does not use Index";
+                        }
+
+                        if (whereConditionIndex != "")
+                        {
+                            return "Where Index has priority";
+                        }
+                        else
+                        {
+                            return "Projection Index";
+                        }
+                    }
+                    else
+                    {
+                        // TODO: when JOIN algorithms are implemented 
+                        //              => methods that check if the JOIN tables can be restricted using index files 
+                    }
                 }
 
+                return selectionResult;
+            }
+            catch (Exception ex)
+            {
+                return ex.Message + ";";
             }
         }
 
@@ -157,7 +167,7 @@ namespace ServerApp.Queries
             }
             catch (Exception ex)
             {
-                return ex.Message + ";";
+                throw ex; 
             }
         }
 

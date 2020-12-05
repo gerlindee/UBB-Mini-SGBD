@@ -153,7 +153,7 @@ namespace miniSGBD
             }
 
             // Display the records for the clicked table
-            tcpClient.Write(Commands.SELECT_RECORDS + ";" + selectedDatabase + ";" + selectedTable);
+            tcpClient.Write(Commands.SELECT_RECORDS + ";" + selectedDatabase + ";" + "SELECT_ALL#" + selectedTable);
             serverResponse = tcpClient.ReadFromServer().Split(';');
             if (serverResponse[0] == Commands.MapCommandToSuccessResponse(Commands.SELECT_RECORDS))
             {
@@ -284,7 +284,7 @@ namespace miniSGBD
 
         private void contextMenu_createStatement(object sender, EventArgs e)
         {
-            StatementsForm createStmForm = new StatementsForm(selectedDatabase, tcpClient);
+            SelectForm createStmForm = new SelectForm(selectedDatabase, tcpClient);
             createStmForm.ShowDialog(this);
         }
 

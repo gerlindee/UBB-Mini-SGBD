@@ -120,7 +120,7 @@ namespace ServerApp.Queries
 
                 if (indexKeys.Exists(elem => elem == indexKey))
                 {
-                    throw new Exception("Could not index content for table: " + TableName);
+                    throw new Exception("Could not create unique Index for table: " + TableName + " due to duplicate values in columns: " + columnsString);
                 }
                 else
                 {

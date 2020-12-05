@@ -66,7 +66,7 @@ namespace ServerApp.Queries
                 XElement[] indexNodes = deletedXMLTag.Descendants("IndexFiles").Descendants("IndexFile").ToArray();
                 foreach (var index in indexNodes)
                 {
-                    MongoDB.RemoveAllKVFromCollection(index.Attribute("fileName").Value);
+                    MongoDB.RemoveAllKVFromCollection(index.Attribute("indexName").Value);
                 }
 
                 // Delete foreign key file collection from MongoDB 

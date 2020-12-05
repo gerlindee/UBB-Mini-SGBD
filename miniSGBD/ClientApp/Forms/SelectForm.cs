@@ -12,14 +12,14 @@ using Utils;
 
 namespace miniSGBD.Forms
 {
-    public partial class StatementsForm : Form
+    public partial class SelectForm : Form
     {
         private string databaseName;
         private Client tcpClient;
         private List<string> selectedTables;
         private List<KeyValuePair<string, List<string>>> tableColumns;  
 
-        public StatementsForm(string _databaseName, Client _tcpClient)
+        public SelectForm(string _databaseName, Client _tcpClient)
         {
             databaseName = _databaseName;
             tcpClient = _tcpClient;
@@ -53,7 +53,7 @@ namespace miniSGBD.Forms
 
         private void button_table_config_Click(object sender, EventArgs e)
         {
-            StatementsFormTables statementsFormTables = new StatementsFormTables(tcpClient, databaseName, selectedTables);
+            SelectFormTables statementsFormTables = new SelectFormTables(tcpClient, databaseName, selectedTables);
             statementsFormTables.ShowDialog();
             selectedTables = statementsFormTables.getSelectedTables();
             changeLayoutAfterTreatySelection();
@@ -142,7 +142,7 @@ namespace miniSGBD.Forms
                 {
                     var resultTableContents = new List<string>();
                     // Select the entire contents of the table, unfiltered => SELECT * FROM <table>
-                    tcpClient.Write(Commands.SELECT_RECORDS + ";" + databaseName + ";" + selectedTables[0]);
+                    tcpClient.Write(Commands.SELECT_RECORDS + ";" + databaseName + ";" + "SELECT_ALL#" + selectedTables[0]);
                     var serverResponse = tcpClient.ReadFromServer().Split(';');
 
                     if (serverResponse[0] == Commands.MapCommandToSuccessResponse(Commands.SELECT_RECORDS))
@@ -156,7 +156,7 @@ namespace miniSGBD.Forms
                         }
 
                         var resultTableHeader = tableColumns.Find(elem => elem.Key == selectedTables[0]).Value;
-                        StatementsResultForm statementsResultForm = new StatementsResultForm(resultTableHeader, resultTableContents);
+                        SelectResultForm statementsResultForm = new SelectResultForm(resultTableHeader, resultTableContents);
                         statementsResultForm.Show();
                     }
                     else
@@ -169,7 +169,7 @@ namespace miniSGBD.Forms
                     if (selectedTables.Count == 1)
                     {
                         // Select on one table, without Join => separate because no validations on join configuration is needed 
-                        var message = Commands.SELECT_QUERY + ';' + databaseName + ';' + selectedTables[0] + ';';
+                        var message = Commands.SELECT_RECORDS + ';' + databaseName + ';';
                         var noRows = list_column_config.Rows.Count - 1;
 
                         for (int idx = 0; idx < noRows; idx++)
@@ -183,6 +183,8 @@ namespace miniSGBD.Forms
                             }
                             else
                             {
+                                message += tableName.ToString() + '#';
+
                                 var columnName = (columnConfig[1] as DataGridViewComboBoxCell).Value;
                                 if (columnName == null)
                                 {
@@ -209,7 +211,7 @@ namespace miniSGBD.Forms
                                     }
                                     else
                                     {
-                                        message += outputCheck.ToString() + '#';
+                                        message += SelectColumnInformation.Output + '#';
                                     }
 
                                     var filterValue = (columnConfig[4] as DataGridViewTextBoxCell).Value;
@@ -229,7 +231,7 @@ namespace miniSGBD.Forms
                                     }
                                     else
                                     {
-                                        message += groupByCheck.ToString() + '#';
+                                        message += SelectColumnInformation.GroupBy + '#';
                                     }
 
                                     var havingValue = (columnConfig[6] as DataGridViewTextBoxCell).Value;

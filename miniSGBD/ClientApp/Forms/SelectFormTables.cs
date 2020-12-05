@@ -12,13 +12,13 @@ using Utils;
 
 namespace miniSGBD.Forms
 {
-    public partial class StatementsFormTables : Form
+    public partial class SelectFormTables : Form
     {
         private Client tcpClient;
         private List<string> selectedTables;
         private string databaseName; 
 
-        public StatementsFormTables(Client _client, string _databaseName, List<string> _selectedTables)
+        public SelectFormTables(Client _client, string _databaseName, List<string> _selectedTables)
         {
             tcpClient = _client;
             databaseName = _databaseName;

@@ -197,7 +197,7 @@ namespace ServerApp.Queries
 
                 if (MongoDB.CollectionContainsKey(referenceData.Item2, uqValue))
                 {
-                    throw new Exception("A record with Unique Key " + uqValue + " is already in referenced table " + referenceData.Item2 + "!");
+                    throw new Exception("A record with Unique Key " + uqValue + " already exists in table " + TableName + "!");
                 }
             }
             return true;

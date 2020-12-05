@@ -95,6 +95,19 @@ namespace ServerApp
             return indexFiles;
         }
 
+        public static List<IndexFileData> GetUniqueFiles(string databaseName, string tableName)
+        {
+            var uniqueFiles = new List<IndexFileData>();
+            var xmlDocument = XDocument.Load(Application.StartupPath + "\\SGBDCatalog.xml");
+
+            XElement givenDB = Array.Find(xmlDocument.Element("Databases").Descendants("Database").ToArray(),
+                                            elem => elem.Attribute("databaseName").Value.Equals(databaseName));
+            XElement givenTable = Array.Find(givenDB.Descendants("Table").ToArray(),
+                                            elem => elem.Attribute("tableName").Value == tableName);
+
+            return uniqueFiles;
+        }
+
         public static List<string> GetPrimaryKey(string databaseName, string tableName)
         {
             var primaryKeys = new List<string>();

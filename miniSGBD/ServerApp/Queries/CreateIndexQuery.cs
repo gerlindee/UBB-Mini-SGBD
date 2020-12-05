@@ -208,7 +208,7 @@ namespace ServerApp.Queries
                 ColumnsPositions.Add(new KeyValuePair<string, int>(columnInfo[idx].Split('#')[0], idx));
             }
 
-            var tableContent = mongoDB.GetAllEntriesFromCollection(TableName);
+            var tableContent = mongoDB.GetEntireCollection(TableName);
             foreach (var record in tableContent)
             {
                 var keySplit = record.GetElement("_id").Value.ToString().Split('#');

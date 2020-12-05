@@ -17,7 +17,7 @@ namespace miniSGBD.Forms
         private string databaseName;
         private Client tcpClient;
         private List<string> selectedTables;
-        private List<KeyValuePair<string, List<string>>> tableColumns;  
+        private List<KeyValuePair<string, List<string>>> tableColumns;
 
         public SelectForm(string _databaseName, Client _tcpClient)
         {

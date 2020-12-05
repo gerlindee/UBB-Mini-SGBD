@@ -63,26 +63,12 @@ namespace ServerApp
             }
         }
 
-        public List<BsonDocument> GetAllEntriesFromCollection(string collectionName)
-        {
-            try
-            {
-                var mongoCollection = MongoDatabase.GetCollection<BsonDocument>(collectionName);
-                var emptyFilter = Builders<BsonDocument>.Filter.Empty;
-                return mongoCollection.Find(emptyFilter).ToList(); 
-            }
-            catch (Exception)
-            {
-                throw new Exception("Could not retrieve all entries from MongoDB Collection: " + collectionName);
-            }
-        }
-
         public void RemoveValueFromCollection(string collectionName, string value)
         {
             try
             {
                 var mongoCollection = MongoDatabase.GetCollection<BsonDocument>(collectionName);
-                var allRecords = GetAllEntriesFromCollection(collectionName);
+                var allRecords = GetEntireCollection(collectionName);
                 foreach (var record in allRecords)
                 {
                     var recordValues = record.GetElement("value").Value.ToString().Split('#');
@@ -126,7 +112,7 @@ namespace ServerApp
             try
             {
                 var mongoCollection = MongoDatabase.GetCollection<BsonDocument>(collectionName);
-                var allRecords = GetAllEntriesFromCollection(collectionName);
+                var allRecords = GetEntireCollection(collectionName);
                 foreach (var record in allRecords)
                 {
                     var recordValue = record.GetElement("value").Value.ToString();
@@ -206,6 +192,19 @@ namespace ServerApp
             catch (Exception)
             {
                 throw new Exception("Could not retrieve the contents of MongoDB Collection: " + collectionName);
+            }
+        }
+
+        public List<BsonDocument> GetCollectionFilteredByKey(string collectionName, FilterDefinition<BsonDocument> filter)
+        {
+            try
+            {
+                var mongoCollection = MongoDatabase.GetCollection<BsonDocument>(collectionName);
+                return mongoCollection.Find(filter).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Could not filter the MongoDB Collection: " + ex.Message);
             }
         }
 

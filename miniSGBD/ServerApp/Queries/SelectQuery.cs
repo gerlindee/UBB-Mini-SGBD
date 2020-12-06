@@ -99,6 +99,18 @@ namespace ServerApp.Queries
             {
                 ParseAttributes();
 
+                return Commands.MapCommandToSuccessResponse(Commands.SELECT_RECORDS) + ";" + GetOutputStructure() + ";" + GetSelectedRecords();
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }    
+        }
+
+        private string GetSelectedRecords()
+        {
+            try
+            {
                 var selectionResult = "";
 
                 if (SelectAllTableName != null)
@@ -111,37 +123,63 @@ namespace ServerApp.Queries
                     {
                         var records = new List<string>();
 
+                        // Primary Key checks
                         var whereConditionPrimaryKey = CheckForPrimaryKey(WhereConditionsList);
-                        var projectionConditionPrimaryKey = CheckForPrimaryKey(OutputParamsAliasList);
+
+                        // Index Key checks 
+                        var whereConditionIndex = CheckForIndex(WhereConditionsList, TablesUsed[0]);
+                        var projectionConditionIndex = CheckForIndex(OutputParamsAliasList, TablesUsed[0]);
 
                         if (whereConditionPrimaryKey != "")
                         {
-                            records = SelectWithIndexWhere(TablesUsed[0]);
+                            records = SelectWithIndexWhere(TablesUsed[0], true);
+                            var output = ApplyProjection(records);
+
+                            foreach (var record in output)
+                            {
+                                selectionResult += record + "|";
+                            }
+                            return selectionResult.Remove(selectionResult.Length - 1);
                         }
 
-                        if (projectionConditionPrimaryKey != "" && records.Count == 0)
-                        {
-                            records = SelectWithIndexProjection(TablesUsed[0]);
-                        }
-
-                        var whereConditionIndex = CheckForIndex(WhereConditionsList);
-                        var projectionConditionIndex = CheckForIndex(OutputParamsAliasList);
-
-                        if (whereConditionIndex == "" && projectionConditionIndex == "" && records.Count == 0)
+                        if (whereConditionIndex == "" && projectionConditionIndex == "")
                         {
                             records = SelectWithTableScan();
+                            var output = ApplyProjection(records);
+
+                            foreach (var record in output)
+                            {
+                                selectionResult += record + "|";
+                            }
+                            return selectionResult.Remove(selectionResult.Length - 1);
                         }
 
-                        if (whereConditionIndex != "" && records.Count == 0)
+                        if (whereConditionIndex != "")
                         {
-                            records = SelectWithIndexWhere(whereConditionIndex);
+                            var keys = SelectWithIndexWhere(whereConditionIndex, false);
+                            records = PerformKeyLookup(keys, TablesUsed[0]);
+                            var output = ApplyProjection(records);
+
+                            foreach (var record in output)
+                            {
+                                selectionResult += record + "|";
+                            }
+                            return selectionResult.Remove(selectionResult.Length - 1);
                         }
                         else
                         {
                             if (records.Count != 0)
                             {
-                                records = SelectWithIndexProjection(projectionConditionIndex);
-                            }         
+                                var unfilteredRecords = SelectWithIndexProjection(projectionConditionIndex);
+                                records = ApplyWhereConditions(unfilteredRecords, TablesUsed[0]);
+                                var output = ApplyProjection(records);
+
+                                foreach (var record in output)
+                                {
+                                    selectionResult += record + "|";
+                                }
+                                return selectionResult.Remove(selectionResult.Length - 1);
+                            }
                         }
                     }
                     else
@@ -155,8 +193,18 @@ namespace ServerApp.Queries
             }
             catch (Exception ex)
             {
-                return ex.Message + ";";
+                throw ex;
             }
+        }
+
+        private string GetOutputStructure()
+        {
+            var outputStructure = "";
+            foreach (var outColumn in OutputParamsAliasList)
+            {
+                outputStructure += outColumn.Item2 + "#";
+            }
+            return outputStructure.Remove(outputStructure.Length - 1);
         }
 
         private string SelectEntireTable()
@@ -183,8 +231,31 @@ namespace ServerApp.Queries
             try
             {
                 var records = new List<string>();
+                var unfilteredRecords = MongoDB.GetEntireCollection(TablesUsed[0]);
 
-                return records; 
+                var groupedConditions = new List<KeyValuePair<string, List<string>>>();
+                foreach (var condition in WhereConditionsList)
+                {
+                    if (groupedConditions.Find(elem => elem.Key == condition.Item1.Item2).Value == null)
+                    {
+                        groupedConditions.Add(new KeyValuePair<string, List<string>>(condition.Item1.Item2, new List<string>()));
+                    }
+
+                    groupedConditions.Find(elem => elem.Key == condition.Item1.Item2).Value.Add(condition.Item2);
+                }
+
+                var tableStructure = TableUtils.GetTableColumns(DatabaseName, TablesUsed[0]);
+
+                foreach (var indexRecord in unfilteredRecords)
+                {
+                    var indRec = indexRecord.GetElement("_id").Value + "#" + indexRecord.GetElement("value").Value;
+                    if (RecordMatchesCondition(indRec, tableStructure, groupedConditions))
+                    {
+                        records.Add(indRec);
+                    }
+                }
+
+                return records;
             }
             catch (Exception ex)
             {
@@ -200,7 +271,7 @@ namespace ServerApp.Queries
                 var keyValuePairs = MongoDB.GetEntireCollection(indexName);
                 foreach (var keyValue in keyValuePairs)
                 {
-                    records.Add(keyValue.GetElement("_id").Value.ToString());
+                    records.Add(keyValue.GetElement("_id").Value + "#" + keyValue.GetElement("value").Value);
                 }
                 return records;
             }
@@ -210,7 +281,7 @@ namespace ServerApp.Queries
             }
         }
 
-        private List<string> SelectWithIndexWhere(string indexName)
+        private List<string> SelectWithIndexWhere(string indexName, bool pkFlag)
         {
             try
             {
@@ -218,7 +289,7 @@ namespace ServerApp.Queries
 
                 var columnsIndex = indexName.Split('_').Where(elem => elem != "Index" && !TablesUsed.Contains(elem)).ToList();
 
-                if (columnsIndex.Count == 1 || !indexName.Contains("_"))
+                if (columnsIndex.Count == 1 || pkFlag == true)
                 {
                     // single-attribute index or selecting using a primary key condition 
                     FilterDefinition<BsonDocument> filter = Builders<BsonDocument>.Filter.Empty;
@@ -268,7 +339,15 @@ namespace ServerApp.Queries
                     var keyValuePairs = MongoDB.GetCollectionFilteredByKey(indexName, filter);
                     foreach (var keyValue in keyValuePairs)
                     {
-                        records.Add(keyValue.GetElement("_id").Value + "#" + keyValue.GetElement("value").Value);
+                        if (pkFlag == true)
+                        {
+                            records.Add(keyValue.GetElement("_id").Value + "#" + keyValue.GetElement("value").Value);
+                        }
+                        else
+                        {
+                            // if we use an index file for reading data, only the value needs to be kept, for key-lookup
+                            records.Add(keyValue.GetElement("value").Value.ToString());
+                        }
                     }
                 }
                 else
@@ -290,9 +369,17 @@ namespace ServerApp.Queries
                     foreach (var indexRecord in unfilteredRecords)
                     {
                         var indRec = indexRecord.GetElement("_id").Value + "#" + indexRecord.GetElement("value").Value;
-                        if (RecordMatchesConditions(indRec, groupedConditions))
+                        if (RecordKeyMatchesCondition(indRec, groupedConditions))
                         {
-                            records.Add(indRec);
+                            if (pkFlag == true)
+                            {
+                                records.Add(indexRecord.GetElement("_id").Value + "#" + indexRecord.GetElement("value").Value);
+                            }
+                            else
+                            {
+                                // if we use an index file for reading data, only the value needs to be kept, for key-lookup
+                                records.Add(indexRecord.GetElement("value").Value.ToString());
+                            }
                         }
                     }
                 }
@@ -305,7 +392,109 @@ namespace ServerApp.Queries
             }
         }
 
-        private bool RecordMatchesConditions(string record, List<KeyValuePair<string, List<string>>> conditions)
+        private bool RecordMatchesCondition(string record, List<string> columns, List<KeyValuePair<string, List<string>>> conditions)
+        {
+            var recordMatches = true;
+            var columnValues = record.Split('#');
+
+            foreach (var condColumns in conditions)
+            {
+                var conditionsForColumn = condColumns.Value;
+                foreach (var condition in conditionsForColumn)
+                {
+                    var conditionOperator = condition.Split(' ')[0];
+                    var conditionValue = condition.Split(' ')[1];
+
+                    var columnValue = columnValues[columns.IndexOf(condColumns.Key)];
+
+                    if (conditionOperator == "=" && columnValue != conditionValue)
+                    {
+                        return false;
+                    }
+
+                    if (conditionOperator == "<>" && columnValue == conditionValue)
+                    {
+                        return false;
+                    }
+
+                    if (conditionOperator == "<")
+                    {
+                        if (int.TryParse(columnValue, out int convertedColumn) && int.TryParse(conditionValue, out int convertedValue))
+                        {
+                            if (convertedColumn >= convertedValue)
+                            {
+                                return false;
+                            }
+                        }
+                        else
+                        {
+                            if (columnValue.CompareTo(conditionValue) >= 0)
+                            {
+                                return false;
+                            }
+                        }
+                    }
+
+                    if (conditionOperator == ">")
+                    {
+                        if (int.TryParse(columnValue, out int convertedColumn) && int.TryParse(conditionValue, out int convertedValue))
+                        {
+                            if (convertedColumn <= convertedValue)
+                            {
+                                return false;
+                            }
+                        }
+                        else
+                        {
+                            if (columnValue.CompareTo(conditionValue) <= 0)
+                            {
+                                return false;
+                            }
+                        }
+                    }
+
+                    if (conditionOperator == "<=")
+                    {
+                        if (int.TryParse(columnValue, out int convertedColumn) && int.TryParse(conditionValue, out int convertedValue))
+                        {
+                            if (convertedColumn > convertedValue)
+                            {
+                                return false;
+                            }
+                        }
+                        else
+                        {
+                            if (columnValue.CompareTo(conditionValue) > 0)
+                            {
+                                return false;
+                            }
+                        }
+                    }
+
+                    if (conditionOperator == ">=")
+                    {
+                        if (int.TryParse(columnValue, out int convertedColumn) && int.TryParse(conditionValue, out int convertedValue))
+                        {
+                            if (convertedColumn < convertedValue)
+                            {
+                                return false;
+                            }
+                        }
+                        else
+                        {
+                            if (columnValue.CompareTo(conditionValue) < 0)
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return recordMatches;
+        }
+
+        private bool RecordKeyMatchesCondition(string record, List<KeyValuePair<string, List<string>>> conditions)
         {
             var recordMatches = true;
             var columns = record.Split('#');
@@ -325,7 +514,7 @@ namespace ServerApp.Queries
 
                     if (conditionOperator == "<>" && columns[idx] == conditionValue)
                     {
-                        return false; 
+                        return false;
                     }
 
                     if (conditionOperator == "<")
@@ -402,7 +591,7 @@ namespace ServerApp.Queries
                 }
             }
 
-            return recordMatches; 
+            return recordMatches;
         }
 
         private string CheckForPrimaryKey(List<Tuple<Tuple<string, string>, string>> conditionList)
@@ -441,7 +630,7 @@ namespace ServerApp.Queries
             return "";
         }
 
-        private string CheckForIndex(List<Tuple<Tuple<string, string>, string>> conditionList)
+        private string CheckForIndex(List<Tuple<Tuple<string, string>, string>> conditionList, string tableName)
         {
             if (conditionList.Count == 0)
             {
@@ -449,15 +638,25 @@ namespace ServerApp.Queries
             }
 
             // build the index name containing the attributes from the condition 
-            var searchedIndexName = "";
+            var columnNames = "";
             foreach (var column in conditionList)
             {
-                searchedIndexName += column.Item1.Item2 + "_";
+                columnNames += column.Item1.Item2 + "_";
             }
-            searchedIndexName = searchedIndexName.Remove(searchedIndexName.Length - 1);
+            columnNames = columnNames.Remove(columnNames.Length - 1);
 
-            var indexFiles = TableUtils.GetIndexFiles(DatabaseName, TablesUsed[0]);
+            // check if any unique key index files can be used
+            var uniqueFiles = TableUtils.GetUniqueFiles(DatabaseName, tableName);
+            foreach (var unique in uniqueFiles)
+            {
+                if (unique.Contains(columnNames))
+                {
+                    return unique;
+                }
+            }
 
+            var searchedIndexName = "Index_" + tableName + "_" + columnNames;
+            var indexFiles = TableUtils.GetIndexFiles(DatabaseName, tableName);
             foreach (var index in indexFiles)
             {
                 if (index.IndexFileName.Contains(searchedIndexName))
@@ -468,6 +667,90 @@ namespace ServerApp.Queries
             }
 
             return "";
+        }
+
+        private List<string> ApplyProjection(List<string> records)
+        {
+            var outputColumns = new List<string>();
+            var tableStructure = TableUtils.GetTableColumns(DatabaseName, TablesUsed[0]);
+
+            foreach (var record in records)
+            {
+                var outputRecord = "";
+                var recordSplit = record.Split('#');
+                foreach (var output in OutputParamsAliasList)
+                {
+                    outputRecord += recordSplit[tableStructure.IndexOf(output.Item1.Item2)] + "#";
+                }
+
+                // Apply DISTINCT as well 
+                outputRecord = outputRecord.Remove(outputRecord.Length - 1);
+                if (!outputColumns.Contains(outputRecord))
+                {
+                    outputColumns.Add(outputRecord);
+                }            
+            }
+
+            return outputColumns;
+        }
+
+        private List<string> PerformKeyLookup(List<string> keys, string tableName)
+        {
+            var records = new List<string>();
+
+            FilterDefinition<BsonDocument> filter = default;
+            foreach (var key in keys)
+            {
+                var keySplit = key.Split('#');
+
+                foreach (var filterVal in keySplit)
+                {
+                    if (filter == null)
+                    {
+                        filter = Builders<BsonDocument>.Filter.Eq("_id", filterVal);
+                    }
+                    else
+                    {
+                        filter |= Builders<BsonDocument>.Filter.Eq("_id", filterVal);
+                    }           
+                }
+            }
+
+            var keyValuePairs = MongoDB.GetCollectionFilteredByKey(tableName, filter);
+            foreach (var keyValue in keyValuePairs)
+            {
+                records.Add(keyValue.GetElement("_id").Value + "#" + keyValue.GetElement("value").Value);
+            }
+
+            return records;
+        }
+
+        private List<string> ApplyWhereConditions(List<string> unfilteredRecords, string tableName)
+        {
+            var records = new List<string>();
+
+            var groupedConditions = new List<KeyValuePair<string, List<string>>>();
+            foreach (var condition in WhereConditionsList)
+            {
+                if (groupedConditions.Find(elem => elem.Key == condition.Item1.Item2).Value == null)
+                {
+                    groupedConditions.Add(new KeyValuePair<string, List<string>>(condition.Item1.Item2, new List<string>()));
+                }
+
+                groupedConditions.Find(elem => elem.Key == condition.Item1.Item2).Value.Add(condition.Item2);
+            }
+
+            var tableStructure = TableUtils.GetTableColumns(DatabaseName, tableName);
+
+            foreach (var record in unfilteredRecords)
+            {
+                if (RecordMatchesCondition(record, tableStructure, groupedConditions))
+                {
+                    records.Add(record);
+                }
+            }
+
+            return records;
         }
     }
 }

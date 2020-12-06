@@ -95,15 +95,21 @@ namespace ServerApp
             return indexFiles;
         }
 
-        public static List<IndexFileData> GetUniqueFiles(string databaseName, string tableName)
+        public static List<string> GetUniqueFiles(string databaseName, string tableName)
         {
-            var uniqueFiles = new List<IndexFileData>();
+            var uniqueFiles = new List<string>();
             var xmlDocument = XDocument.Load(Application.StartupPath + "\\SGBDCatalog.xml");
 
             XElement givenDB = Array.Find(xmlDocument.Element("Databases").Descendants("Database").ToArray(),
                                             elem => elem.Attribute("databaseName").Value.Equals(databaseName));
             XElement givenTable = Array.Find(givenDB.Descendants("Table").ToArray(),
                                             elem => elem.Attribute("tableName").Value == tableName);
+            XElement[] uniqueKeysNode = givenTable.Descendants("UniqueKeys").Descendants("UniqueKeyColumn").ToArray();
+
+            foreach (var uniqueKey in uniqueKeysNode)
+            {
+                uniqueFiles.Add(uniqueKey.Attribute("fileName").Value);
+            }
 
             return uniqueFiles;
         }
@@ -125,6 +131,25 @@ namespace ServerApp
             }
 
             return primaryKeys;
+        }
+
+        public static List<string> GetTableColumns(string databaseName, string tableName)
+        {
+            var columns = new List<string>();
+            var xmlDocument = XDocument.Load(Application.StartupPath + "\\SGBDCatalog.xml");
+
+            XElement givenDB = Array.Find(xmlDocument.Element("Databases").Descendants("Database").ToArray(),
+                                            elem => elem.Attribute("databaseName").Value.Equals(databaseName));
+            XElement givenTable = Array.Find(givenDB.Descendants("Table").ToArray(),
+                                            elem => elem.Attribute("tableName").Value == tableName);
+            XElement[] columnNodes = givenTable.Descendants("Structure").Descendants("Column").ToArray();
+
+            foreach (var columnNode in columnNodes)
+            {
+                columns.Add(columnNode.Attribute("columnName").Value);
+            }
+
+            return columns;
         }
     }
 }

@@ -248,7 +248,30 @@ namespace miniSGBD.Forms
                         }
 
                         tcpClient.Write(message);
-                        var serverResponse = tcpClient.ReadFromServer();
+                        var serverResponse = tcpClient.ReadFromServer().Split(';');
+
+                        if (serverResponse[0] == Commands.MapCommandToSuccessResponse(Commands.SELECT_RECORDS))
+                        {
+                            var resultTableHeader = new List<string>();
+                            foreach (var outHeader in serverResponse[1].Split('#'))
+                            {
+                                resultTableHeader.Add(outHeader);
+                            }
+
+                            var resultTableContents = new List<string>();
+                            foreach (var outRecord in serverResponse[2].Split('|'))
+                            {
+                                resultTableContents.Add(outRecord);
+                            }
+
+                            SelectResultForm statementsResultForm = new SelectResultForm(resultTableHeader, resultTableContents);
+                            statementsResultForm.Show();
+                        }
+                        else
+                        {
+                            MessageBox.Show(serverResponse[0], "Query Execution Result", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+
                     }
                     else
                     {

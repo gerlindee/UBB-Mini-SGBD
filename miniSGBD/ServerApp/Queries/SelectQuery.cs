@@ -98,8 +98,17 @@ namespace ServerApp.Queries
             try
             {
                 ParseAttributes();
+                if (SelectAllTableName != null)
+                {   
+                    // SELECT * FROM <table>
+                    return Commands.MapCommandToSuccessResponse(Commands.SELECT_RECORDS) + ";" + SelectEntireTable();
+                }
+                else
+                {
+                    // Any other kind of Select 
+                    return Commands.MapCommandToSuccessResponse(Commands.SELECT_RECORDS) + ";" + GetOutputStructure() + ";" + GetSelectedRecords();
+                }
 
-                return Commands.MapCommandToSuccessResponse(Commands.SELECT_RECORDS) + ";" + GetOutputStructure() + ";" + GetSelectedRecords();
             }
             catch (Exception ex)
             {
@@ -218,7 +227,7 @@ namespace ServerApp.Queries
                     records += keyValue.GetElement("_id").Value + "#" + keyValue.GetElement("value").Value + "|";
                 }
 
-                return Commands.MapCommandToSuccessResponse(Commands.SELECT_RECORDS) + ";" + records;
+                return records;
             }
             catch (Exception ex)
             {

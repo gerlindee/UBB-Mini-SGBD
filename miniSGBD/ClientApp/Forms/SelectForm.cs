@@ -18,6 +18,7 @@ namespace miniSGBD.Forms
         private Client tcpClient;
         private List<string> selectedTables;
         private List<KeyValuePair<string, List<string>>> tableColumns;
+        private bool AtLeastOneOutputSelected; // used for validation 
 
         public SelectForm(string _databaseName, Client _tcpClient)
         {
@@ -79,7 +80,7 @@ namespace miniSGBD.Forms
 
                 var tableName = new Label();
                 tableName.Text = table;
-                
+
                 var columnsCheckBoxed = new CheckedListBox();
                 foreach (var column in tableColumns.Find(elem => elem.Key == table).Value)
                 {
@@ -113,7 +114,7 @@ namespace miniSGBD.Forms
         }
 
         private void getValuesForColumnsComboBox()
-        { 
+        {
             foreach (var table in selectedTables)
             {
                 var columnsInTable = new List<string>();
@@ -164,8 +165,10 @@ namespace miniSGBD.Forms
                         MessageBox.Show(serverResponse[0], "Query Execution Result", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
-                else 
+                else
                 {
+                    AtLeastOneOutputSelected = false; 
+
                     if (selectedTables.Count == 1)
                     {
                         // Select on one table, without Join => separate because no validations on join configuration is needed 
@@ -194,7 +197,17 @@ namespace miniSGBD.Forms
                                 {
                                     message += columnName.ToString() + '#';
 
-                                    var aliasName = (columnConfig[2] as DataGridViewTextBoxCell).Value;
+                                    var aggregateFunction = (columnConfig[2] as DataGridViewComboBoxCell).Value;
+                                    if (aggregateFunction == null)
+                                    {
+                                        message += "-#";
+                                    }
+                                    else
+                                    {
+                                        message += aggregateFunction.ToString() + '#';
+                                    }
+
+                                    var aliasName = (columnConfig[3] as DataGridViewTextBoxCell).Value;
                                     if (aliasName == null)
                                     {
                                         message += "-#";
@@ -204,17 +217,18 @@ namespace miniSGBD.Forms
                                         message += aliasName.ToString() + '#';
                                     }
 
-                                    var outputCheck = (columnConfig[3] as DataGridViewCheckBoxCell).Value;
+                                    var outputCheck = (columnConfig[4] as DataGridViewCheckBoxCell).Value;
                                     if (outputCheck == null)
                                     {
                                         message += "-#";
                                     }
                                     else
                                     {
+                                        AtLeastOneOutputSelected = true;
                                         message += SelectColumnInformation.Output + '#';
                                     }
 
-                                    var filterValue = (columnConfig[4] as DataGridViewTextBoxCell).Value;
+                                    var filterValue = (columnConfig[5] as DataGridViewTextBoxCell).Value;
                                     if (filterValue == null)
                                     {
                                         message += "-#";
@@ -224,7 +238,7 @@ namespace miniSGBD.Forms
                                         message += filterValue.ToString() + '#';
                                     }
 
-                                    var groupByCheck = (columnConfig[5] as DataGridViewCheckBoxCell).Value;
+                                    var groupByCheck = (columnConfig[6] as DataGridViewCheckBoxCell).Value;
                                     if (groupByCheck == null)
                                     {
                                         message += "-#";
@@ -234,7 +248,7 @@ namespace miniSGBD.Forms
                                         message += SelectColumnInformation.GroupBy + '#';
                                     }
 
-                                    var havingValue = (columnConfig[6] as DataGridViewTextBoxCell).Value;
+                                    var havingValue = (columnConfig[7] as DataGridViewTextBoxCell).Value;
                                     if (havingValue == null)
                                     {
                                         message += "-|";
@@ -247,31 +261,37 @@ namespace miniSGBD.Forms
                             }
                         }
 
-                        tcpClient.Write(message);
-                        var serverResponse = tcpClient.ReadFromServer().Split(';');
-
-                        if (serverResponse[0] == Commands.MapCommandToSuccessResponse(Commands.SELECT_RECORDS))
+                        if (!AtLeastOneOutputSelected)
                         {
-                            var resultTableHeader = new List<string>();
-                            foreach (var outHeader in serverResponse[1].Split('#'))
-                            {
-                                resultTableHeader.Add(outHeader);
-                            }
-
-                            var resultTableContents = new List<string>();
-                            foreach (var outRecord in serverResponse[2].Split('|'))
-                            {
-                                resultTableContents.Add(outRecord);
-                            }
-
-                            SelectResultForm statementsResultForm = new SelectResultForm(resultTableHeader, resultTableContents);
-                            statementsResultForm.Show();
+                            MessageBox.Show("At least one column needs to be selected for output!", "Invalid Configuration", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
                         else
                         {
-                            MessageBox.Show(serverResponse[0], "Query Execution Result", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
+                            tcpClient.Write(message);
+                            var serverResponse = tcpClient.ReadFromServer().Split(';');
 
+                            if (serverResponse[0] == Commands.MapCommandToSuccessResponse(Commands.SELECT_RECORDS))
+                            {
+                                var resultTableHeader = new List<string>();
+                                foreach (var outHeader in serverResponse[1].Split('#'))
+                                {
+                                    resultTableHeader.Add(outHeader);
+                                }
+
+                                var resultTableContents = new List<string>();
+                                foreach (var outRecord in serverResponse[2].Split('|'))
+                                {
+                                    resultTableContents.Add(outRecord);
+                                }
+
+                                SelectResultForm statementsResultForm = new SelectResultForm(resultTableHeader, resultTableContents);
+                                statementsResultForm.Show();
+                            }
+                            else
+                            {
+                                MessageBox.Show(serverResponse[0], "Query Execution Result", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            }
+                        }
                     }
                     else
                     {
@@ -316,7 +336,7 @@ namespace miniSGBD.Forms
                             }
                             else
                             {
-                                // Aici o sa fie chemat Select Query-ul cu Join-uri 
+                                // If all UI checks pass => send the Select Query with Joins to the server 
                             }
                         }
                     }

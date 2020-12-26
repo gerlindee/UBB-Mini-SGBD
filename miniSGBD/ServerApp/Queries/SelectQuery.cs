@@ -15,10 +15,9 @@ namespace ServerApp.Queries
         private string Attributes;
         private MongoDBAcess MongoDB;
 
-        // only used for SELECT * from <table> 
-        private string SelectAllTableName;
+        private string TableName;
+        private bool SelectAllFlag = false; // set to true when doing SELECT * FROM, without any where conditions 
 
-        private List<string> TablesUsed = new List<string>();
         private List<SelectRowInfo> SelectConfigList = new List<SelectRowInfo>();
         private List<Tuple<Tuple<string, string>, string>> OutputParamsAliasList = new List<Tuple<Tuple<string, string>, string>>();
         private List<Tuple<Tuple<string, string>, string>> WhereConditionsList = new List<Tuple<Tuple<string, string>, string>>();
@@ -38,7 +37,8 @@ namespace ServerApp.Queries
 
             if (splitAttributes[0].Contains("SELECT_ALL"))
             {
-                SelectAllTableName = splitAttributes[0].Split('#')[1];
+                TableName = splitAttributes[0].Split('#')[1];
+                SelectAllFlag = true;
             }
             else
             {
@@ -48,10 +48,10 @@ namespace ServerApp.Queries
                     {
                         var newColumnConfig = new SelectRowInfo(attribute);
                         SelectConfigList.Add(newColumnConfig);
-
-                        if (!TablesUsed.Contains(newColumnConfig.TableName))
+                        
+                        if (TableName == null)
                         {
-                            TablesUsed.Add(newColumnConfig.TableName);
+                            TableName = newColumnConfig.TableName;
                         }
                     }
                 }
@@ -98,14 +98,14 @@ namespace ServerApp.Queries
             try
             {
                 ParseAttributes();
-                if (SelectAllTableName != null)
+                if (SelectAllFlag)
                 {   
                     // SELECT * FROM <table>
                     return Commands.MapCommandToSuccessResponse(Commands.SELECT_RECORDS) + ";" + SelectEntireTable();
                 }
                 else
                 {
-                    // Any other kind of Select 
+                    // Any other kind of Select on one table 
                     return Commands.MapCommandToSuccessResponse(Commands.SELECT_RECORDS) + ";" + GetOutputStructure() + ";" + GetSelectedRecords();
                 }
 
@@ -122,26 +122,18 @@ namespace ServerApp.Queries
             {
                 var selectionResult = "";
 
-                if (SelectAllTableName != null)
-                {
-                    selectionResult = SelectEntireTable();
-                }
-                else
-                {
-                    if (TablesUsed.Count == 1)
-                    {
                         var records = new List<string>();
 
                         // Primary Key checks
                         var whereConditionPrimaryKey = CheckForPrimaryKey(WhereConditionsList);
 
                         // Index Key checks 
-                        var whereConditionIndex = CheckForIndex(WhereConditionsList, TablesUsed[0]);
-                        var projectionConditionIndex = CheckForIndex(OutputParamsAliasList, TablesUsed[0]);
+                        var whereConditionIndex = CheckForIndex(WhereConditionsList, TableName);
+                        var projectionConditionIndex = CheckForIndex(OutputParamsAliasList, TableName);
 
                         if (whereConditionPrimaryKey != "")
                         {
-                            records = SelectWithIndexWhere(TablesUsed[0], true);
+                            records = SelectWithIndexWhere(TableName, true);
                             var output = ApplyProjection(records);
 
                             foreach (var record in output)
@@ -166,7 +158,7 @@ namespace ServerApp.Queries
                         if (whereConditionIndex != "")
                         {
                             var keys = SelectWithIndexWhere(whereConditionIndex, false);
-                            records = PerformKeyLookup(keys, TablesUsed[0]);
+                            records = PerformKeyLookup(keys, TableName);
                             var output = ApplyProjection(records);
 
                             foreach (var record in output)
@@ -177,10 +169,10 @@ namespace ServerApp.Queries
                         }
                         else
                         {
-                            if (records.Count != 0)
+                            if (records.Count == 0)
                             {
                                 var unfilteredRecords = SelectWithIndexProjection(projectionConditionIndex);
-                                records = ApplyWhereConditions(unfilteredRecords, TablesUsed[0]);
+                                records = ApplyWhereConditions(unfilteredRecords, TableName);
                                 var output = ApplyProjection(records);
 
                                 foreach (var record in output)
@@ -190,13 +182,8 @@ namespace ServerApp.Queries
                                 return selectionResult.Remove(selectionResult.Length - 1);
                             }
                         }
-                    }
-                    else
-                    {
-                        // TODO: when JOIN algorithms are implemented 
-                        //              => methods that check if the JOIN tables can be restricted using index files 
-                    }
-                }
+                    
+                
 
                 return selectionResult;
             }
@@ -221,7 +208,7 @@ namespace ServerApp.Queries
             try
             {
                 var records = "";
-                var keyValuePairs = MongoDB.GetEntireCollection(SelectAllTableName);
+                var keyValuePairs = MongoDB.GetEntireCollection(TableName);
                 foreach (var keyValue in keyValuePairs)
                 {
                     records += keyValue.GetElement("_id").Value + "#" + keyValue.GetElement("value").Value + "|";
@@ -240,7 +227,7 @@ namespace ServerApp.Queries
             try
             {
                 var records = new List<string>();
-                var unfilteredRecords = MongoDB.GetEntireCollection(TablesUsed[0]);
+                var unfilteredRecords = MongoDB.GetEntireCollection(TableName);
 
                 var groupedConditions = new List<KeyValuePair<string, List<string>>>();
                 foreach (var condition in WhereConditionsList)
@@ -253,7 +240,7 @@ namespace ServerApp.Queries
                     groupedConditions.Find(elem => elem.Key == condition.Item1.Item2).Value.Add(condition.Item2);
                 }
 
-                var tableStructure = TableUtils.GetTableColumns(DatabaseName, TablesUsed[0]);
+                var tableStructure = TableUtils.GetTableColumns(DatabaseName, TableName);
 
                 foreach (var indexRecord in unfilteredRecords)
                 {
@@ -296,7 +283,8 @@ namespace ServerApp.Queries
             {
                 var records = new List<string>();
 
-                var columnsIndex = indexName.Split('_').Where(elem => elem != "Index" && !TablesUsed.Contains(elem)).ToList();
+                // only returns the names of the columns in the index, discarding the other parts of the index name (INDEX_<TableName>_....) 
+                var columnsIndex = indexName.Split('_').Where(elem => elem != "Index" && !TableName.Contains(elem)).ToList();
 
                 if (columnsIndex.Count == 1 || pkFlag == true)
                 {
@@ -611,7 +599,7 @@ namespace ServerApp.Queries
             }
 
             var columnsUsed = "";
-            var primaryKeyColumns = TableUtils.GetPrimaryKey(DatabaseName, TablesUsed[0]);
+            var primaryKeyColumns = TableUtils.GetPrimaryKey(DatabaseName, TableName);
             var primaryKeyColumnsString = "";
 
             foreach (var primaryKey in primaryKeyColumns)
@@ -681,7 +669,7 @@ namespace ServerApp.Queries
         private List<string> ApplyProjection(List<string> records)
         {
             var outputColumns = new List<string>();
-            var tableStructure = TableUtils.GetTableColumns(DatabaseName, TablesUsed[0]);
+            var tableStructure = TableUtils.GetTableColumns(DatabaseName, TableName);
 
             foreach (var record in records)
             {

@@ -21,8 +21,9 @@ namespace ServerApp.Queries
         private List<SelectRowInfo> SelectConfigList = new List<SelectRowInfo>();
         private List<Tuple<Tuple<string, string>, string>> OutputParamsAliasList = new List<Tuple<Tuple<string, string>, string>>();
         private List<Tuple<Tuple<string, string>, string>> WhereConditionsList = new List<Tuple<Tuple<string, string>, string>>();
-        private List<Tuple<Tuple<string, string>, string>> HavingParamsList = new List<Tuple<Tuple<string, string>, string>>();
+        private List<Tuple<string, string>> AggregateFunctionList = new List<Tuple<string, string>>();
         private List<Tuple<string, string>> GroupByList = new List<Tuple<string, string>>();
+        private List<Tuple<Tuple<string, string>, string>> HavingParamsList = new List<Tuple<Tuple<string, string>, string>>();
 
         public SelectQuery(string _databaseName, string _attributes) : base(Commands.SELECT_RECORDS)
         {
@@ -89,6 +90,11 @@ namespace ServerApp.Queries
                 if (column.Having != "-")
                 {
                     HavingParamsList.Add(new Tuple<Tuple<string, string>, string>(new Tuple<string, string>(column.TableName, column.ColumnName), column.Having));
+                }
+
+                if (column.Aggregate != "-")
+                {
+                    AggregateFunctionList.Add(new Tuple<string, string>(column.ColumnName, column.Aggregate));
                 }
             }
         }
@@ -671,21 +677,31 @@ namespace ServerApp.Queries
             var outputColumns = new List<string>();
             var tableStructure = TableUtils.GetTableColumns(DatabaseName, TableName);
 
-            foreach (var record in records)
+            if (AggregateFunctionList.Count == 0)
             {
-                var outputRecord = "";
-                var recordSplit = record.Split('#');
-                foreach (var output in OutputParamsAliasList)
+                // Select the values of the columns from the record and add them to the output
+                foreach (var record in records)
                 {
-                    outputRecord += recordSplit[tableStructure.IndexOf(output.Item1.Item2)] + "#";
-                }
+                    var outputRecord = "";
+                    var recordSplit = record.Split('#');
+                    foreach (var output in OutputParamsAliasList)
+                    {
+                        outputRecord += recordSplit[tableStructure.IndexOf(output.Item1.Item2)] + "#";
+                    }
 
-                // Apply DISTINCT as well 
-                outputRecord = outputRecord.Remove(outputRecord.Length - 1);
-                if (!outputColumns.Contains(outputRecord))
-                {
-                    outputColumns.Add(outputRecord);
-                }            
+                    // Apply DISTINCT as well 
+                    outputRecord = outputRecord.Remove(outputRecord.Length - 1);
+                    if (!outputColumns.Contains(outputRecord))
+                    {
+                        outputColumns.Add(outputRecord);
+                    }
+                }
+            }
+            else
+            {
+                // Collect the result of the aggregations => This will always be one row 
+                
+
             }
 
             return outputColumns;

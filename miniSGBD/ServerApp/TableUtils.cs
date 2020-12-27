@@ -67,6 +67,32 @@ namespace ServerApp
             return fkFiles;
         }
 
+        public static List<List<string>> GetForeignKeyData(string databaseName, string tableName)
+        {
+            var fkData = new List<List<string>>();
+            var xmlDocument = XDocument.Load(Application.StartupPath + "\\SGBDCatalog.xml");
+
+            XElement[] databasesNodes = xmlDocument.Element("Databases").Descendants("Database").ToArray();
+            XElement givenDB = Array.Find(databasesNodes, elem => elem.Attribute("databaseName").Value.Equals(databaseName));
+            var givenTable = Array.Find(givenDB.Descendants("Table").ToArray(), elem => elem.Attribute("tableName").Value == tableName);
+            var foreignKeys = givenTable.Descendants("ForeignKeys").Descendants("ForeignKey").ToArray();
+
+            foreach (var foreignKey in foreignKeys)
+            {
+                var fkInfo = new List<string>();
+                fkInfo.Add(foreignKey.Descendants("ReferencedTable").ToArray()[0].Value);
+                
+                foreach (var fkColumns in foreignKey.Descendants("ReferencedColumn"))
+                {
+                    fkInfo.Add(fkColumns.Value);
+                }
+
+                fkData.Add(fkInfo);
+            }
+
+            return fkData;
+        }
+
         public static List<IndexFileData> GetIndexFiles(string databaseName, string tableName)
         {
             var indexFiles = new List<IndexFileData>();

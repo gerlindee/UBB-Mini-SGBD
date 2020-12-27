@@ -18,6 +18,7 @@ namespace Utils
         public const string GET_ALL_TABLES = "GET_ALL_TABLES";
         public const string DROP_TABLE = "DROP_TABLE";
         public const string GET_TABLE_INFORMATION = "GET_TABLE_INFORMATION";
+        public const string GET_TABLE_FOREIGN_KEYS = "GET_TABLE_FOREIGN_KEYS";
 
         public const string GET_TABLE_COLUMNS = "GET_TABLE_COLUMNS";
         public const string INSERT_INTO_TABLE = "INSERT_INTO_TABLE";

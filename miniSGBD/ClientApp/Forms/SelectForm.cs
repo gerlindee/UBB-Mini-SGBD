@@ -18,6 +18,7 @@ namespace miniSGBD.Forms
         private Client tcpClient;
         private List<string> selectedTables;
         private List<KeyValuePair<string, List<string>>> tableColumns;
+        private List<Tuple<string, CheckedListBox>> checkedForeignKeyColumns; 
         private bool AtLeastOneOutputSelected; // used for validation 
 
         public SelectForm(string _databaseName, Client _tcpClient)
@@ -26,6 +27,7 @@ namespace miniSGBD.Forms
             tcpClient = _tcpClient;
             selectedTables = new List<string>();
             tableColumns = new List<KeyValuePair<string, List<string>>>();
+            checkedForeignKeyColumns = new List<Tuple<string, CheckedListBox>>();
             InitializeComponent();
             list_column_config.CellValueChanged += new DataGridViewCellEventHandler(list_column_config_CellValueChanged);
             list_column_config.CurrentCellDirtyStateChanged += new EventHandler(list_column_config_CurrentCellDirtyStateChanged);
@@ -57,31 +59,40 @@ namespace miniSGBD.Forms
             SelectFormTables statementsFormTables = new SelectFormTables(tcpClient, databaseName, selectedTables);
             statementsFormTables.ShowDialog();
             selectedTables = statementsFormTables.getSelectedTables();
-            changeLayoutAfterTreatySelection();
+            changeLayoutAfterTableSelection();
         }
 
-        private void changeLayoutAfterTreatySelection()
+        private void changeLayoutAfterTableSelection()
         {
             panel_join_config.Controls.Clear();
             list_column_config.Rows.Clear();
             setupTablesComboBox();
             getValuesForColumnsComboBox();
             setUpJoinTables();
-            setupSortingComboBox();
+
+            if (selectedTables.Count > 1)
+            {
+                checkForeignKeyColumns();
+            }
         }
 
         private void setUpJoinTables()
         {
             foreach (var table in selectedTables)
             {
-                var panelForTable = new FlowLayoutPanel();
-                panelForTable.AutoSize = true;
-                panelForTable.FlowDirection = FlowDirection.TopDown;
+                var panelForTable = new FlowLayoutPanel
+                {
+                    AutoSize = true,
+                    FlowDirection = FlowDirection.TopDown
+                };
 
-                var tableName = new Label();
-                tableName.Text = table;
+                var tableName = new Label { Text = table };
 
-                var columnsCheckBoxed = new CheckedListBox();
+                var columnsCheckBoxed = new CheckedListBox
+                {
+                    Enabled = false
+                };
+
                 foreach (var column in tableColumns.Find(elem => elem.Key == table).Value)
                 {
                     columnsCheckBoxed.Items.Add(column);
@@ -90,8 +101,40 @@ namespace miniSGBD.Forms
                 panelForTable.Controls.Add(tableName);
                 panelForTable.Controls.Add(columnsCheckBoxed);
                 panel_join_config.Controls.Add(panelForTable);
-            }
 
+                checkedForeignKeyColumns.Add(new Tuple<string, CheckedListBox>(table, columnsCheckBoxed));
+            }
+        }
+
+        private void checkForeignKeyColumns()
+        {
+            foreach (var table in checkedForeignKeyColumns)
+            {
+                tcpClient.Write(Commands.GET_TABLE_FOREIGN_KEYS + ";" + databaseName + ";" + table.Item1);
+                var serverResponse = tcpClient.ReadFromServer().Split(';');
+
+                foreach (var foreignKey in serverResponse)
+                {
+                    if (foreignKey != "")
+                    {
+                        var fkInfo = foreignKey.Split('|');
+                        var refTableCheckboxes = checkedForeignKeyColumns.Find(elem => elem.Item1 == fkInfo[0]);
+                        if (selectedTables.Contains(fkInfo[0]))
+                        {
+                            for (int i = 1; i < fkInfo.Length; i++)
+                            {
+                                // Set the FK column to checked in the table where the reference is made
+                                var idxInCheckList = table.Item2.Items.IndexOf(fkInfo[i]);
+                                table.Item2.SetItemChecked(idxInCheckList, true);
+
+                                // Set the corresponding PK column to checked in the referenced table
+                                idxInCheckList = refTableCheckboxes.Item2.Items.IndexOf(fkInfo[i]);
+                                refTableCheckboxes.Item2.SetItemChecked(idxInCheckList, true);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         private void setupTablesComboBox()
@@ -102,15 +145,6 @@ namespace miniSGBD.Forms
         private void setupColumnsComboBox(string tableName)
         {
             binding_source_column_name.DataSource = tableColumns.Find(elem => elem.Key == tableName).Value;
-        }
-
-        private void setupSortingComboBox()
-        {
-            var sortingTypes = new List<string>();
-            sortingTypes.Add("None");
-            sortingTypes.Add("Ascending");
-            sortingTypes.Add("Descending");
-            binding_source_sorting.DataSource = sortingTypes;
         }
 
         private void getValuesForColumnsComboBox()
@@ -315,29 +349,11 @@ namespace miniSGBD.Forms
                         // If there is a selected table for the join but no columns selected for the join => error 
                         if (selectedJoinColumns.Count != selectedTables.Count)
                         {
-                            MessageBox.Show("Configure the columns for the join opereation for all selected tables!", "Invalid Configuration", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageBox.Show("There is no Foreign Key relation between the selected tables, JOIN operation cannot be performed!", "Invalid Configuration", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
                         else
                         {
-                            // If the number of columns selected for join differs between tables => error 
-                            var errorColumnsFlag = false;
-                            for (int idx = 0; idx < selectedJoinColumns.Count - 1; idx++)
-                            {
-                                if (selectedJoinColumns[idx].Value.Count != selectedJoinColumns[idx + 1].Value.Count)
-                                {
-                                    errorColumnsFlag = true;
-                                    break;
-                                }
-                            }
 
-                            if (errorColumnsFlag)
-                            {
-                                MessageBox.Show("The same number of columns need to be selected for all join tables!", "Invalid Configuration", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            }
-                            else
-                            {
-                                // If all UI checks pass => send the Select Query with Joins to the server 
-                            }
                         }
                     }
                 }

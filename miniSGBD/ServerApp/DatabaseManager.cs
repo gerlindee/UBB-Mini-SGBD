@@ -69,6 +69,11 @@ namespace ServerApp
                         executionResponse = FetchTableStructureInformation(commandSplit[1], commandSplit[2]);
                     }
                     break;
+                case Commands.GET_TABLE_FOREIGN_KEYS:
+                    {
+                        executionResponse = FetchTableForeignKeys(commandSplit[1], commandSplit[2]);
+                    }
+                    break;
                 case Commands.GET_TABLE_COLUMNS:
                     {
                         executionResponse = FetchTableColumns(commandSplit[1], commandSplit[2]);
@@ -359,6 +364,27 @@ namespace ServerApp
             }
             messageInfo = messageInfo + pkString + columnInfo;
             return messageInfo.Remove(messageInfo.Length - 1);
+        }
+
+        private static string FetchTableForeignKeys(string database, string table)
+        {
+            var result = "";
+            var foreignKeyFiles = TableUtils.GetForeignKeyData(database, table);
+
+            if (foreignKeyFiles.Count > 0)
+            {
+                foreach (var foreignKeyFile in foreignKeyFiles)
+                {
+                    foreach (var fkInfo in foreignKeyFile)
+                    {
+                        result += fkInfo + "|";
+                    }
+
+                    result = result.Remove(result.Length - 1) + ";";
+                }
+            }
+
+            return result; 
         }
     }
 }

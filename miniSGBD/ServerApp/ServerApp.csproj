@@ -125,6 +125,7 @@
     <Compile Include="Queries\DropTableQuery.cs" />
     <Compile Include="Queries\InsertQuery.cs" />
     <Compile Include="Queries\SelectQuery.cs" />
+    <Compile Include="Queries\SelectWithJoinQuery.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="Session.cs" />
     <Compile Include="TableUtils.cs" />

@@ -40,6 +40,7 @@
             this.panel_join_config = new System.Windows.Forms.FlowLayoutPanel();
             this.table_name = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.col_name = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.Aggregate = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.alias = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.output = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.filter = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -64,7 +65,7 @@
             // button_table_config
             // 
             this.button_table_config.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button_table_config.Location = new System.Drawing.Point(1196, 42);
+            this.button_table_config.Location = new System.Drawing.Point(1319, 42);
             this.button_table_config.Name = "button_table_config";
             this.button_table_config.Size = new System.Drawing.Size(50, 50);
             this.button_table_config.TabIndex = 2;
@@ -85,7 +86,7 @@
             // button_column_config
             // 
             this.button_column_config.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button_column_config.Location = new System.Drawing.Point(1057, 714);
+            this.button_column_config.Location = new System.Drawing.Point(1236, 714);
             this.button_column_config.Name = "button_column_config";
             this.button_column_config.Size = new System.Drawing.Size(133, 30);
             this.button_column_config.TabIndex = 5;
@@ -100,6 +101,7 @@
             this.list_column_config.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.table_name,
             this.col_name,
+            this.Aggregate,
             this.alias,
             this.output,
             this.filter,
@@ -111,7 +113,7 @@
             this.list_column_config.RowHeadersWidth = 25;
             this.list_column_config.RowTemplate.Height = 24;
             this.list_column_config.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.list_column_config.Size = new System.Drawing.Size(1171, 288);
+            this.list_column_config.Size = new System.Drawing.Size(1238, 288);
             this.list_column_config.TabIndex = 6;
             // 
             // panel_join_config
@@ -139,6 +141,18 @@
             this.col_name.MinimumWidth = 6;
             this.col_name.Name = "col_name";
             this.col_name.Width = 125;
+            // 
+            // Aggregate
+            // 
+            this.Aggregate.HeaderText = "Aggregate";
+            this.Aggregate.Items.AddRange(new object[] {
+            "COUNT",
+            "MAX",
+            "MIN",
+            "SUM"});
+            this.Aggregate.MinimumWidth = 6;
+            this.Aggregate.Name = "Aggregate";
+            this.Aggregate.Width = 125;
             // 
             // alias
             // 
@@ -175,19 +189,19 @@
             this.having.Name = "having";
             this.having.Width = 125;
             // 
-            // StatementsForm
+            // SelectForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            this.ClientSize = new System.Drawing.Size(1265, 756);
+            this.ClientSize = new System.Drawing.Size(1381, 756);
             this.Controls.Add(this.panel_join_config);
             this.Controls.Add(this.list_column_config);
             this.Controls.Add(this.button_column_config);
             this.Controls.Add(this.label_column_config);
             this.Controls.Add(this.button_table_config);
             this.Controls.Add(this.label_table_config);
-            this.Name = "StatementsForm";
+            this.Name = "SelectForm";
             this.Text = "Data Selection";
             ((System.ComponentModel.ISupportInitialize)(this.list_column_config)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.binding_source_table_name)).EndInit();
@@ -211,6 +225,7 @@
         private System.Windows.Forms.BindingSource binding_source_sorting;
         private System.Windows.Forms.DataGridViewComboBoxColumn table_name;
         private System.Windows.Forms.DataGridViewComboBoxColumn col_name;
+        private System.Windows.Forms.DataGridViewComboBoxColumn Aggregate;
         private System.Windows.Forms.DataGridViewTextBoxColumn alias;
         private System.Windows.Forms.DataGridViewCheckBoxColumn output;
         private System.Windows.Forms.DataGridViewTextBoxColumn filter;

@@ -329,25 +329,20 @@ namespace miniSGBD.Forms
                     }
                     else
                     {
-                        // Build the list of checked columns for join, for each displayed table
-                        var selectedJoinColumns = new List<KeyValuePair<string, List<string>>>();
+                        // Build the list of tables which have at least one FK checked for the JOIN operation 
+                        var tablesWithCheckedFK = new List<string>();
                         foreach (FlowLayoutPanel tableControl in panel_join_config.Controls)
                         {
                             var tableName = tableControl.Controls[0].Text;
                             var checkedColumns = (tableControl.Controls[1] as CheckedListBox).CheckedItems;
                             if (checkedColumns.Count != 0)
                             {
-                                var joinColumns = new List<string>();
-                                foreach (var column in checkedColumns)
-                                {
-                                    joinColumns.Add(column.ToString());
-                                }
-                                selectedJoinColumns.Add(new KeyValuePair<string, List<string>>(tableName, joinColumns));
+                                tablesWithCheckedFK.Add(tableName);
                             }
                         }
 
-                        // If there is a selected table for the join but no columns selected for the join => error 
-                        if (selectedJoinColumns.Count != selectedTables.Count)
+                        // If the number of tables with checked columns differs from the total number of tables selected => between two tables no FK relation was found => error 
+                        if (tablesWithCheckedFK.Count != selectedTables.Count)
                         {
                             MessageBox.Show("There is no Foreign Key relation between the selected tables, JOIN operation cannot be performed!", "Invalid Configuration", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }

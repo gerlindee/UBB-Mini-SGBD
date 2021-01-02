@@ -18,7 +18,8 @@ namespace miniSGBD.Forms
         private Client tcpClient;
         private List<string> selectedTables;
         private List<KeyValuePair<string, List<string>>> tableColumns;
-        private List<Tuple<string, CheckedListBox>> checkedForeignKeyColumns; 
+        private List<Tuple<string, CheckedListBox>> checkedForeignKeyColumns;
+        private List<string> tableJoinDetails; 
         private bool AtLeastOneOutputSelected; // used for validation 
 
         public SelectForm(string _databaseName, Client _tcpClient)
@@ -28,6 +29,7 @@ namespace miniSGBD.Forms
             selectedTables = new List<string>();
             tableColumns = new List<KeyValuePair<string, List<string>>>();
             checkedForeignKeyColumns = new List<Tuple<string, CheckedListBox>>();
+            tableJoinDetails = new List<string>();
             InitializeComponent();
             list_column_config.CellValueChanged += new DataGridViewCellEventHandler(list_column_config_CellValueChanged);
             list_column_config.CurrentCellDirtyStateChanged += new EventHandler(list_column_config_CurrentCellDirtyStateChanged);
@@ -130,6 +132,9 @@ namespace miniSGBD.Forms
                                 // Set the corresponding PK column to checked in the referenced table
                                 idxInCheckList = refTableCheckboxes.Item2.Items.IndexOf(fkInfo[i]);
                                 refTableCheckboxes.Item2.SetItemChecked(idxInCheckList, true);
+
+                                // Add the detais about the join conditions which will be sent to the server 
+                                tableJoinDetails.Add(fkInfo[0] + "#" + table.Item1 + "#" + "FK_" + table.Item1 + "_" + fkInfo[0] + "#" + fkInfo[i]);
                             }
                         }
                     }
@@ -348,7 +353,51 @@ namespace miniSGBD.Forms
                         }
                         else
                         {
+                            var message = Commands.SELECT_RECORDS_WITH_JOIN + ";" + databaseName + ";" + "SELECT_ALL|";
 
+                            if (columnConditions == 1)
+                            {
+                                // SELECT * from the result of the join 
+                                foreach (var selectedTable in selectedTables)
+                                {
+                                    var joinCondition = tableJoinDetails.Find(elem => elem.Split('#')[0] == selectedTable);
+                                    
+                                    if (joinCondition != null)
+                                    {
+                                        message += joinCondition + "|";
+                                    }
+                                }
+                                message = message.Remove(message.Length - 1);
+
+                                tcpClient.Write(message);
+                                var serverResponse = tcpClient.ReadFromServer().Split(';');
+
+                                if (serverResponse[0] == Commands.MapCommandToSuccessResponse(Commands.SELECT_RECORDS_WITH_JOIN))
+                                {
+                                    var resultTableHeader = new List<string>();
+                                    foreach (var outHeader in serverResponse[1].Split('#'))
+                                    {
+                                        resultTableHeader.Add(outHeader);
+                                    }
+
+                                    var resultTableContents = new List<string>();
+                                    foreach (var outRecord in serverResponse[2].Split('|'))
+                                    {
+                                        resultTableContents.Add(outRecord);
+                                    }
+
+                                    SelectResultForm statementsResultForm = new SelectResultForm(resultTableHeader, resultTableContents);
+                                    statementsResultForm.Show();
+                                }
+                                else
+                                {
+                                    MessageBox.Show(serverResponse[0], "Query Execution Result", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                }
+                            }
+                            else
+                            {
+                                // SELECT with some output conditions 
+                            }
                         }
                     }
                 }

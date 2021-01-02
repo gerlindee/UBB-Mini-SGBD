@@ -29,15 +29,16 @@
         private void InitializeComponent()
         {
             this.list_tables = new System.Windows.Forms.DataGridView();
-            this.button_tables = new System.Windows.Forms.Button();
-            this.label_tables = new System.Windows.Forms.Label();
             this.table_name = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.selected = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.button_tables = new System.Windows.Forms.Button();
+            this.label_tables = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.list_tables)).BeginInit();
             this.SuspendLayout();
             // 
             // list_tables
             // 
+            this.list_tables.AllowDrop = true;
             this.list_tables.AllowUserToAddRows = false;
             this.list_tables.AllowUserToDeleteRows = false;
             this.list_tables.BackgroundColor = System.Drawing.SystemColors.Window;
@@ -50,8 +51,24 @@
             this.list_tables.RowHeadersVisible = false;
             this.list_tables.RowHeadersWidth = 51;
             this.list_tables.RowTemplate.Height = 24;
+            this.list_tables.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.list_tables.Size = new System.Drawing.Size(272, 299);
             this.list_tables.TabIndex = 0;
+            // 
+            // table_name
+            // 
+            this.table_name.HeaderText = "Table Name";
+            this.table_name.MinimumWidth = 6;
+            this.table_name.Name = "table_name";
+            this.table_name.ReadOnly = true;
+            this.table_name.Width = 125;
+            // 
+            // selected
+            // 
+            this.selected.HeaderText = "Selected";
+            this.selected.MinimumWidth = 6;
+            this.selected.Name = "selected";
+            this.selected.Width = 75;
             // 
             // button_tables
             // 
@@ -74,22 +91,7 @@
             this.label_tables.TabIndex = 2;
             this.label_tables.Text = "Tables selected for join:";
             // 
-            // table_name
-            // 
-            this.table_name.HeaderText = "Table Name";
-            this.table_name.MinimumWidth = 6;
-            this.table_name.Name = "table_name";
-            this.table_name.ReadOnly = true;
-            this.table_name.Width = 125;
-            // 
-            // selected
-            // 
-            this.selected.HeaderText = "Selected";
-            this.selected.MinimumWidth = 6;
-            this.selected.Name = "selected";
-            this.selected.Width = 75;
-            // 
-            // StatementsFormTables
+            // SelectFormTables
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -98,7 +100,7 @@
             this.Controls.Add(this.label_tables);
             this.Controls.Add(this.button_tables);
             this.Controls.Add(this.list_tables);
-            this.Name = "StatementsFormTables";
+            this.Name = "SelectFormTables";
             this.Text = "Tables For Data Selection";
             ((System.ComponentModel.ISupportInitialize)(this.list_tables)).EndInit();
             this.ResumeLayout(false);

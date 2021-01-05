@@ -49,7 +49,7 @@ namespace ServerApp.Queries
                     {
                         var newColumnConfig = new SelectRowInfo(attribute);
                         SelectConfigList.Add(newColumnConfig);
-                        
+
                         if (TableName == null)
                         {
                             TableName = newColumnConfig.TableName;
@@ -105,7 +105,7 @@ namespace ServerApp.Queries
             {
                 ParseAttributes();
                 if (SelectAllFlag)
-                {   
+                {
                     // SELECT * FROM <table>
                     return Commands.MapCommandToSuccessResponse(Commands.SELECT_RECORDS) + ";" + SelectEntireTable();
                 }
@@ -119,7 +119,7 @@ namespace ServerApp.Queries
             catch (Exception ex)
             {
                 return ex.Message;
-            }    
+            }
         }
 
         private string GetSelectedRecords()
@@ -128,70 +128,49 @@ namespace ServerApp.Queries
             {
                 var selectionResult = "";
 
-                        var records = new List<string>();
+                var records = new List<string>();
 
-                        // Primary Key checks
-                        var whereConditionPrimaryKey = CheckForPrimaryKey(WhereConditionsList);
+                // Primary Key checks
+                var whereConditionPrimaryKey = CheckForPrimaryKey(WhereConditionsList);
 
-                        // Index Key checks 
-                        var whereConditionIndex = CheckForIndex(WhereConditionsList, TableName);
-                        var projectionConditionIndex = CheckForIndex(OutputParamsAliasList, TableName);
+                // Index Key checks 
+                var whereConditionIndex = CheckForIndex(WhereConditionsList, TableName);
 
-                        if (whereConditionPrimaryKey != "")
-                        {
-                            records = SelectWithIndexWhere(TableName, true);
-                            var output = ApplyProjection(records);
+                if (whereConditionPrimaryKey != "")
+                {
+                    records = SelectWithIndexWhere(TableName, true);
+                    var output = ApplyProjection(records);
 
-                            foreach (var record in output)
-                            {
-                                selectionResult += record + "|";
-                            }
-                            return selectionResult.Remove(selectionResult.Length - 1);
-                        }
+                    foreach (var record in output)
+                    {
+                        selectionResult += record + "|";
+                    }
+                    return selectionResult.Remove(selectionResult.Length - 1);
+                }
 
-                        if (whereConditionIndex == "" && projectionConditionIndex == "")
-                        {
-                            records = SelectWithTableScan();
-                            var output = ApplyProjection(records);
+                if (whereConditionIndex == "")
+                {
+                    records = SelectWithTableScan();
+                    var output = ApplyProjection(records);
 
-                            foreach (var record in output)
-                            {
-                                selectionResult += record + "|";
-                            }
-                            return selectionResult.Remove(selectionResult.Length - 1);
-                        }
+                    foreach (var record in output)
+                    {
+                        selectionResult += record + "|";
+                    }
+                    return selectionResult.Remove(selectionResult.Length - 1);
+                }
+                else
+                {
+                    var keys = SelectWithIndexWhere(whereConditionIndex, false);
+                    records = PerformKeyLookup(keys, TableName);
+                    var output = ApplyProjection(records);
 
-                        if (whereConditionIndex != "")
-                        {
-                            var keys = SelectWithIndexWhere(whereConditionIndex, false);
-                            records = PerformKeyLookup(keys, TableName);
-                            var output = ApplyProjection(records);
-
-                            foreach (var record in output)
-                            {
-                                selectionResult += record + "|";
-                            }
-                            return selectionResult.Remove(selectionResult.Length - 1);
-                        }
-                        else
-                        {
-                            if (records.Count == 0)
-                            {
-                                var unfilteredRecords = SelectWithIndexProjection(projectionConditionIndex);
-                                records = ApplyWhereConditions(unfilteredRecords, TableName);
-                                var output = ApplyProjection(records);
-
-                                foreach (var record in output)
-                                {
-                                    selectionResult += record + "|";
-                                }
-                                return selectionResult.Remove(selectionResult.Length - 1);
-                            }
-                        }
-                    
-                
-
-                return selectionResult;
+                    foreach (var record in output)
+                    {
+                        selectionResult += record + "|";
+                    }
+                    return selectionResult.Remove(selectionResult.Length - 1);
+                }
             }
             catch (Exception ex)
             {
@@ -700,7 +679,7 @@ namespace ServerApp.Queries
             else
             {
                 // Collect the result of the aggregations => This will always be one row 
-                
+
 
             }
 
@@ -725,7 +704,7 @@ namespace ServerApp.Queries
                     else
                     {
                         filter |= Builders<BsonDocument>.Filter.Eq("_id", filterVal);
-                    }           
+                    }
                 }
             }
 

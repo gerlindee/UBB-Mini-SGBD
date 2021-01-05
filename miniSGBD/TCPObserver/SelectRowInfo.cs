@@ -12,8 +12,8 @@ namespace Utils
             var columnStruct = command.Split('#');
             TableName = columnStruct[0];
             ColumnName = columnStruct[1];
-            Alias = columnStruct[2];
-            Aggregate = columnStruct[3];
+            Alias = columnStruct[3];
+            Aggregate = columnStruct[2];
 
             if(columnStruct[4] == SelectColumnInformation.Output)
             {

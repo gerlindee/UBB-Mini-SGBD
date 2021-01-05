@@ -353,10 +353,12 @@ namespace miniSGBD.Forms
                         }
                         else
                         {
-                            var message = Commands.SELECT_RECORDS_WITH_JOIN + ";" + databaseName + ";" + "SELECT_ALL|";
+                            var message = Commands.SELECT_RECORDS_WITH_JOIN + ";" + databaseName + ";";
 
                             if (columnConditions == 1)
                             {
+                                message += "SELECT_ALL|";
+
                                 // SELECT * from the result of the join 
                                 foreach (var selectedTable in selectedTables)
                                 {
@@ -378,7 +380,7 @@ namespace miniSGBD.Forms
                                     foreach (var outHeader in serverResponse[1].Split('#'))
                                     {
                                         resultTableHeader.Add(outHeader);
-                                    }
+                                    } 
 
                                     var resultTableContents = new List<string>();
                                     foreach (var outRecord in serverResponse[2].Split('|'))
@@ -396,7 +398,138 @@ namespace miniSGBD.Forms
                             }
                             else
                             {
-                                // SELECT with some output conditions 
+                                // SELECT with some output conditions on the results of the join 
+                                foreach (var selectedTable in selectedTables)
+                                {
+                                    var joinCondition = tableJoinDetails.Find(elem => elem.Split('#')[0] == selectedTable);
+
+                                    if (joinCondition != null)
+                                    {
+                                        message += joinCondition + "*";
+                                    }
+                                }
+                                message = message.Remove(message.Length - 1) + "|";
+
+                                var noRows = list_column_config.Rows.Count - 1;
+                                AtLeastOneOutputSelected = false;
+
+                                for (int idx = 0; idx < noRows; idx++)
+                                {
+                                    var columnConfig = list_column_config.Rows[idx].Cells;
+                                    var tableName = (columnConfig[0] as DataGridViewComboBoxCell).Value;
+
+                                    if (tableName == null)
+                                    {
+                                        MessageBox.Show("Table name needs to be selected in row " + idx.ToString(), "Invalid Configuration", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    }
+                                    else
+                                    {
+                                        message += tableName.ToString() + '#';
+
+                                        var columnName = (columnConfig[1] as DataGridViewComboBoxCell).Value;
+                                        if (columnName == null)
+                                        {
+                                            MessageBox.Show("Column name needs to be selected in row " + idx.ToString(), "Invalid Configuration", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                        }
+                                        else
+                                        {
+                                            message += columnName.ToString() + '#';
+
+                                            var aggregateFunction = (columnConfig[2] as DataGridViewComboBoxCell).Value;
+                                            if (aggregateFunction == null)
+                                            {
+                                                message += "-#";
+                                            }
+                                            else
+                                            {
+                                                message += aggregateFunction.ToString() + '#';
+                                            }
+
+                                            var aliasName = (columnConfig[3] as DataGridViewTextBoxCell).Value;
+                                            if (aliasName == null)
+                                            {
+                                                message += "-#";
+                                            }
+                                            else
+                                            {
+                                                message += aliasName.ToString() + '#';
+                                            }
+
+                                            var outputCheck = (columnConfig[4] as DataGridViewCheckBoxCell).Value;
+                                            if (outputCheck == null)
+                                            {
+                                                message += "-#";
+                                            }
+                                            else
+                                            {
+                                                AtLeastOneOutputSelected = true;
+                                                message += SelectColumnInformation.Output + '#';
+                                            }
+
+                                            var filterValue = (columnConfig[5] as DataGridViewTextBoxCell).Value;
+                                            if (filterValue == null)
+                                            {
+                                                message += "-#";
+                                            }
+                                            else
+                                            {
+                                                message += filterValue.ToString() + '#';
+                                            }
+
+                                            var groupByCheck = (columnConfig[6] as DataGridViewCheckBoxCell).Value;
+                                            if (groupByCheck == null)
+                                            {
+                                                message += "-#";
+                                            }
+                                            else
+                                            {
+                                                message += SelectColumnInformation.GroupBy + '#';
+                                            }
+
+                                            var havingValue = (columnConfig[7] as DataGridViewTextBoxCell).Value;
+                                            if (havingValue == null)
+                                            {
+                                                message += "-*";
+                                            }
+                                            else
+                                            {
+                                                message += havingValue.ToString() + '*';
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (!AtLeastOneOutputSelected)
+                                {
+                                    MessageBox.Show("At least one column needs to be selected for output!", "Invalid Configuration", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                }
+                                else
+                                {
+                                    tcpClient.Write(message);
+                                    var serverResponse = tcpClient.ReadFromServer().Split(';');
+
+                                    if (serverResponse[0] == Commands.MapCommandToSuccessResponse(Commands.SELECT_RECORDS))
+                                    {
+                                        var resultTableHeader = new List<string>();
+                                        foreach (var outHeader in serverResponse[1].Split('#'))
+                                        {
+                                            resultTableHeader.Add(outHeader);
+                                        }
+
+                                        var resultTableContents = new List<string>();
+                                        foreach (var outRecord in serverResponse[2].Split('|'))
+                                        {
+                                            resultTableContents.Add(outRecord);
+                                        }
+
+                                        SelectResultForm statementsResultForm = new SelectResultForm(resultTableHeader, resultTableContents);
+                                        statementsResultForm.Show();
+                                    }
+                                    else
+                                    {
+                                        MessageBox.Show(serverResponse[0], "Query Execution Result", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    }
+                                }
                             }
                         }
                     }

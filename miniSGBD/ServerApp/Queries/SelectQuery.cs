@@ -21,8 +21,9 @@ namespace ServerApp.Queries
         private List<SelectRowInfo> SelectConfigList = new List<SelectRowInfo>();
         private List<Tuple<Tuple<string, string>, string>> OutputParamsAliasList = new List<Tuple<Tuple<string, string>, string>>();
         private List<Tuple<Tuple<string, string>, string>> WhereConditionsList = new List<Tuple<Tuple<string, string>, string>>();
-        private List<Tuple<Tuple<string, string>, string>> HavingParamsList = new List<Tuple<Tuple<string, string>, string>>();
+        private List<Tuple<string, string>> AggregateFunctionList = new List<Tuple<string, string>>();
         private List<Tuple<string, string>> GroupByList = new List<Tuple<string, string>>();
+        private List<Tuple<Tuple<string, string>, string>> HavingParamsList = new List<Tuple<Tuple<string, string>, string>>();
 
         public SelectQuery(string _databaseName, string _attributes) : base(Commands.SELECT_RECORDS)
         {
@@ -48,7 +49,7 @@ namespace ServerApp.Queries
                     {
                         var newColumnConfig = new SelectRowInfo(attribute);
                         SelectConfigList.Add(newColumnConfig);
-                        
+
                         if (TableName == null)
                         {
                             TableName = newColumnConfig.TableName;
@@ -90,6 +91,11 @@ namespace ServerApp.Queries
                 {
                     HavingParamsList.Add(new Tuple<Tuple<string, string>, string>(new Tuple<string, string>(column.TableName, column.ColumnName), column.Having));
                 }
+
+                if (column.Aggregate != "-")
+                {
+                    AggregateFunctionList.Add(new Tuple<string, string>(column.ColumnName, column.Aggregate));
+                }
             }
         }
 
@@ -99,7 +105,7 @@ namespace ServerApp.Queries
             {
                 ParseAttributes();
                 if (SelectAllFlag)
-                {   
+                {
                     // SELECT * FROM <table>
                     return Commands.MapCommandToSuccessResponse(Commands.SELECT_RECORDS) + ";" + SelectEntireTable();
                 }
@@ -113,7 +119,7 @@ namespace ServerApp.Queries
             catch (Exception ex)
             {
                 return ex.Message;
-            }    
+            }
         }
 
         private string GetSelectedRecords()
@@ -122,70 +128,49 @@ namespace ServerApp.Queries
             {
                 var selectionResult = "";
 
-                        var records = new List<string>();
+                var records = new List<string>();
 
-                        // Primary Key checks
-                        var whereConditionPrimaryKey = CheckForPrimaryKey(WhereConditionsList);
+                // Primary Key checks
+                var whereConditionPrimaryKey = CheckForPrimaryKey(WhereConditionsList);
 
-                        // Index Key checks 
-                        var whereConditionIndex = CheckForIndex(WhereConditionsList, TableName);
-                        var projectionConditionIndex = CheckForIndex(OutputParamsAliasList, TableName);
+                // Index Key checks 
+                var whereConditionIndex = CheckForIndex(WhereConditionsList, TableName);
 
-                        if (whereConditionPrimaryKey != "")
-                        {
-                            records = SelectWithIndexWhere(TableName, true);
-                            var output = ApplyProjection(records);
+                if (whereConditionPrimaryKey != "")
+                {
+                    records = SelectWithIndexWhere(TableName, true);
+                    var output = ApplyProjection(records);
 
-                            foreach (var record in output)
-                            {
-                                selectionResult += record + "|";
-                            }
-                            return selectionResult.Remove(selectionResult.Length - 1);
-                        }
+                    foreach (var record in output)
+                    {
+                        selectionResult += record + "|";
+                    }
+                    return selectionResult.Remove(selectionResult.Length - 1);
+                }
 
-                        if (whereConditionIndex == "" && projectionConditionIndex == "")
-                        {
-                            records = SelectWithTableScan();
-                            var output = ApplyProjection(records);
+                if (whereConditionIndex == "")
+                {
+                    records = SelectWithTableScan();
+                    var output = ApplyProjection(records);
 
-                            foreach (var record in output)
-                            {
-                                selectionResult += record + "|";
-                            }
-                            return selectionResult.Remove(selectionResult.Length - 1);
-                        }
+                    foreach (var record in output)
+                    {
+                        selectionResult += record + "|";
+                    }
+                    return selectionResult.Remove(selectionResult.Length - 1);
+                }
+                else
+                {
+                    var keys = SelectWithIndexWhere(whereConditionIndex, false);
+                    records = PerformKeyLookup(keys, TableName);
+                    var output = ApplyProjection(records);
 
-                        if (whereConditionIndex != "")
-                        {
-                            var keys = SelectWithIndexWhere(whereConditionIndex, false);
-                            records = PerformKeyLookup(keys, TableName);
-                            var output = ApplyProjection(records);
-
-                            foreach (var record in output)
-                            {
-                                selectionResult += record + "|";
-                            }
-                            return selectionResult.Remove(selectionResult.Length - 1);
-                        }
-                        else
-                        {
-                            if (records.Count == 0)
-                            {
-                                var unfilteredRecords = SelectWithIndexProjection(projectionConditionIndex);
-                                records = ApplyWhereConditions(unfilteredRecords, TableName);
-                                var output = ApplyProjection(records);
-
-                                foreach (var record in output)
-                                {
-                                    selectionResult += record + "|";
-                                }
-                                return selectionResult.Remove(selectionResult.Length - 1);
-                            }
-                        }
-                    
-                
-
-                return selectionResult;
+                    foreach (var record in output)
+                    {
+                        selectionResult += record + "|";
+                    }
+                    return selectionResult.Remove(selectionResult.Length - 1);
+                }
             }
             catch (Exception ex)
             {
@@ -671,21 +656,31 @@ namespace ServerApp.Queries
             var outputColumns = new List<string>();
             var tableStructure = TableUtils.GetTableColumns(DatabaseName, TableName);
 
-            foreach (var record in records)
+            if (AggregateFunctionList.Count == 0)
             {
-                var outputRecord = "";
-                var recordSplit = record.Split('#');
-                foreach (var output in OutputParamsAliasList)
+                // Select the values of the columns from the record and add them to the output
+                foreach (var record in records)
                 {
-                    outputRecord += recordSplit[tableStructure.IndexOf(output.Item1.Item2)] + "#";
-                }
+                    var outputRecord = "";
+                    var recordSplit = record.Split('#');
+                    foreach (var output in OutputParamsAliasList)
+                    {
+                        outputRecord += recordSplit[tableStructure.IndexOf(output.Item1.Item2)] + "#";
+                    }
 
-                // Apply DISTINCT as well 
-                outputRecord = outputRecord.Remove(outputRecord.Length - 1);
-                if (!outputColumns.Contains(outputRecord))
-                {
-                    outputColumns.Add(outputRecord);
-                }            
+                    // Apply DISTINCT as well 
+                    outputRecord = outputRecord.Remove(outputRecord.Length - 1);
+                    if (!outputColumns.Contains(outputRecord))
+                    {
+                        outputColumns.Add(outputRecord);
+                    }
+                }
+            }
+            else
+            {
+                // Collect the result of the aggregations => This will always be one row 
+
+
             }
 
             return outputColumns;
@@ -709,7 +704,7 @@ namespace ServerApp.Queries
                     else
                     {
                         filter |= Builders<BsonDocument>.Filter.Eq("_id", filterVal);
-                    }           
+                    }
                 }
             }
 

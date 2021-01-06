@@ -7,17 +7,17 @@ namespace Utils
     public class SelectJoinInfo
     {
         public string LeftTableName { get; set; }
+        public string LeftTableColumn { get; set; }
         public string RightTableName { get; set; }
-        public string FKFileName { get; set; }
-        public string FKColumn { get; set; }
+        public string RightTableColumn { get; set; }
 
         public SelectJoinInfo(string attributes)
         {
             var splitAttributes = attributes.Split('#');
             LeftTableName = splitAttributes[0];
-            RightTableName = splitAttributes[1];
-            FKFileName = splitAttributes[2];
-            FKColumn = splitAttributes[3];
+            LeftTableColumn = splitAttributes[1];
+            RightTableName = splitAttributes[2];
+            RightTableColumn = splitAttributes[3];
         }
     }
 }

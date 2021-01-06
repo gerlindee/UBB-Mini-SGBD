@@ -44,10 +44,15 @@
             this.filter = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.group_by = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.having = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.panel_join_config = new System.Windows.Forms.FlowLayoutPanel();
+            this.list_join_config = new System.Windows.Forms.DataGridView();
+            this.LeftTableName = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.LeftTableColumn = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.RightTableName = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.RightTableColumn = new System.Windows.Forms.DataGridViewComboBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.list_column_config)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.binding_source_table_name)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.binding_source_column_name)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.list_join_config)).BeginInit();
             this.SuspendLayout();
             // 
             // label_table_config
@@ -177,15 +182,63 @@
             this.having.Name = "having";
             this.having.Width = 125;
             // 
-            // panel_join_config
+            // list_join_config
             // 
-            this.panel_join_config.AutoSize = true;
-            this.panel_join_config.BackColor = System.Drawing.SystemColors.Window;
-            this.panel_join_config.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel_join_config.Location = new System.Drawing.Point(19, 42);
-            this.panel_join_config.Name = "panel_join_config";
-            this.panel_join_config.Size = new System.Drawing.Size(1238, 337);
-            this.panel_join_config.TabIndex = 7;
+            this.list_join_config.BackgroundColor = System.Drawing.SystemColors.Window;
+            this.list_join_config.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.list_join_config.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.LeftTableName,
+            this.LeftTableColumn,
+            this.RightTableName,
+            this.RightTableColumn});
+            this.list_join_config.GridColor = System.Drawing.SystemColors.GrayText;
+            this.list_join_config.Location = new System.Drawing.Point(19, 42);
+            this.list_join_config.Name = "list_join_config";
+            this.list_join_config.RowHeadersWidth = 25;
+            this.list_join_config.RowTemplate.Height = 24;
+            this.list_join_config.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.list_join_config.Size = new System.Drawing.Size(1238, 288);
+            this.list_join_config.TabIndex = 7;
+            // 
+            // LeftTableName
+            // 
+            this.LeftTableName.DataSource = this.binding_source_table_name;
+            this.LeftTableName.HeaderText = "Left Table Name";
+            this.LeftTableName.MinimumWidth = 6;
+            this.LeftTableName.Name = "LeftTableName";
+            this.LeftTableName.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.LeftTableName.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this.LeftTableName.Width = 145;
+            // 
+            // LeftTableColumn
+            // 
+            this.LeftTableColumn.DataSource = this.binding_source_column_name;
+            this.LeftTableColumn.HeaderText = "Left Table Column";
+            this.LeftTableColumn.MinimumWidth = 6;
+            this.LeftTableColumn.Name = "LeftTableColumn";
+            this.LeftTableColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.LeftTableColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this.LeftTableColumn.Width = 155;
+            // 
+            // RightTableName
+            // 
+            this.RightTableName.DataSource = this.binding_source_table_name;
+            this.RightTableName.HeaderText = "Right Table Name";
+            this.RightTableName.MinimumWidth = 6;
+            this.RightTableName.Name = "RightTableName";
+            this.RightTableName.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.RightTableName.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this.RightTableName.Width = 155;
+            // 
+            // RightTableColumn
+            // 
+            this.RightTableColumn.DataSource = this.binding_source_column_name;
+            this.RightTableColumn.HeaderText = "Right Table Column";
+            this.RightTableColumn.MinimumWidth = 6;
+            this.RightTableColumn.Name = "RightTableColumn";
+            this.RightTableColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.RightTableColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this.RightTableColumn.Width = 160;
             // 
             // SelectForm
             // 
@@ -193,7 +246,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ClientSize = new System.Drawing.Size(1321, 756);
-            this.Controls.Add(this.panel_join_config);
+            this.Controls.Add(this.list_join_config);
             this.Controls.Add(this.list_column_config);
             this.Controls.Add(this.button_column_config);
             this.Controls.Add(this.label_column_config);
@@ -204,6 +257,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.list_column_config)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.binding_source_table_name)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.binding_source_column_name)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.list_join_config)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -218,7 +272,6 @@
         private System.Windows.Forms.DataGridView list_column_config;
         private System.Windows.Forms.BindingSource binding_source_table_name;
         private System.Windows.Forms.BindingSource binding_source_column_name;
-        private System.Windows.Forms.FlowLayoutPanel panel_join_config;
         private System.Windows.Forms.DataGridViewComboBoxColumn table_name;
         private System.Windows.Forms.DataGridViewComboBoxColumn col_name;
         private System.Windows.Forms.DataGridViewComboBoxColumn Aggregate;
@@ -227,5 +280,10 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn filter;
         private System.Windows.Forms.DataGridViewCheckBoxColumn group_by;
         private System.Windows.Forms.DataGridViewTextBoxColumn having;
+        private System.Windows.Forms.DataGridView list_join_config;
+        private System.Windows.Forms.DataGridViewComboBoxColumn LeftTableName;
+        private System.Windows.Forms.DataGridViewComboBoxColumn LeftTableColumn;
+        private System.Windows.Forms.DataGridViewComboBoxColumn RightTableName;
+        private System.Windows.Forms.DataGridViewComboBoxColumn RightTableColumn;
     }
 }

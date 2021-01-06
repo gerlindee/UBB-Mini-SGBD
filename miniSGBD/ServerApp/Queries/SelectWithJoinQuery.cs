@@ -3,7 +3,7 @@ using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Collections; 
+using System.Collections;
 using Utils;
 
 namespace ServerApp.Queries
@@ -22,11 +22,11 @@ namespace ServerApp.Queries
         // Key = TableName, Value = list of (ColumnName, AliasName) 
         private List<KeyValuePair<string, List<Tuple<string, string>>>> OutputParamsAliasList;
         private List<KeyValuePair<string, List<Tuple<string, string>>>> WhereConditionsList;
-        private List<KeyValuePair<string, List<Tuple<string, string>>>> AggregateFunctionList;
-        private List<KeyValuePair<string, List<Tuple<string, string>>>> HavingParamsList;
+        private List<Tuple<string, string>> AggregateFunctionList = new List<Tuple<string, string>>();
+        private List<Tuple<Tuple<string, string>, string>> HavingParamsList = new List<Tuple<Tuple<string, string>, string>>();
 
         // Key = TableName, Value = list of ColumnName
-        private List<KeyValuePair<string, List<string>>> GroupByList;
+        private List<Tuple<Tuple<string, string>, string>> GroupByList = new List<Tuple<Tuple<string, string>, string>>();
 
         public SelectWithJoinQuery(string _databaseName, string _attributes)
         {
@@ -40,9 +40,9 @@ namespace ServerApp.Queries
             SelectConfigList = new List<SelectRowInfo>();
             OutputParamsAliasList = new List<KeyValuePair<string, List<Tuple<string, string>>>>();
             WhereConditionsList = new List<KeyValuePair<string, List<Tuple<string, string>>>>();
-            AggregateFunctionList = new List<KeyValuePair<string, List<Tuple<string, string>>>>();
-            GroupByList = new List<KeyValuePair<string, List<string>>>();
-            HavingParamsList = new List<KeyValuePair<string, List<Tuple<string, string>>>>();
+            AggregateFunctionList = new List<Tuple<string, string>>();
+            GroupByList = new List<Tuple<Tuple<string, string>, string>>();
+            HavingParamsList = new List<Tuple<Tuple<string, string>, string>>();
         }
 
         public override void ParseAttributes()
@@ -125,38 +125,20 @@ namespace ServerApp.Queries
 
                 if (column.GroupBy)
                 {
-                    var groupByOption = new KeyValuePair<string, List<string>>();
-                    if (!GroupByList.Any(elem => elem.Key == column.TableName))
-                    {
-                        GroupByList.Add(new KeyValuePair<string, List<string>>(column.TableName, new List<string>()));
-                    }
-                    groupByOption = GroupByList.Find(elem => elem.Key == column.TableName);
-
-                    groupByOption.Value.Add(column.ColumnName);
+                    GroupByList.Add(new Tuple<Tuple<string, string>, string>(new Tuple<string, string>(column.TableName, column.ColumnName), column.ColumnName));
                 }
 
                 if (column.Having != "-")
                 {
-                    var havingOption = new KeyValuePair<string, List<Tuple<string, string>>>();
-                    if (!HavingParamsList.Any(elem => elem.Key == column.TableName))
-                    {
-                        HavingParamsList.Add(new KeyValuePair<string, List<Tuple<string, string>>>(column.TableName, new List<Tuple<string, string>>()));
-                    }
-                    havingOption = HavingParamsList.Find(elem => elem.Key == column.TableName);
-
-                    havingOption.Value.Add(new Tuple<string, string>(column.ColumnName, column.Having));
+                    HavingParamsList.Add(new Tuple<Tuple<string, string>, string>(new Tuple<string, string>(column.TableName, column.ColumnName), column.Having));
                 }
 
                 if (column.Aggregate != "-")
                 {
-                    var aggregateOption = new KeyValuePair<string, List<Tuple<string, string>>>();
-                    if (!AggregateFunctionList.Any(elem => elem.Key == column.TableName))
+                    if (column.Aggregate != "-")
                     {
-                        AggregateFunctionList.Add(new KeyValuePair<string, List<Tuple<string, string>>>(column.TableName, new List<Tuple<string, string>>()));
+                        AggregateFunctionList.Add(new Tuple<string, string>(column.ColumnName, column.Aggregate));
                     }
-                    aggregateOption = AggregateFunctionList.Find(elem => elem.Key == column.TableName);
-
-                    aggregateOption.Value.Add(new Tuple<string, string>(column.ColumnName, column.Aggregate));
                 }
             }
         }
@@ -165,7 +147,7 @@ namespace ServerApp.Queries
         {
             try
             {
-                 ParseAttributes();
+                ParseAttributes();
                 return Commands.MapCommandToSuccessResponse(Commands.SELECT_RECORDS_WITH_JOIN) + ";" + SelectRecords();
             }
             catch (Exception ex)
@@ -181,7 +163,7 @@ namespace ServerApp.Queries
                 var interimJoinStructure = new List<string>();
                 var interimJoinRecords = new List<List<string>>();
 
-                for (int idx = 0;idx < SelectJoinInfo.Count; idx++)
+                for (int idx = 0; idx < SelectJoinInfo.Count; idx++)
                 {
                     var leftTable = SelectedTablesStructure.Find(elem => elem.Item1 == SelectJoinInfo[idx].LeftTableName);
                     var rightTable = SelectedTablesStructure.Find(elem => elem.Item1 == SelectJoinInfo[idx].RightTableName);
@@ -197,25 +179,57 @@ namespace ServerApp.Queries
                         var innerTableRecords = GetRecordsForSelectionIndex(rightIndex);
                         interimJoinRecords = PerformIndexedNestedLoopsJoin(interimJoinStructure, outerTableRecords, innerTableRecords, SelectJoinInfo[idx].LeftTableColumn, SelectJoinInfo[idx].RightTableName, true);
                     }
-                    else 
+                    else
                     {
-                        interimJoinStructure = JoinTableStructures(interimJoinStructure, rightTable.Item2);
                         if (leftIndex != "")
                         {
                             // Perform Index Nested Loops with the left table as an inner 
+                            interimJoinStructure = JoinTableStructures(interimJoinStructure, rightTable.Item2);
                             var outerTableRecords = GetRecordsForSelection(rightTable.Item1);
                             interimJoinRecords = PerformIndexedNestedLoopsJoin(interimJoinStructure, interimJoinRecords, outerTableRecords, SelectJoinInfo[idx].RightTableColumn, SelectJoinInfo[idx].RightTableName, false);
                         }
                         else
                         {
                             // No Index on the join column => Perform Hash Join
+                            if (interimJoinRecords.Count != 0)
+                            {
+                                interimJoinStructure = JoinTableStructures(interimJoinStructure, rightTable.Item2);
+                            }
+                            else
+                            {
+                                interimJoinRecords = GetRecordsForSelection(leftTable.Item1);
+                                interimJoinStructure = JoinTableStructures(leftTable.Item2, rightTable.Item2);
+                            }
                             var outerTableRecords = GetRecordsForSelection(rightTable.Item1);
                             interimJoinRecords = PerformHashJoin(interimJoinStructure, interimJoinRecords, outerTableRecords, SelectJoinInfo[idx].LeftTableColumn, SelectJoinInfo[idx].RightTableColumn, SelectedTablesStructure.Find(elem => elem.Item1 == SelectJoinInfo[idx].RightTableName).Item2);
                         }
                     }
                 }
 
-                 return ReturnOutputHeader() + ";" + PerformProjection(interimJoinRecords, interimJoinStructure);
+                if (GroupByList.Count > 0)
+                {
+                    var groupByRecords = new List<string>();
+                    foreach (var record in interimJoinRecords)
+                    {
+                        var stringRecord = "";
+                        foreach (var col in record)
+                        {
+                            stringRecord += col + "#";
+                        }
+                        groupByRecords.Add(stringRecord.Remove(stringRecord.Length - 1));
+                    }
+
+                    var groups = ApplyGroupBy(groupByRecords, interimJoinStructure);
+                    var output = "";
+                    foreach (var group in groups)
+                    {
+                        output += group + "|";
+                    }
+
+                    return ReturnOutputHeader() + ";" + output.Remove(output.Length - 1);
+                }
+
+                return ReturnOutputHeader() + ";" + PerformProjection(interimJoinRecords, interimJoinStructure);
             }
             catch (Exception ex)
             {
@@ -498,7 +512,7 @@ namespace ServerApp.Queries
                         }
                     }
                 }
-            }    
+            }
 
             return true;
         }
@@ -628,7 +642,7 @@ namespace ServerApp.Queries
             foreach (var record in leftTableRecords)
             {
                 var joinColumnValue = record[joinStructure.IndexOf(leftTableColumn)];
-                if(!hashTable.ContainsKey(joinColumnValue))
+                if (!hashTable.ContainsKey(joinColumnValue))
                 {
                     hashTable.Add(joinColumnValue, new List<string>());
                 }
@@ -685,7 +699,7 @@ namespace ServerApp.Queries
                 outRecords = outRecords.Remove(outRecords.Length - 1) + "|";
             }
 
-            return outRecords.Remove(outRecords.Length - 1); 
+            return outRecords.Remove(outRecords.Length - 1);
         }
 
         private string ReturnOutputHeader()
@@ -712,5 +726,177 @@ namespace ServerApp.Queries
 
             return conditions;
         }
+
+        private List<string> ApplyGroupBy(List<string> records, List<string> structure)
+        {
+            var group = GroupByList[0].Item2;
+            var groupByPK = new List<KeyValuePair<string, List<string>>>();
+            var result = new List<string>();
+
+            foreach (var rec in records)
+            {
+                var recordSplit = rec.Split('#');
+                var value = recordSplit[structure.IndexOf(group)];
+                if (!groupByPK.Any(elem => elem.Key == value))
+                {
+                    groupByPK.Add(new KeyValuePair<string, List<string>>(value, new List<string>()));
+                }
+                groupByPK.Find(elem => elem.Key == value).Value.Add(rec);
+            }
+
+            foreach (var record in groupByPK)
+            {
+                var aggregate = ApplyAggregate(record.Value, structure);
+
+                var havingCond = HavingParamsList[0].Item2;
+                if (RecordMatchesHaving(aggregate[0], havingCond))
+                {
+                    var outputColums = record.Value[0];
+
+                    var outputRecord = aggregate[0] + '#';
+                    var recordSplit = outputColums.Split('#');
+
+                    outputRecord += recordSplit[structure.IndexOf(OutputParamsAliasList[1].Value[0].Item2)] + "#";
+                    outputRecord += recordSplit[structure.IndexOf(OutputParamsAliasList[1].Value[1].Item2)] + "#";
+
+                    result.Add(outputRecord.Remove(outputRecord.Length - 1));
+                }
+            }
+
+            return result;
+        }
+
+        private List<string> ApplyAggregate(List<string> records, List<string> structure)
+        {
+            var outputColumns = new List<string>();
+            var groups = new List<List<Tuple<string, string>>>();
+            // Collect the result of the aggregations => This will always be one row 
+            foreach (var output in AggregateFunctionList)
+            {
+                var selectedColumns = new List<Tuple<string, string>>();
+
+                foreach (var record in records)
+                {
+                    var recordSplit = record.Split('#');
+                    selectedColumns.Add(new Tuple<string, string>(recordSplit[0], recordSplit[structure.IndexOf(output.Item1)]));
+                }
+                groups.Add(selectedColumns);
+            }
+
+            const string COUNT = "COUNT";
+            const string MIN = "MIN";
+            const string MAX = "MAX";
+
+            for (var i = 0; i < AggregateFunctionList.Count; i++)
+            {
+                switch (AggregateFunctionList[i].Item2)
+                {
+                    case COUNT:
+                        var distinct = groups[i].Select(x => x.Item2).Distinct().ToList();
+                        outputColumns.Add(distinct.Count.ToString());
+                        break;
+                    case MIN:
+                        var min = groups[i].Min(x => Int32.Parse(x.Item2));
+                        outputColumns.Add(min.ToString());
+                        break;
+                    case MAX:
+                        var max = groups[i].Max(x => Int32.Parse(x.Item2));
+                        outputColumns.Add(max.ToString());
+                        break;
+                }
+            }
+            return outputColumns;
+        }
+
+        private bool RecordMatchesHaving(string record, string condition)
+        {
+            var conditionOperator = condition.Split(' ')[0];
+            var conditionValue = condition.Split(' ')[1];
+
+            if (conditionOperator == "=" && record != conditionValue)
+            {
+                return false;
+            }
+
+            if (conditionOperator == "<>" && record == conditionValue)
+            {
+                return false;
+            }
+
+            if (conditionOperator == "<")
+            {
+                if (int.TryParse(record, out int convertedColumn) && int.TryParse(conditionValue, out int convertedValue))
+                {
+                    if (convertedColumn >= convertedValue)
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    if (record.CompareTo(conditionValue) >= 0)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            if (conditionOperator == ">")
+            {
+                if (int.TryParse(record, out int convertedColumn) && int.TryParse(conditionValue, out int convertedValue))
+                {
+                    if (convertedColumn <= convertedValue)
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    if (record.CompareTo(conditionValue) <= 0)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            if (conditionOperator == "<=")
+            {
+                if (int.TryParse(record, out int convertedColumn) && int.TryParse(conditionValue, out int convertedValue))
+                {
+                    if (convertedColumn > convertedValue)
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    if (record.CompareTo(conditionValue) > 0)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            if (conditionOperator == ">=")
+            {
+                if (int.TryParse(record, out int convertedColumn) && int.TryParse(conditionValue, out int convertedValue))
+                {
+                    if (convertedColumn < convertedValue)
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    if (record.CompareTo(conditionValue) < 0)
+                    {
+                        return false;
+                    }
+                }
+
+            }
+            return true;
+        }
     }
 }
+
